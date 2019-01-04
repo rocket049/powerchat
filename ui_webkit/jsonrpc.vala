@@ -3,19 +3,22 @@ public class RpcClient:GLib.Object{
     public Jsonrpc.Client c;
     public int counter{get;set;default=0;}
     public bool connect(string host,uint16 port){
-        try{
-            Resolver resolver = Resolver.get_default ();
-            List<InetAddress> addresses = resolver.lookup_by_name (host, null);
-            InetAddress address = addresses.nth_data (0);
-            SocketClient client = new SocketClient ();
-            SocketConnection conn = client.connect(new InetSocketAddress (address, port));
+        Resolver resolver = Resolver.get_default ();
+		List<InetAddress> addresses = resolver.lookup_by_name (host, null);
+		for(uint i=0;i<addresses.length();i++){
+			try{
+				
+				InetAddress address = addresses.nth_data (i);
+				SocketClient client = new SocketClient ();
+				SocketConnection conn = client.connect(new InetSocketAddress (address, port));
 
-            this.c = new Jsonrpc.Client(conn);
-            return true;
-        }catch (Error e) {
-            stdout.printf ("Error: %s\n", e.message);
-            return false;
-        }
+				this.c = new Jsonrpc.Client(conn);
+				return true;
+			}catch (Error e) {
+				stdout.printf ("Error: %s\n", e.message);
+			}
+		}
+		return false;
     }
     public int64 login(string name, string pwd,out UserData u){
         var params = new Variant.parsed("{'Name':<%s>,'Pwd':<%s>}",name,pwd);
