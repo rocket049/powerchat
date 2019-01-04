@@ -239,13 +239,17 @@ public class RpcClient:GLib.Object{
 	}
 	public bool add_user(string name,string pwd,int sex,int birthyear,string desc){
 		var params = new GLib.Variant.parsed("{'Name':<%s>,'Sex':<%i>,'Birth':<%i>,'Desc':<%s>,'Pwd':<%s>}",name,sex,birthyear,desc,pwd);
-		//GLib.Variant res;
+		GLib.Variant res;
 		try{
-            c.call_async.begin("PClient.NewUser",params,null,(s,r)=>{c.call_async.end(r,null);});
-            
-            return true;
+            var ok = c.call("PClient.NewUser",params,null,out res);
+            if(ok==false)
+				return false;
+			if(res.get_int64()==1)
+				return true;
+			else
+				return false;
         }catch (Error e) {
-            stdout.printf ("Error: %s\n", e.message);
+            stdout.printf ("add user Error: %s\n", e.message);
             return false;
         }
 	}

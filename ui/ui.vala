@@ -289,11 +289,16 @@ list{
 		});
         user_btn.clicked.connect (() => {
 			// Emitted when the button has been activated:
-			this.add_left_name_icon(@"登录用户：$(this.uname) 的情况",1);
+			var dlg_user = new Gtk.MessageDialog(app, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
+			dlg_user.text = @"登录用户：$(this.uname) 的情况";
 			var sex="男";
 			if (this.usex==2)
 				sex="女";
-            this.add_text(@"ID:$(this.uid)\n年龄：$(this.uage)\n性别：$(sex)\n自述：$(this.udesc)");
+            dlg_user.secondary_text = @"ID:$(this.uid)\n年龄：$(this.uage)\n性别：$(sex)\n自述：$(this.udesc)";
+            dlg_user.show();
+            dlg_user.response.connect((rid)=>{
+				dlg_user.destroy();
+			});
 		});
         b7.clicked.connect (() => {
 			// 发送信息

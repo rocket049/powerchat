@@ -71,8 +71,15 @@ public class AddUserDialog: GLib.Object{
 					grid1.usex = u.sex;
 					grid1.uage = u.age;
 					grid1.udesc = u.desc;
+					grid1.user_btn.label = u.name;
 				}else{
+					this.dlg1.title = "用户／密码错误。";
 					stdout.printf("login fail\n");
+					return;
+				}
+				if(rpc1.get_friends_async()==false){
+					print("RPC error");
+					Gtk.main_quit();
 				}
 				this.dlg1.hide();
 				app.show_all();

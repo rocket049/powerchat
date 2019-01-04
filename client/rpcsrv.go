@@ -77,6 +77,12 @@ func (c *PClient) NewUser(p NUParam, res *int) error {
 	}
 	msg, _ := MsgEncode(CmdRegister, 0, 0, b)
 	c.conn.Write(msg)
+	ret := <-cmdChan
+	if ret.Cmd == CmdRegResult && string(ret.Msg[0:2]) == "OK" {
+		*res = 1
+	} else {
+		*res = -1
+	}
 	return nil
 }
 
