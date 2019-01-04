@@ -50,7 +50,7 @@ func client() {
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
 	//go httpServe(conn1)
-	go startMyHttpServe(filepath.Join(os.Getenv("HOME"), "MyShare"), fmt.Sprintf("localhost:%d", proxyPort))
+	go startMyHttpServe(filepath.Join(os.Getenv("HOME"), "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	go readConn(conn1)
 	ok := <-res1
 	close(res1)
