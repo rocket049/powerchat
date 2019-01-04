@@ -26,7 +26,7 @@ public class MyGrid: GLib.Object{
 	public Gtk.Entry port1;
 	int64 to;
 	bool running = true;
-	public MyBrowser browser;
+	//public MyBrowser browser;
 
 	public Gtk.Grid mygrid;
 	Gee.HashMap<string,UserData?> frds1;
@@ -48,7 +48,7 @@ public class MyGrid: GLib.Object{
 	Gtk.CssProvider cssp;
 	Gtk.ScrolledWindow msg_win;
 	public MyGrid(){
-		this.browser = new MyBrowser();
+		//this.browser = new MyBrowser();
 		this.frds1 = new Gee.HashMap<string,UserData?>();
 		this.frd_boxes = new Gee.HashMap<string,weak Gtk.Grid?>();
 		this.mygrid = new Gtk.Grid();

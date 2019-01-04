@@ -1,7 +1,4 @@
 using Jsonrpc;
-using Gtk;
-using Gdk;
-
 public class RpcClient:GLib.Object{
     public Jsonrpc.Client c;
     public int counter{get;set;default=0;}
@@ -214,8 +211,7 @@ public class RpcClient:GLib.Object{
             c.call_async.begin("PClient.HttpConnect",params,null,(s,r)=>{
 				c.call_async.end(r,null);
 				//print("URL http://localhost:$(server_port)/");
-				//grid1.browser.open(@"http://localhost:$(server_port)/");
-				Gtk.show_uri(null,@"http://localhost:$(server_port)/",Gdk.CURRENT_TIME);
+				grid1.browser.open(@"http://localhost:$(server_port)/");
 			});
             return true;
         }catch (Error e) {

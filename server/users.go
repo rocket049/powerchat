@@ -26,6 +26,7 @@ func init() {
 	var err error
 	exe1, _ := os.Executable()
 	dbstore = filepath.Join(filepath.Dir(exe1), "dbstore")
+	os.MkdirAll(dbstore, os.ModePerm)
 	db, err = sql.Open("sqlite3", filepath.Join(dbstore, "users.db"))
 	if err != nil {
 		panic(err)
