@@ -9,7 +9,7 @@ public class MyFriendMenu : Gtk.Menu{
 		friend_id = id;
 	}
 	public MyFriendMenu(){
-		var item1 = new Gtk.MenuItem.with_label ("删除");
+		var item1 = new Gtk.MenuItem.with_label (_("Delete"));
 		item1.activate.connect(()=>{
 			stdout.printf("menu: %s\n",this.friend_id);
 			grid1.remove_friend(this.friend_id);

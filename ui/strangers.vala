@@ -12,16 +12,16 @@ public class StrangersDialg:GLib.Object{
 		this.get_msgs();
 	}
 	public void create_dialg(){
-		this.dlg1 = new Gtk.Dialog.with_buttons("陌生人信息",app,Gtk.DialogFlags.MODAL);
+		this.dlg1 = new Gtk.Dialog.with_buttons(_("Information of Strangers"),app,Gtk.DialogFlags.MODAL);
 		var view = new Gtk.TreeView.with_model(this.store1);
 		//Gtk.CellRendererText cell = new Gtk.CellRendererText ();
-		view.insert_column_with_attributes (0, "名称", new Gtk.CellRendererText (), "text",0,"background",7);
-		view.insert_column_with_attributes (1, "留言", new Gtk.CellRendererText (), "text",1,"background",7);
-		view.insert_column_with_attributes (2, "时间", new Gtk.CellRendererText (), "text",2,"background",7);
+		view.insert_column_with_attributes (0, _("Name"), new Gtk.CellRendererText (), "text",0,"background",7);
+		view.insert_column_with_attributes (1, _("Said"), new Gtk.CellRendererText (), "text",1,"background",7);
+		view.insert_column_with_attributes (2, _("Time"), new Gtk.CellRendererText (), "text",2,"background",7);
 		view.insert_column_with_attributes (3, "ID", new Gtk.CellRendererText (), "text",3,"background",7);
-		view.insert_column_with_attributes (4, "性别", new Gtk.CellRendererText (), "text",4,"background",7);
-		view.insert_column_with_attributes (5, "年龄", new Gtk.CellRendererText (), "text",5,"background",7);
-		view.insert_column_with_attributes (6, "自述", new Gtk.CellRendererText (), "text",6,"background",7);
+		view.insert_column_with_attributes (4, _("Sex"), new Gtk.CellRendererText (), "text",4,"background",7);
+		view.insert_column_with_attributes (5, _("Age"), new Gtk.CellRendererText (), "text",5,"background",7);
+		view.insert_column_with_attributes (6, _("Description"), new Gtk.CellRendererText (), "text",6,"background",7);
 		view.headers_visible = true;
 		view.show_all();
 		
@@ -34,7 +34,7 @@ public class StrangersDialg:GLib.Object{
 		var content = this.dlg1.get_content_area () as Gtk.Box;
 		content.pack_start(scroll1);
 		
-		this.dlg1.add_button("关闭",2);
+		this.dlg1.add_button(_("Close"),2);
 		this.dlg1.response.connect((rid)=>{
 			this.dlg1.close();
 			(this.store1 as Gtk.TreeModel).foreach((m,p,iter)=>{
@@ -64,11 +64,11 @@ public class StrangersDialg:GLib.Object{
 		this.persons.append(u1);
 		Gtk.TreeIter iter;
 		this.store1.append (out iter);
-		string sex="不明";
+		string sex=_("Unknown");
 		if(u1.sex==1){
-			sex = "男";
+			sex = _("Man");
 		}else if(u1.sex==2){
-			sex = "女";
+			sex = _("Woman");
 		}
 		this.store1.set (iter, 0, u1.name, 1, u1.msg_offline,2,u1.timestamp_offline,3,u1.id,4,sex,5,u1.age,6,u1.desc,7,"#FFFFFF");
 		//stdout.printf("%s %s\n",u1.name,u1.desc);
@@ -77,11 +77,11 @@ public class StrangersDialg:GLib.Object{
 		this.persons.prepend(u1);
 		Gtk.TreeIter iter;
 		this.store1.prepend (out iter);
-		string sex="不明";
+		string sex=_("Unknown");
 		if(u1.sex==1){
-			sex = "男";
+			sex = _("Man");
 		}else if(u1.sex==2){
-			sex = "女";
+			sex = _("Woman");
 		}
 		this.store1.set (iter, 0, u1.name, 1, u1.msg_offline,2,u1.timestamp_offline,3,u1.id,4,sex,5,u1.age,6,u1.desc,7,"#F75656");
 		var sc1 = grid1.strangers_btn.get_style_context();

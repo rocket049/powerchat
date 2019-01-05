@@ -65,9 +65,6 @@ type NUParam struct {
 }
 
 func (c *PClient) NewUser(p NUParam, res *int) error {
-	//	pwdmd5 := md5.Sum([]byte(p.Name + p.Pwd))
-	//	e := make([]byte, 32)
-	//	hex.Encode(e, pwdmd5[:])
 	var user1 = &UserInfo{0, p.Name, p.Sex,
 		fmt.Sprintf("%d-01-01", p.Birth), p.Desc, string(newuserMd5(p.Name, p.Pwd))}
 	b, err := json.Marshal(user1)
@@ -116,17 +113,23 @@ func newuserMd5(name, pwd string) []byte {
 }
 
 //NewPasswd params Name,OldMd5-login中的算法,NewMd5-NewUser的算法
+func (c *PClient) NewPasswd(params []string, res *int) error {
+	msg1 := make(map[string][]byte)
+	msg1["old"] = loginMd5(params[0], params[1], c.token)
+	msg1["new"] = newuserMd5(params[0], params[2])
+	msg1["name"] = []byte(params[0])
+
+	msg2, err := json.Marshal(msg1)
+	if err != nil {
+		return err
+	}
+	msg, _ := MsgEncode(CmdUpdatePasswd, 0, 0, msg2)
+	c.conn.Write(msg)
+	return nil
+}
+
 //rpc service
 func (c *PClient) Login(p LogParam, res *FriendData) error {
-	//	buf := bytes.NewBufferString(p.Name)
-	//	buf.WriteString(p.Pwd)
-	//	var pwdmd5 = md5.Sum(buf.Bytes())
-	//	e := make([]byte, 32)
-	//	hex.Encode(e, pwdmd5[:])
-	//	bbuf := bytes.NewBufferString("")
-	//	bbuf.Write(c.token)
-	//	bbuf.Write(e)
-	//	b := md5.Sum(bbuf.Bytes())
 	dgam := &LogDgam{Name: p.Name, Pwdmd5: loginMd5(p.Name, p.Pwd, c.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)

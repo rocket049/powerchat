@@ -38,8 +38,8 @@ public class MyGrid: GLib.Object{
 	public Gtk.Button strangers_btn;
 	public Gtk.Button user_btn;
 
-	public string man_icon = "icons/man.png";
-	public string woman_icon = "icons/woman.png";
+	public string man_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","man.png");
+	public string woman_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","woman.png");
 	public int64 uid;
 	public int16 usex;
 	public string uname;
@@ -86,7 +86,7 @@ list{
 		this.mygrid.attach(scrollWin1,0,0,2,3);
 		this.friends = new Gtk.ListBox();
 		scrollWin1.add(this.friends);
-		var t1 = new Gtk.Label("我的朋友");
+		var t1 = new Gtk.Label(_("My Friends"));
 		this.friends.add(t1);
 		var r0 = (t1.parent as Gtk.ListBoxRow);
 		r0.set_selectable(false);
@@ -124,21 +124,23 @@ list{
 			}
 		});
 
-		var b1 = new Gtk.Button.with_label("找人");
+		var b1 = new Gtk.Button.with_label(_("Find Persons"));
 		this.mygrid.attach(b1,0,3,1,1);
 
-		strangers_btn = new Gtk.Button.with_label("陌生人");
+		strangers_btn = new Gtk.Button.with_label(_("Strangers"));
 		this.mygrid.attach(strangers_btn,1,3,1,1);
 
-		user_btn = new Gtk.Button.with_label("登录用户");
+		user_btn = new Gtk.Button.with_label(_("Current User"));
 		this.mygrid.attach(user_btn,2,0,1,1);
 		user_btn.hexpand = true;
 
-		var sp = new Gtk.Image();
-		sp.hexpand = true;
-		this.mygrid.attach(sp,3,0,1,1);
+		var pwd_btn = new Gtk.Button.with_label(_("UpdatePasswd"));
+		this.mygrid.attach(pwd_btn,3,0,1,1);
+		pwd_btn.clicked.connect(()=>{
+			this.update_pwd();
+		});
 
-		var b4 = new Gtk.Label("代理端口");
+		var b4 = new Gtk.Label(_("Proxy Port"));
 		b4.hexpand = true;
 		this.mygrid.attach(b4,4,0,1,1);
 
@@ -149,7 +151,7 @@ list{
 		port1.editable=false;
 		this.mygrid.attach(port1,5,0,1,1);
 
-		var b6 = new Gtk.Button.with_label("修改");
+		var b6 = new Gtk.Button.with_label(_("Modify"));
 		this.mygrid.attach(b6,6,0,1,1);
 
 		this.msg_win = new Gtk.ScrolledWindow(null,null);
@@ -160,17 +162,17 @@ list{
 		var grid1 = new Gtk.Grid();
 		this.mygrid.attach(grid1,2,2,5,2);
 
-		var bf1  = new Gtk.Button.with_label("文件");
+		var bf1  = new Gtk.Button.with_label(_("File"));
 		grid1.attach(bf1,0,0,1,1);
 
-		var bp1  = new Gtk.Button.with_label("图片");
+		var bp1  = new Gtk.Button.with_label(_("Image"));
 		grid1.attach(bp1,1,0,1,1);
 
 		this.entry1 = new Gtk.Entry();
 		grid1.attach(this.entry1,0,1,3,1);
 		this.entry1.hexpand = true;
 
-		var b7 = new Gtk.Button.with_label("发送");
+		var b7 = new Gtk.Button.with_label(_("Send"));
 		grid1.attach(b7,3,1,1,1);
 
 		this.mygrid.show.connect(()=>{
@@ -207,10 +209,10 @@ list{
 				return;
 			//file choose
 			Gtk.FileChooserDialog chooser = new Gtk.FileChooserDialog (
-				"Select your favorite file", app, Gtk.FileChooserAction.OPEN,
-				"_Cancel",
+				_("Select a file to send"), app, Gtk.FileChooserAction.OPEN,
+				_("Cancel"),
 				Gtk.ResponseType.CANCEL,
-				"_Open",
+				_("Open"),
 				Gtk.ResponseType.ACCEPT);
 			// Multiple files can be selected:
 			chooser.select_multiple = false;
@@ -237,10 +239,10 @@ list{
 				return;
 			//file choose
 			Gtk.FileChooserDialog chooser = new Gtk.FileChooserDialog (
-				"Select your favorite file", app, Gtk.FileChooserAction.OPEN,
-				"_Cancel",
+				_("Select a file to send"), app, Gtk.FileChooserAction.OPEN,
+				_("Cancel"),
 				Gtk.ResponseType.CANCEL,
-				"_Open",
+				_("Open"),
 				Gtk.ResponseType.ACCEPT);
 			// Multiple files can be selected:
 			chooser.select_multiple = false;
@@ -275,10 +277,10 @@ list{
 			// 修改代理端口
 			if(port1.editable==false){
 				port1.editable = true;
-				b6.set_label("保存");
+				b6.set_label(_("Save"));
 			}else{
 				port1.editable=false;
-				b6.set_label("修改");
+				b6.set_label(_("Modify"));
 				var ret = rpc1.set_proxy( (uint16)port1.text.to_int64() );
 				if(ret==false)
 					Gtk.main_quit();
@@ -290,11 +292,11 @@ list{
         user_btn.clicked.connect (() => {
 			// Emitted when the button has been activated:
 			var dlg_user = new Gtk.MessageDialog(app, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
-			dlg_user.text = @"登录用户：$(this.uname) 的情况";
-			var sex="男";
+			dlg_user.text = this.uname+_(" Details");
+			var sex=_("Man");
 			if (this.usex==2)
-				sex="女";
-            dlg_user.secondary_text = @"ID:$(this.uid)\n年龄：$(this.uage)\n性别：$(sex)\n自述：$(this.udesc)";
+				sex=_("Woman");
+            dlg_user.secondary_text = @"ID:$(this.uid)\n"+_("Age:")+@"$(this.uage)\n"+_("Sex:")+@"$(sex)\n"+_("Description:")+@"$(this.udesc)";
             dlg_user.show();
             dlg_user.response.connect((rid)=>{
 				dlg_user.destroy();
@@ -333,14 +335,49 @@ list{
 			var sc3 = grid.get_style_context();
 			sc3.remove_provider(this.mark1);
 			sc3.remove_class("mark");
-			//test css
-			/*
-			Gtk.Grid grid = this.frd_boxes[id.to_string()];
-			var sc3 = grid.get_style_context();
-			sc3.remove_provider(this.provider1);
-			* */
+
 			this.msg_win.show_all();
 		});
+	}
+	public void update_pwd(){
+		var dlg_pwd = new Gtk.Dialog.with_buttons(_("Update Password"),app,Gtk.DialogFlags.MODAL);
+		var grid = new Gtk.Grid();
+		grid.attach(new Gtk.Label(_("Input your new password")),0,0,2,1);
+		
+		grid.attach(new Gtk.Label(_("Old Password:")),0,1);
+		var pwd1 = new Gtk.Entry();
+		pwd1.set_visibility(false);
+		grid.attach(pwd1,1,1);
+		
+		grid.attach(new Gtk.Label(_("New Password:")),0,2);
+		var pwd2 = new Gtk.Entry();
+		pwd2.set_visibility(false);
+		grid.attach(pwd2,1,2);
+		
+		grid.attach(new Gtk.Label(_("Confirm Password:")),0,3);
+		var pwd3 = new Gtk.Entry();
+		pwd3.set_visibility(false);
+		grid.attach(pwd3,1,3);
+		
+		var content = dlg_pwd.get_content_area () as Gtk.Box;
+		content.pack_start(grid);
+		
+		dlg_pwd.add_button(_("Update"),2);
+		dlg_pwd.add_button(_("Cancel"),3);
+		
+		dlg_pwd.response.connect((rid)=>{
+			if(rid==3){
+				dlg_pwd.destroy();
+			}else if(rid==2){
+				if (pwd2.text != pwd3.text){
+					dlg_pwd.title = _("Confirm Fail!");
+					return;
+				}
+				rpc1.update_pwd(this.uname,pwd1.text,pwd2.text);
+				dlg_pwd.destroy();
+			}
+		});
+		dlg_pwd.show_all();
 	}
 	Gee.HashMap<string,Gtk.ListBox?> boxes = new Gee.HashMap<string,Gtk.ListBox?>();
 	//Gtk.ListBox hides = new Gtk.ListBox();
@@ -353,7 +390,7 @@ list{
 		//this.msgs.modify_bg(Gtk.StateType.NORMAL,color1);
 		//this.msg_win.add(box);
 		var u1 = this.frds1[uid.to_string()];
-		var t2 = new Gtk.Label(@"和 $(u1.name) 聊天");
+		var t2 = new Gtk.Label(_("Chat To: ")+u1.name);
 		box.add(t2);
 		(t2.parent as Gtk.ListBoxRow).set_selectable(false);
 
@@ -366,7 +403,7 @@ list{
 		if (u1.timestamp_offline.length > 10){
 			//insert offline message
 			add_right_name_icon(u1.name,u1.sex);
-			add_text(@"离线信息：[$(u1.timestamp_offline)]\n$(u1.msg_offline)");
+			add_text(_("Offline Message:")+@"[$(u1.timestamp_offline)]\n$(u1.msg_offline)");
 		}
 		this.msg_win.show_all();
 
@@ -561,7 +598,7 @@ list{
 				//show msg
 				var tmp = this.msgs;
 				this.msgs = this.boxes[off_id];
-				this.add_text("[离线状态]",false);
+				this.add_text(_("[Offline]"),false);
 				this.msgs = tmp;
 				GLib.Idle.add(()=>{
 					var adj1 = this.msgs.get_adjustment();
@@ -683,7 +720,7 @@ list{
 public class AppWin:Gtk.Window{
 	public AppWin(){
 		// Sets the title of the Window:
-		this.title = "人人公众号";
+		this.title = _("Everyone Publish!");
 
 		// Center window at startup:
 		this.window_position = Gtk.WindowPosition.CENTER;
@@ -694,7 +731,7 @@ public class AppWin:Gtk.Window{
 		this.hide_titlebar_when_maximized = true;
 
         this.set_resizable(false);
-        this.set_icon_from_file("tank.png");
+        this.set_icon_from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","tank.png"));
 
 		// Method called on pressing [X]
 		this.destroy.connect (() => {
@@ -713,11 +750,11 @@ public class LoginDialog :GLib.Object{
 	public Gtk.Dialog dlg1;
 	//public Thread<int> thread;
 	public LoginDialog(){
-		this.dlg1 = new Gtk.Dialog.with_buttons("登录",app,Gtk.DialogFlags.MODAL);
+		this.dlg1 = new Gtk.Dialog.with_buttons(_("login"),app,Gtk.DialogFlags.MODAL);
 		var grid = new Gtk.Grid();
-		grid.attach(new Gtk.Label("输入登录信息"),0,0,2,1);
-		grid.attach(new Gtk.Label("用户："),0,1,1,1);
-		grid.attach(new Gtk.Label("密码："),0,2,1,1);
+		grid.attach(new Gtk.Label(_("Input name and password:")),0,0,2,1);
+		grid.attach(new Gtk.Label(_("Login Name：")),0,1,1,1);
+		grid.attach(new Gtk.Label(_("Password：")),0,2,1,1);
 		this.name = new Gtk.Entry();
 		grid.attach(this.name,1,1,1,1);
 		this.passwd = new Gtk.Entry();
@@ -726,9 +763,9 @@ public class LoginDialog :GLib.Object{
 		var content = this.dlg1.get_content_area () as Gtk.Box;
 		content.pack_start(grid);
 		content.show_all();
-		this.dlg1.add_button("登录",2);
-		this.dlg1.add_button("注册",4);
-		this.dlg1.add_button("取消",3);
+		this.dlg1.add_button(_("Login"),2);
+		this.dlg1.add_button(_("Register"),4);
+		this.dlg1.add_button(_("Cancel"),3);
 
 		this.dlg1.response.connect((rid)=>{
 			if (rid==2){
@@ -744,7 +781,7 @@ public class LoginDialog :GLib.Object{
 					grid1.udesc = u.desc;
 					grid1.user_btn.label = u.name;
 				}else{
-					this.dlg1.title = "用户／密码错误。";
+					this.dlg1.title = _("Name/Password Error!");
 					stdout.printf("login fail\n");
 					return;
 				}
@@ -770,9 +807,18 @@ public class LoginDialog :GLib.Object{
 		this.dlg1.hide();
 	}
 }
+public static string prog_path;
+public void set_my_locale(string path1){
+	var dir1 = GLib.Path.get_dirname(path1);
+	prog_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_current_dir(),dir1);
+	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"locale");
+	GLib.Intl.textdomain("powerchat");
+	GLib.Intl.bindtextdomain("powerchat",textpath);
+}
 static uint16 server_port=7890;
 static uint16 proxy_port;
 public static int main(string[] args){
+	set_my_locale(args[0]);
 	if (!Thread.supported()) {
 		stderr.printf("Cannot run without threads.\n");
 		return 1;

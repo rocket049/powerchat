@@ -1,0 +1,240 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-01-05 19:03+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ui.vala:89
+msgid "My Friends"
+msgstr "我的朋友"
+
+#: ui.vala:127 search.vala:12
+msgid "Find Persons"
+msgstr "找人"
+
+#: ui.vala:130
+msgid "Strangers"
+msgstr "陌生人"
+
+#: ui.vala:133
+msgid "Current User"
+msgstr "当前用户"
+
+#: ui.vala:137
+msgid "UpdatePasswd"
+msgstr "改密码"
+
+#: ui.vala:141
+msgid "Proxy Port"
+msgstr "代理端口"
+
+#: ui.vala:152 ui.vala:281
+msgid "Modify"
+msgstr "修改"
+
+#: ui.vala:163
+msgid "File"
+msgstr "文件"
+
+#: ui.vala:166
+msgid "Image"
+msgstr "图片"
+
+#: ui.vala:173
+msgid "Send"
+msgstr "发送"
+
+#: ui.vala:212 ui.vala:242
+msgid "Select a file to send"
+msgstr "选择要发送的文件"
+
+#: ui.vala:215 ui.vala:245
+msgid "Open"
+msgstr "打开"
+
+#: ui.vala:278
+msgid "Save"
+msgstr "保存"
+
+#: ui.vala:293
+msgid " Details"
+msgstr "的详细情况"
+
+#: ui.vala:294 adduser.vala:39 search.vala:69 strangers.vala:69
+#: strangers.vala:82
+msgid "Man"
+msgstr "男"
+
+#: ui.vala:296 adduser.vala:40 search.vala:71 strangers.vala:71
+#: strangers.vala:84
+msgid "Woman"
+msgstr "女"
+
+#: ui.vala:297
+msgid "Age:"
+msgstr "年龄："
+
+#: ui.vala:297 adduser.vala:42
+msgid "Sex:"
+msgstr "性别："
+
+#: ui.vala:297 adduser.vala:48
+msgid "Description:"
+msgstr "自述："
+
+#: ui.vala:343
+msgid "Update Password"
+msgstr "修改密码"
+
+#: ui.vala:345
+msgid "Input your new password"
+msgstr "输入你的新密码"
+
+#: ui.vala:347
+msgid "Old Password:"
+msgstr "旧密码："
+
+#: ui.vala:352
+msgid "New Password:"
+msgstr "新密码："
+
+#: ui.vala:357
+msgid "Confirm Password:"
+msgstr "确认密码："
+
+#: ui.vala:365
+msgid "Update"
+msgstr "跟新"
+
+#: ui.vala:373
+msgid "Confirm Fail!"
+msgstr ""
+
+#: ui.vala:356
+msgid "Chat To: "
+msgstr "聊天对象："
+
+#: ui.vala:369
+msgid "Offline Message:"
+msgstr "离线信息"
+
+#: ui.vala:564
+msgid "[Offline]"
+msgstr "[离线]"
+
+#: ui.vala:686
+msgid "Everyone Publish!"
+msgstr "人人公众号"
+
+#: ui.vala:716
+msgid "login"
+msgstr "登录"
+
+#: ui.vala:718
+msgid "Input name and password:"
+msgstr "输入名称和密码："
+
+#: ui.vala:719
+msgid "Login Name："
+msgstr "名称："
+
+#: ui.vala:720
+msgid "Password："
+msgstr "密码："
+
+#: ui.vala:729
+msgid "Login"
+msgstr "登录"
+
+#: ui.vala:730 adduser.vala:11 adduser.vala:55
+msgid "Register"
+msgstr "注册"
+
+#: ui.vala:731 adduser.vala:56
+msgid "Cancel"
+msgstr "取消"
+
+#: ui.vala:747 adduser.vala:76
+msgid "Name/Password Error!"
+msgstr "名称／密码错误！"
+
+#: adduser.vala:13
+msgid "Input your information"
+msgstr "输入注册信息"
+
+#: adduser.vala:14
+msgid "Name:"
+msgstr "名称："
+
+#: adduser.vala:18
+msgid "Password:"
+msgstr "密码："
+
+#: adduser.vala:31
+msgid "Born Year:"
+msgstr "出生年份："
+
+#: adduser.vala:62
+msgid "Register Fail!"
+msgstr "注册失败！"
+
+#: search.vala:14
+msgid "(part of)Name："
+msgstr "名称（部分）："
+
+#: search.vala:17
+msgid "Search"
+msgstr "搜索"
+
+#: search.vala:25 strangers.vala:18
+msgid "Name"
+msgstr "名称"
+
+#: search.vala:26 strangers.vala:22
+msgid "Sex"
+msgstr "性别"
+
+#: search.vala:27 strangers.vala:23
+msgid "Age"
+msgstr "年龄"
+
+#: search.vala:28 strangers.vala:24
+msgid "Description"
+msgstr "自述"
+
+#: search.vala:41 strangers.vala:37
+msgid "Close"
+msgstr "关闭"
+
+#: search.vala:67 strangers.vala:67 strangers.vala:80
+msgid "Unknown"
+msgstr "未知"
+
+#: popup.vala:12
+msgid "Delete"
+msgstr "删除"
+
+#: strangers.vala:15
+msgid "Information of Strangers"
+msgstr "陌生人信息"
+
+#: strangers.vala:19
+msgid "Said"
+msgstr "留言"
+
+#: strangers.vala:20
+msgid "Time"
+msgstr "时间"

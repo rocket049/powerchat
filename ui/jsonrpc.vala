@@ -62,6 +62,16 @@ public class RpcClient:GLib.Object{
             return -1;
         }
     }
+    public bool update_pwd(string name,string pwd1,string pwd2){
+		var params = new Variant("(sss)",name,pwd1,pwd2);
+		try{
+            c.call_async.begin("PClient.NewPasswd",params,null,(s,r)=>{c.call_async.end(r,null);});
+            return true;
+        }catch (Error e) {
+            stdout.printf ("update_pwd Error: %s\n", e.message);
+            return false;
+        }
+	}
     public bool add_friend(int64 uid){
 		var params = new Variant("(i)",uid);
         //Variant res;

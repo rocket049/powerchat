@@ -43,6 +43,13 @@ func dbClose() {
 	dbMutex.Unlock()
 }
 
+func updatePasswd(id int64, pwdmd5 string) error {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+	_, err := db.Exec("update users set pwdmd5=? where id=?;", pwdmd5, id)
+	return err
+}
+
 //insertUser insert and return id
 func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int64, error) {
 	sql1 := "insert into users(name,sex,birthday,desc,pwdmd5) values(?,?,date(?),?,?);"

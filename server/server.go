@@ -157,6 +157,11 @@ func serveConn(conn1 net.Conn) {
 			} else {
 				client.Redirect(conn1, smsg)
 			}
+		case CmdUpdatePasswd:
+			err := client.UpdatePass(smsg)
+			if err != nil {
+				log.Printf("on CmdUpdatePasswd:%v\n", err)
+			}
 		default:
 			err := client.Redirect(conn1, smsg)
 			if err != nil {
@@ -294,22 +299,6 @@ func (c *ClientType) Redirect(conn1 io.Writer, msg *MsgType) error {
 	}
 	return nil
 }
-func (c *ClientType) RespTest(conn1 io.Writer, msg *MsgType) error {
-	log.Printf("Cmd:%d  From:%d  To:%d\n", msg.Cmd, msg.From, msg.To)
-	req, err := MsgEncode(CmdChat, 0, 100, []byte("OK"))
-	if err != nil {
-		log.Printf("MsgEncode:%v\n", err)
-		c.SysResp(conn1, CmdSysReturn, err.Error())
-		return err
-	}
-	_, err = io.Copy(conn1, bytes.NewBuffer(req))
-	if err != nil {
-		log.Printf("io.Copy:%v\n", err)
-		c.SysResp(conn1, CmdSysReturn, err.Error())
-		return err
-	}
-	return nil
-}
 
 func (c *ClientType) ServeReady(conn1 io.Writer) error {
 	var p = c.Token[:]
@@ -384,6 +373,31 @@ func (c *ClientType) Login(conn1 io.Writer, msg *MsgType) error {
 	reqb, _ := json.Marshal(u)
 	c.SysResp(conn1, CmdLogResult, string(reqb))
 	return nil
+}
+
+func (c *ClientType) UpdatePass(msg *MsgType) error {
+	info1 := make(map[string][]byte)
+	err := json.Unmarshal(msg.Msg, &info1)
+	if err != nil {
+		return err
+	}
+	name1 := string(info1["name"])
+	old1 := info1["old"]
+	new1 := info1["new"]
+
+	u, err := getUserByName(name1)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBufferString("")
+	buf.Write(c.Token[:])
+	buf.Write([]byte(u.Pwdmd5))
+	b := md5.Sum(buf.Bytes())
+	if bytes.Compare(b[:], old1) != 0 {
+		return errors.New("auth fail")
+	}
+
+	return updatePasswd(c.Id, string(new1))
 }
 
 func (c *ClientType) SysResp(conn1 io.Writer, cmd ChatCommand, s string) {
