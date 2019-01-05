@@ -216,7 +216,7 @@ public class RpcClient:GLib.Object{
         }
 	}
 	public bool send_file(int64 to , string pathname){
-		var params = new GLib.Variant.parsed("{'To':<%i>,'PathName':<%s>}",to,pathname);
+		var params = new GLib.Variant.parsed("{'To':<%i>,'PathName':<%s>}",to,to_utf8(pathname));
 		//GLib.Variant res;
 		try{
             c.call_async.begin("PClient.SendFile",params,null,(s,r)=>{
