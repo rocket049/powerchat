@@ -793,7 +793,7 @@ public static int main(string[] args){
 			var typ = (int8) p.lookup_value("T",null).get_int64();
 			var from = p.lookup_value("From",null).get_int64();
 			var msg = p.lookup_value("Msg",null).get_string();
-			grid1.rpc_callback(typ,from,msg);
+			grid1.rpc_callback(typ,from,to_local(msg));
 		}catch(Error e){
 			stdout.printf ("Error: %s\n", e.message);
 		}

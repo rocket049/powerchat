@@ -25,6 +25,7 @@ func newMyHandler(pathRoot string) *myHandler {
 }
 
 func startMyHttpServe(pathRoot, addr string) {
+	log.Println("www root:", pathRoot)
 	handler := newMyHandler(pathRoot)
 	http.ListenAndServe(addr, handler)
 }

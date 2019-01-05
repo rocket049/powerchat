@@ -2,6 +2,24 @@ using Jsonrpc;
 using Gtk;
 using Gdk;
 
+public string to_utf8(string s){
+	string codec;
+	if(GLib.get_charset(out codec)){
+		return s;
+	}else{
+		return GLib.convert(s,s.length,"UTF-8", codec);
+	}
+}
+
+public string to_local(string s){
+	string codec;
+	if(GLib.get_charset(out codec)){
+		return s;
+	}else{
+		return GLib.convert(s,s.length, codec,"UTF-8");
+	}
+}
+
 public class RpcClient:GLib.Object{
     public Jsonrpc.Client c;
     public int counter{get;set;default=0;}
@@ -24,7 +42,7 @@ public class RpcClient:GLib.Object{
 		return false;
     }
     public int64 login(string name, string pwd,out UserData u){
-        var params = new Variant.parsed("{'Name':<%s>,'Pwd':<%s>}",name,pwd);
+        var params = new Variant.parsed("{'Name':<%s>,'Pwd':<%s>}",to_utf8(name),pwd);
         Variant res;
         try{
             var ok = c.call("PClient.Login",params,null,out res);
@@ -37,7 +55,7 @@ public class RpcClient:GLib.Object{
             var uname = res.lookup_value("Name",null).get_string();
             var desc = res.lookup_value("Desc",null).get_string();
             var age = res.lookup_value("Age",null).get_int64();
-            u = {id,(int16)sex,uname,desc,(int16)age,"",""};
+            u = {id,(int16)sex,to_local(uname),to_local(desc),(int16)age,"",""};
             return id;
         }catch (Error e) {
             stdout.printf ("Error: %s\n", e.message);
@@ -55,36 +73,9 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
-	public bool search_person(string key,out GLib.List<UserData?> persons){
-		var params = new Variant("(s)",key);
-        Variant res;
-        try{
-            var ok = c.call("PClient.SearchPersons",params,null,out res);
-            if(ok==false)
-				return false;
-            persons = new GLib.List<UserData?>();
-            Variant val;
-            var size1 = res.n_children();
-            for(size_t i=0;i<size1;i++){
-                val = res.get_child_value(i).get_child_value(0);
-                var id = val.lookup_value("Id",null).get_int64();
-                var sex = val.lookup_value("Sex",null).get_int64();
-                var name = val.lookup_value("Name",null).get_string();
-                var desc = val.lookup_value("Desc",null).get_string();
-                var age = val.lookup_value("Age",null).get_int64();
-                //stdout.printf("%s %s\n",name,desc);
-                UserData u1 = {id,(int16)sex,name,desc,(int16)age,"",""};
-				persons.append(u1);
-            }
-            return true;
-        }catch (Error e) {
-            stdout.printf ("Error: %s\n", e.message);
-            return false;
-        }
-	}
 	
 	public bool search_person_async(string key,SearchCallback f){
-		var params = new Variant("(s)",key);
+		var params = new Variant("(s)",to_utf8(key));
         try{
             c.call_async.begin("PClient.SearchPersons",params,null,(s,r)=>{
 				Variant res;
@@ -99,7 +90,7 @@ public class RpcClient:GLib.Object{
 					var desc = val.lookup_value("Desc",null).get_string();
 					var age = val.lookup_value("Age",null).get_int64();
 					//stdout.printf("%s %s\n",name,desc);
-					UserData u1 = {id,(int16)sex,name,desc,(int16)age,"",""};
+					UserData u1 = {id,(int16)sex,to_local(name),to_local(desc),(int16)age,"",""};
 					f(u1);
 				}
 			});
@@ -140,7 +131,7 @@ public class RpcClient:GLib.Object{
 					var msg_offline = obj_offline.lookup_value("Msg",null).get_string();
 					var timestamp_offline = obj_offline.lookup_value("Timestamp",null).get_string();
 					//stdout.printf("%s %s\n",name,desc);
-					UserData u1 = {id,(int16)sex,name,desc,(int16)age,msg_offline,timestamp_offline};
+					UserData u1 = {id,(int16)sex,to_local(name),to_local(desc),(int16)age,to_local(msg_offline),timestamp_offline};
 					add_row(u1);
 				}
 				if(size1>0){
@@ -176,7 +167,7 @@ public class RpcClient:GLib.Object{
 					var msg_offline = obj_offline.lookup_value("Msg",null).get_string();
 					var timestamp_offline = obj_offline.lookup_value("Timestamp",null).get_string();
 					//stdout.printf("%s %s\n",name,desc);
-					UserData u1 = {id,(int16)sex,name,desc,(int16)age,msg_offline,timestamp_offline};
+					UserData u1 = {id,(int16)sex,to_local(name),to_local(desc),(int16)age,to_local(msg_offline),timestamp_offline};
 					grid1.add_friend(u1);
 				}
 			});
@@ -188,7 +179,7 @@ public class RpcClient:GLib.Object{
         }
     }
     public bool ChatTo(int64 to , string msg){
-		var params = new Variant.parsed("{'To':<%i>,'Msg':<%s>}",to,msg);
+		var params = new Variant.parsed("{'To':<%i>,'Msg':<%s>}",to,to_utf8(msg));
         //Variant res;
         try{
             c.call_async.begin("PClient.ChatTo",params,null,(s,r)=>{c.call_async.end(r,null);});
@@ -216,8 +207,6 @@ public class RpcClient:GLib.Object{
 		try{
             c.call_async.begin("PClient.HttpConnect",params,null,(s,r)=>{
 				c.call_async.end(r,null);
-				//print("URL http://localhost:$(server_port)/");
-				//grid1.browser.open(@"http://localhost:$(server_port)/");
 				Gtk.show_uri(null,@"http://localhost:$(server_port)/",Gdk.CURRENT_TIME);
 			});
             return true;
@@ -245,7 +234,7 @@ public class RpcClient:GLib.Object{
         }
 	}
 	public bool add_user(string name,string pwd,int sex,int birthyear,string desc){
-		var params = new GLib.Variant.parsed("{'Name':<%s>,'Sex':<%i>,'Birth':<%i>,'Desc':<%s>,'Pwd':<%s>}",name,sex,birthyear,desc,pwd);
+		var params = new GLib.Variant.parsed("{'Name':<%s>,'Sex':<%i>,'Birth':<%i>,'Desc':<%s>,'Pwd':<%s>}",to_utf8(name),sex,birthyear,to_utf8(desc),pwd);
 		GLib.Variant res;
 		try{
             var ok = c.call("PClient.NewUser",params,null,out res);
@@ -332,7 +321,7 @@ public class RpcClient:GLib.Object{
 				var desc = res.lookup_value("Desc",null).get_string();
 				//grid1.add_text(@"$(id) : $(name)");
 				var tm1 = new GLib.DateTime.now_local();
-				UserData u = {id,sex,name,desc,age,msg,tm1.format("%Y-%m-%d %H:%M:%S")};
+				UserData u = {id,sex,to_local(name),to_local(desc),age,to_local(msg),tm1.format("%Y-%m-%d %H:%M:%S")};
 				f(u);
 			});
             return true;

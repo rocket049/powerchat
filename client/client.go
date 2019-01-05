@@ -12,6 +12,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -50,7 +51,8 @@ func client() {
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
 	//go httpServe(conn1)
-	go startMyHttpServe(filepath.Join(os.Getenv("HOME"), "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
+	u1, _ := user.Current()
+	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	go readConn(conn1)
 	ok := <-res1
 	close(res1)
