@@ -45,6 +45,9 @@ msgstr "代理端口"
 msgid "Modify"
 msgstr "修改"
 
+msgid "[TransferBlocked]"
+msgstr "[文件传送被阻止]"
+
 #: ui.vala:163
 msgid "File"
 msgstr "文件"

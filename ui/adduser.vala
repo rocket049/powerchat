@@ -20,6 +20,11 @@ public class AddUserDialog: GLib.Object{
 		this.pwd.set_visibility(false);
 		grid.attach(this.pwd,1,2);
 		
+		grid.attach(new Gtk.Label(_("Confirm Password:")),0,3);
+		var cfpwd = new Gtk.Entry();
+		cfpwd.set_visibility(false);
+		grid.attach(cfpwd,1,3);
+		
 		var date1 = new GLib.DateTime.now_local();
 		int year1 = date1.get_year();
 		Gtk.ComboBoxText yearSelect = new Gtk.ComboBoxText ();
@@ -28,8 +33,8 @@ public class AddUserDialog: GLib.Object{
 		}
 		yearSelect.active=10;
 		this.birthyear = year1-15;
-		grid.attach(new Gtk.Label(_("Born Year:")),0,3);
-		grid.attach(yearSelect,1,3);
+		grid.attach(new Gtk.Label(_("Born Year:")),0,4);
+		grid.attach(yearSelect,1,4);
 		yearSelect.changed.connect(()=>{
 			string title = yearSelect.get_active_text ();
 			this.birthyear = (int) title.to_int64();
@@ -39,15 +44,15 @@ public class AddUserDialog: GLib.Object{
 		sexSelect.append_text (_("Man"));
 		sexSelect.append_text (_("Woman"));
 		sexSelect.active = 0;
-		grid.attach(new Gtk.Label(_("Sex:")),0,4);
-		grid.attach(sexSelect,1,4);
+		grid.attach(new Gtk.Label(_("Sex:")),0,5);
+		grid.attach(sexSelect,1,5);
 		sexSelect.changed.connect(()=>{
 			this.sex = sexSelect.active + 1;
 		});
 		
-		grid.attach(new Gtk.Label(_("Description:")),0,5);
+		grid.attach(new Gtk.Label(_("Description:")),0,6);
 		this.desc = new Gtk.Entry();
-		grid.attach(this.desc,1,5);
+		grid.attach(this.desc,1,6);
 		
 		var content = this.dlg1.get_content_area () as Gtk.Box;
 		content.pack_start(grid);
@@ -58,6 +63,11 @@ public class AddUserDialog: GLib.Object{
 		this.dlg1.response.connect((rid)=>{
 			if(rid==2){
 				//stdout.printf("%s %d %d\n",this.name.text,this.sex,this.birthyear);
+				if(cfpwd.text != this.pwd.text){
+					this.dlg1.title = _("Confirm Fail!");
+					return;
+				}
+					
 				if( rpc1.add_user(this.name.text,this.pwd.text,this.sex,this.birthyear,this.desc.text)==false ){
 					this.dlg1.title=_("Register Fail!");
 					return;

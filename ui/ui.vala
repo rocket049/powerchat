@@ -835,7 +835,7 @@ public static int main(string[] args){
 		return -1;
 	}
 	rpc1.c.notification.connect((s,m,p)=>{
-		stdout.printf("notify: %s\n",m);
+		//stdout.printf("notify: %s\n",m);
 		if (m!="msg")
 			return;
 		try{

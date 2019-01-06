@@ -139,7 +139,7 @@ func serveConn(conn1 net.Conn) {
 				client.Redirect(conn1, &req)
 			}
 		case CmdChat:
-			log.Println("Chat:",string(smsg.Msg))
+			//log.Println("Chat:",string(smsg.Msg))
 			if client.IsOnline(smsg.To) == false {
 				offlineMsg(client.Id, smsg.To, string(smsg.Msg))
 			}

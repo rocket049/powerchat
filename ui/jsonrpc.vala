@@ -189,7 +189,7 @@ public class RpcClient:GLib.Object{
         }
     }
     public bool ChatTo(int64 to , string msg){
-		stdout.printf("%s\n",msg);
+		//stdout.printf("%s\n",msg);
 		var v1 = new Variant.int64(to);
 		var v2 = new Variant.string(msg);
 		var params = new Variant.parsed("{'To':%v,'Msg':%v}",v1,v2 );
@@ -239,7 +239,7 @@ public class RpcClient:GLib.Object{
 					c.call_async.end(r,null);
 				}catch(Error e){
 					//stdout.printf ("sendfile return Error: %s\n", e.message);
-					grid1.add_text("[文件传送被阻止]",true);
+					grid1.add_text(_("[TransferBlocked]"),true);
 				}
 			});
             return true;

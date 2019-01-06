@@ -11,7 +11,6 @@ import (
 	"net"
 	"net/rpc"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -166,7 +165,7 @@ func (c *PClient) Login(p LogParam, res *FriendData) error {
 		if ok == false {
 			return nil
 		}
-		log.Println(reflect.TypeOf(sPort).Name())
+		//log.Println(reflect.TypeOf(sPort).Name())
 		port, err := strconv.ParseInt(sPort, 10, 32)
 		if err == nil {
 			proxyPort = int(port)
@@ -227,7 +226,7 @@ func (c *PClient) GetFriends(p []byte, res *[]FriendData) error {
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, MsgOffline: offmsg})
 	}
 	*res = ret
-	log.Println("GetFriends")
+	//log.Println("GetFriends")
 	return nil
 }
 
@@ -286,7 +285,7 @@ func (c *PClient) GetStrangerMsgs(p []byte, res *[]FriendData) error {
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, MsgOffline: offmsg})
 	}
 	*res = ret
-	log.Println("GetStrangerMsgs")
+	//log.Println("GetStrangerMsgs")
 	return nil
 }
 
@@ -322,7 +321,7 @@ type ChatMessage struct {
 
 //rpc service
 func (c *PClient) ChatTo(p ChatMessage, res *int) error {
-	log.Println(p.Msg)
+	//log.Println(p.Msg)
 	buf := bytes.NewBufferString("TEXT")
 	buf.WriteString(p.Msg)
 	msg, _ := MsgEncode(CmdChat, 0, p.To, buf.Bytes())
@@ -394,7 +393,7 @@ func (c *PClient) SendFile(param SFParam, res *int) error {
 			return errors.New("working,try later.")
 		}
 	}
-	log.Println(param.PathName);
+	//log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.Prepare(param.PathName, param.To, c.conn)
 	ok, _ := sender.SendFileHeader()
