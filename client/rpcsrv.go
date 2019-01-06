@@ -322,7 +322,10 @@ type ChatMessage struct {
 
 //rpc service
 func (c *PClient) ChatTo(p ChatMessage, res *int) error {
-	msg, _ := MsgEncode(CmdChat, 0, p.To, []byte("TEXT"+p.Msg))
+	log.Println(p.Msg)
+	buf := bytes.NewBufferString("TEXT")
+	buf.WriteString(p.Msg)
+	msg, _ := MsgEncode(CmdChat, 0, p.To, buf.Bytes())
 	c.conn.Write(msg)
 	return nil
 }
@@ -391,7 +394,7 @@ func (c *PClient) SendFile(param SFParam, res *int) error {
 			return errors.New("working,try later.")
 		}
 	}
-
+	log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.Prepare(param.PathName, param.To, c.conn)
 	ok, _ := sender.SendFileHeader()

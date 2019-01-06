@@ -222,6 +222,7 @@ list{
 				if (uri[0:7]=="file://"){
 					//print ("Selection: %s\n",uri[7:uri.length]);
 					var fname = GLib.Filename.from_uri(uri);
+					//stdout.printf(fname);
 					if( rpc1.send_file(this.to, fname) ){
 						string text1 = @"<a href='$(uri)'>$(GLib.Path.get_basename(fname))</a>";
 						this.add_left_name_icon(this.uname,this.usex);
@@ -810,8 +811,9 @@ public class LoginDialog :GLib.Object{
 public static string prog_path;
 public void set_my_locale(string path1){
 	var dir1 = GLib.Path.get_dirname(path1);
-	prog_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_current_dir(),dir1);
+	prog_path = dir1;
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"locale");
+	//GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"zh_CN.UTF-8");
 	GLib.Intl.textdomain("powerchat");
 	GLib.Intl.bindtextdomain("powerchat",textpath);
 }
@@ -839,7 +841,7 @@ public static int main(string[] args){
 			var typ = (int8) p.lookup_value("T",null).get_int64();
 			var from = p.lookup_value("From",null).get_int64();
 			var msg = p.lookup_value("Msg",null).get_string();
-			grid1.rpc_callback(typ,from,to_local(msg));
+			grid1.rpc_callback(typ,from,msg);
 		}catch(Error e){
 			stdout.printf ("Error: %s\n", e.message);
 		}
