@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"mime"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -30,8 +30,8 @@ func getFileDir() string {
 		os.Mkdir("RecvFiles", os.ModePerm)
 		return "RecvFiles"
 	}
-	dir1 := path.Dir(exe1)
-	res := path.Join(dir1, "RecvFiles")
+	dir1 := filepath.Dir(exe1)
+	res := filepath.Join(dir1, "RecvFiles")
 	os.Mkdir(res, os.ModePerm)
 	return res
 }
@@ -106,7 +106,7 @@ func startFileServ(conn1 io.Writer) {
 		var from = h1.From
 		var session = h2.Session
 		var bs = make([]byte, 4)
-		file1, err := os.Create(path.Join(fileDir, h2.Name))
+		file1, err := os.Create(filepath.Join(fileDir, h2.Name))
 		if err != nil {
 			log.Println("error create file:", h2.Name)
 			continue
@@ -203,7 +203,7 @@ func (s *FileSender) SendFileHeader() (bool, uint32) {
 	if len(secs) > 1 {
 		typ1 = secs[len(secs)-1]
 	}
-	fh2 := &fileHeaderType{Name: path.Base(s.pathname),
+	fh2 := &fileHeaderType{Name: filepath.Base(s.pathname),
 		Mime:    mime.TypeByExtension("." + typ1),
 		Size:    int64(fh1.Size()),
 		Session: s.session}
