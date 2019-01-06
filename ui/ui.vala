@@ -813,9 +813,10 @@ public void set_my_locale(string path1){
 	var dir1 = GLib.Path.get_dirname(path1);
 	prog_path = dir1;
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"locale");
-	//GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"zh_CN.UTF-8");
+	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
 	GLib.Intl.textdomain("powerchat");
 	GLib.Intl.bindtextdomain("powerchat",textpath);
+	GLib.Intl.bind_textdomain_codeset ("powerchat", "UTF-8");
 }
 static uint16 server_port=7890;
 static uint16 proxy_port;
