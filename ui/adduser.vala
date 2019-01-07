@@ -81,7 +81,7 @@ public class AddUserDialog: GLib.Object{
 					grid1.usex = u.sex;
 					grid1.uage = u.age;
 					grid1.udesc = u.desc;
-					grid1.user_btn.label = u.name;
+					grid1.user_btn.label = _("About: ")+u.name;
 				}else{
 					this.dlg1.title = _("Name/Password Error!");
 					stdout.printf("login fail\n");

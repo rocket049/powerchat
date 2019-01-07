@@ -241,3 +241,20 @@ msgstr "留言"
 #: strangers.vala:20
 msgid "Time"
 msgstr "时间"
+
+msgid "Blog Directory:"
+msgstr "Blog目录："
+
+msgid "Click to open"
+msgstr "点击打开文件"
+
+msgid "About: "
+msgstr "关于："
+
+#: ui.vala:149
+msgid ""
+"Click `Modify` button to edit.\n"
+"Set 0 to restore default value."
+msgstr ""
+"点击'修改'按钮后输入自定义值\n"
+"0 表示恢复默认值"

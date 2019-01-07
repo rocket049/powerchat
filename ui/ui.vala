@@ -146,6 +146,7 @@ list{
 
 		port1 = new Gtk.Entry();
 		port1.set_text(proxy_port.to_string());
+		port1.tooltip_text = _("Click `Modify` button to edit.\nSet 0 to restore default value.");
 		port1.max_length = 5;
 		port1.width_request = 50;
 		port1.editable=false;
@@ -297,7 +298,9 @@ list{
 			var sex=_("Man");
 			if (this.usex==2)
 				sex=_("Woman");
-            dlg_user.secondary_text = @"ID:$(this.uid)\n"+_("Age:")+@"$(this.uage)\n"+_("Sex:")+@"$(sex)\n"+_("Description:")+@"$(this.udesc)";
+			var blog_dir = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),"ChatShare");
+            dlg_user.secondary_text = @"ID:$(this.uid)\n"+_("Age:")+@"$(this.uage)\n"+_("Sex:")+@"$(sex)\n"+_("Description:")+@"$(this.udesc)\n"
+					+ _("Blog Directory:")+blog_dir;
             dlg_user.show();
             dlg_user.response.connect((rid)=>{
 				dlg_user.destroy();
@@ -660,7 +663,7 @@ list{
 			var obj2 = node2.get_object();
 			string name1 = obj2.get_string_member("Name");
 			string mime1 = obj2.get_string_member("Mime");
-			string display_text = @"点击打开文件：<a href='file://$(name1)'>$(GLib.Path.get_basename(name1))</a>  <a href='file://$(GLib.Path.get_dirname(name1))'>打开目录</a>";
+			string display_text = _("Click to open")+@": <a href='$(GLib.Filename.to_uri(name1))'>$(GLib.Path.get_basename(name1))</a>  <a href='file://$(GLib.Path.get_dirname(name1))'>打开目录</a>";
 			if(mime1[0:5]=="image"){
 				//GLib.Idle.add(()=>{
 				//this.msgs = display;
@@ -780,7 +783,7 @@ public class LoginDialog :GLib.Object{
 					grid1.usex = u.sex;
 					grid1.uage = u.age;
 					grid1.udesc = u.desc;
-					grid1.user_btn.label = u.name;
+					grid1.user_btn.label = _("About: ")+u.name;
 				}else{
 					this.dlg1.title = _("Name/Password Error!");
 					stdout.printf("login fail\n");
