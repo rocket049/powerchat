@@ -2,24 +2,6 @@ using Jsonrpc;
 using Gtk;
 using Gdk;
 
-//public string to_utf8(string s){
-//	string codec;
-//	if(GLib.get_charset(out codec)){
-//		return s;
-//	}else{
-//		return GLib.convert(s,s.length,"UTF-8", codec);
-//	}
-//}
-
-//public string to_local(string s){
-//	string codec;
-//	if(GLib.get_charset(out codec)){
-//		return s;
-//	}else{
-//		return GLib.convert(s,s.length, codec,"UTF-8");
-//	}
-//}
-
 public class RpcClient:GLib.Object{
     public Jsonrpc.Client c;
     public int counter{get;set;default=0;}
