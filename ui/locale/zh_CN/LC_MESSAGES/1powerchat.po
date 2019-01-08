@@ -258,3 +258,12 @@ msgid ""
 msgstr ""
 "点击'修改'按钮后输入自定义值\n"
 "0 表示恢复默认值"
+
+msgid "OpenFile"
+msgstr "打开文件"
+
+msgid "OpenDir"
+msgstr "打开目录"
+
+msgid "RemoveFile"
+msgstr "删除文件"

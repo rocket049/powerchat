@@ -573,7 +573,35 @@ list{
 		this.msgs.add(grid);
 		grid.show_all();
     }
-
+	private void add_operate_buttons(string pathname){
+		var dir1 = GLib.Path.get_dirname(pathname);
+		var grid = new Gtk.Grid();
+		var lb1 = new Gtk.Label(" ");
+		var lb2 = new Gtk.Label(" ");
+		lb1.expand=true;
+		lb2.expand=true;
+		var bt_open = new Gtk.Button.with_label(_("OpenFile"));
+		var bt_dir = new Gtk.Button.with_label(_("OpenDir"));
+		var bt_del = new Gtk.Button.with_label(_("RemoveFile"));
+		grid.attach(lb1,0,0);
+		grid.attach(bt_open,1,0);
+		grid.attach(bt_dir,2,0);
+		grid.attach(bt_del,3,0);
+		grid.attach(lb2,4,0);
+		
+		this.msgs.add( grid );
+		grid.show_all();
+		
+		bt_open.clicked.connect(()=>{
+			rpc1.open_path(pathname);
+		});
+		bt_dir.clicked.connect(()=>{
+			rpc1.open_path(dir1);
+		});
+		bt_del.clicked.connect(()=>{
+			GLib.FileUtils.remove(pathname);
+		});
+	}
 	//callback in rpc msg
 	public void rpc_callback(int8 typ,int64 from,string msg){
 		//Msg　开头可以带着类型标记 JSON/TEXT
@@ -591,12 +619,6 @@ list{
 				sc.add_provider(this.provider1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 				if (sc.has_class("off")==false){
 					sc.add_class("off");
-					//move down
-//					Gtk.ListBoxRow r = grid.get_parent() as Gtk.ListBoxRow;
-//					r.set_selectable(false);
-//					this.friends.remove(r);
-//					this.friends.add(r);
-//					r.set_selectable(true);
 				}
 				this.friends.invalidate_sort ();
 				//show msg
@@ -663,31 +685,12 @@ list{
 			var obj2 = node2.get_object();
 			string name1 = obj2.get_string_member("Name");
 			string mime1 = obj2.get_string_member("Mime");
-			string display_text = _("Click to open")+@": <a href='$(GLib.Filename.to_uri(name1))'>$(GLib.Path.get_basename(name1))</a>  <a href='$(GLib.Filename.to_uri(GLib.Path.get_dirname(name1)))'>打开目录</a>";
+			this.add_right_name_icon(fname,fsex);
 			if(mime1[0:5]=="image"){
-				//GLib.Idle.add(()=>{
-				//this.msgs = display;
-				this.add_right_name_icon(fname,fsex);
 				this.add_image(name1);
-				this.add_text(display_text,true,true);
-				//this.msgs = bak_msgs;
-					//return false;
-				//});
-			}else{
-				//GLib.Idle.add(()=>{
-				//this.msgs = display;
-				this.add_right_name_icon(fname,fsex);
-				this.add_text(display_text,true,true);
-				//this.msgs = bak_msgs;
-					//return false;
-				//});
 			}
-			var rm_btn = new Gtk.Button.with_label(@"删除可疑文件：$(GLib.Path.get_basename(name1))");
-			this.msgs.add(rm_btn);
-			rm_btn.clicked.connect(()=>{
-				GLib.FileUtils.remove(name1);
-				print(@"remove $(name1)\n");
-			});
+			this.add_text(GLib.Path.get_basename(name1),true);
+			add_operate_buttons(name1);
 			msg_mark(from.to_string());
 			this.msgs.show_all();
 			break;

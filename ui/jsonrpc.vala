@@ -301,6 +301,17 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
+	public bool open_path(string path1){
+		var params = new Variant("(s)",path1);
+		try{
+            c.call_async.begin("PClient.OpenPath",params,null,(s,r)=>{c.call_async.end(r,null);});
+            return true;
+        }catch (Error e) {
+            stdout.printf ("Error: %s\n", e.message);
+            return false;
+        }
+	}
+	
 	public delegate void QueryCallback(UserData u);
 	public bool offline_msg_with_id(int64 uid,string msg, QueryCallback f){
 		if(uid==0){

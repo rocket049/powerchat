@@ -15,6 +15,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/skratchdot/open-golang/open"
+
 	"github.com/powerman/rpc-codec/jsonrpc2"
 
 	"github.com/rocket049/go-jsonrpc2glib"
@@ -439,4 +441,9 @@ func (c *PClient) Quit(param []byte, res *int) error {
 	log.Println("rpc serve normal exit")
 	os.Exit(0)
 	return nil
+}
+
+//rpc service block
+func (c *PClient) OpenPath(param []string, res *int) error {
+	return open.Run(param[0])
 }
