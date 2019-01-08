@@ -663,7 +663,7 @@ list{
 			var obj2 = node2.get_object();
 			string name1 = obj2.get_string_member("Name");
 			string mime1 = obj2.get_string_member("Mime");
-			string display_text = _("Click to open")+@": <a href='$(GLib.Filename.to_uri(name1))'>$(GLib.Path.get_basename(name1))</a>  <a href='file://$(GLib.Path.get_dirname(name1))'>打开目录</a>";
+			string display_text = _("Click to open")+@": <a href='$(GLib.Filename.to_uri(name1))'>$(GLib.Path.get_basename(name1))</a>  <a href='$(GLib.Filename.to_uri(GLib.Path.get_dirname(name1)))'>打开目录</a>";
 			if(mime1[0:5]=="image"){
 				//GLib.Idle.add(()=>{
 				//this.msgs = display;
