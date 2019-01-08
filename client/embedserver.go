@@ -72,7 +72,7 @@ func (s *myHandler) lsPath(resp http.ResponseWriter, req *http.Request) {
 			var link1 LinkData
 			if item1.IsDir() {
 				link1.Name = path.Base(item1.Name()) + "/"
-				if strings.HasPrefix(link1.Name, "_") {
+				if strings.HasPrefix(link1.Name, "_") || strings.HasPrefix(link1.Name, ".") {
 					continue
 				}
 				link1.MTime = item1.ModTime()
