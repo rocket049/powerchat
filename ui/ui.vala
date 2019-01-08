@@ -71,7 +71,7 @@ list{
 """);
 
 		this.mark1 = new Gtk.CssProvider();
-		this.mark1.load_from_data("""grid{color:#0000FF;}
+		this.mark1.load_from_data("""grid{background:#E3FB33;}
 """);
 
 		this.button1 = new Gtk.CssProvider();
@@ -306,21 +306,13 @@ list{
 				dlg_user.destroy();
 			});
 		});
+		this.entry1.activate.connect( ()=>{
+			this.send_msg();
+		} );
+			
         b7.clicked.connect (() => {
 			// 发送信息
-			if(this.to>0)
-				if( false == rpc1.ChatTo(this.to,this.entry1.text) ){
-					Gtk.main_quit();
-				}
-				//var u = this.frds1[this.uid.to_string()];
-				this.add_left_name_icon(this.uname,this.usex);
-				this.add_text(this.entry1.text);
-				this.entry1.text = "";
-				GLib.Idle.add(()=>{
-					var adj1 = this.msgs.get_adjustment();
-					adj1.value = adj1.upper;
-					return false;
-				});
+			this.send_msg();
 		});
 
 		this.friends.row_selected.connect((r)=>{
@@ -341,6 +333,23 @@ list{
 			sc3.remove_class("mark");
 
 			this.msg_win.show_all();
+		});
+	}
+	public void send_msg(){
+		// 发送信息
+		if(this.to==0)
+			return;
+		if( false == rpc1.ChatTo(this.to,this.entry1.text) ){
+			Gtk.main_quit();
+		}
+		//var u = this.frds1[this.uid.to_string()];
+		this.add_left_name_icon(this.uname,this.usex);
+		this.add_text(this.entry1.text);
+		this.entry1.text = "";
+		GLib.Idle.add(()=>{
+			var adj1 = this.msgs.get_adjustment();
+			adj1.value = adj1.upper;
+			return false;
 		});
 	}
 	public void update_pwd(){
@@ -408,6 +417,7 @@ list{
 			//insert offline message
 			add_right_name_icon(u1.name,u1.sex);
 			add_text(_("Offline Message:")+@"[$(u1.timestamp_offline)]\n$(u1.msg_offline)");
+			this.msg_mark(u1.id.to_string());
 		}
 		this.msg_win.show_all();
 
@@ -720,7 +730,7 @@ list{
 		sc3.add_provider(this.mark1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 		sc3.add_class("mark");
 		grid.show_all();
-		print(@"mark: $(uid)\n");
+		//print(@"mark: $(uid)\n");
 	}
 }
 
