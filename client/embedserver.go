@@ -35,14 +35,15 @@ func (s *myHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		resp.WriteHeader(404)
 		return
 	}
-	if "/ls" == req.URL.Path || "/" == req.URL.Path {
+	p1 := req.URL.Query().Get("m")
+	if "ls" == p1 || req.URL.Path == "/" {
 		s.lsPath(resp, req)
-	} else if req.URL.Path == "/md" {
+	} else if p1 == "md" {
 		s.readMd(resp, req)
+	} else if p1 == "ht" {
+		s.readHtml(resp, req)
 	} else if req.URL.Path == "/style.css" {
 		s.getStyle(resp, req)
-	} else if req.URL.Path == "/ht" {
-		s.readHtml(resp, req)
 	} else {
 		http.ServeFile(resp, req, filepath.Join(s.root, req.URL.Path))
 	}
@@ -56,19 +57,15 @@ type LinkData struct {
 }
 
 func (s *myHandler) lsPath(resp http.ResponseWriter, req *http.Request) {
-	p1 := req.URL.Query().Get("p")
-	if len(p1) == 0 {
-		p1 = "/"
-	}
-	path1 := filepath.Join(s.root, p1)
-	info1, err := os.Stat(path1)
+	p1 := filepath.Join(s.root, req.URL.Path)
+	info1, err := os.Stat(p1)
 	if err != nil {
 		resp.WriteHeader(404)
 		return
 	}
 	linkList := []LinkData{}
 	if info1.IsDir() {
-		dir1, _ := os.Open(path1)
+		dir1, _ := os.Open(p1)
 		defer dir1.Close()
 		items, _ := dir1.Readdir(0)
 		for _, item1 := range items {
@@ -147,19 +144,14 @@ func (s *myHandler) lsPath(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (s *myHandler) readMd(resp http.ResponseWriter, req *http.Request) {
-	p1 := req.URL.Query().Get("p")
-	if len(p1) == 0 {
-		resp.WriteHeader(404)
-		return
-	}
-	path1 := filepath.Join(s.root, p1)
-	_, err := os.Stat(path1)
+	p1 := filepath.Join(s.root, req.URL.Path)
+	_, err := os.Stat(p1)
 	if err != nil {
 		resp.WriteHeader(404)
 		return
 	}
 	header1 := strings.Replace(header, "{{.title}}", path.Base(p1), -1)
-	p, err := ioutil.ReadFile(path1)
+	p, err := ioutil.ReadFile(p1)
 	if err != nil {
 		resp.WriteHeader(404)
 		return
@@ -174,12 +166,7 @@ func (s *myHandler) readMd(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (s *myHandler) readHtml(resp http.ResponseWriter, req *http.Request) {
-	p1 := req.URL.Query().Get("p")
-	if len(p1) == 0 {
-		resp.WriteHeader(404)
-		return
-	}
-	path1 := filepath.Join(s.root, p1)
+	path1 := filepath.Join(s.root, req.URL.Path)
 	_, err := os.Stat(path1)
 	if err != nil {
 		resp.WriteHeader(404)

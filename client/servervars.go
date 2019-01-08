@@ -8,7 +8,7 @@ const tmpl string = `<html>
 <head>
 <body>
 <h1>{{.title}}</h1>
-{{range .links}}{{.MTime.Format "2006-01-02 15:04"}} &nbsp;&nbsp; <a href="/{{.Action}}?p={{.Path}}">{{.Name}}</a><br>{{end}}
+{{range .links}}{{.MTime.Format "2006-01-02 15:04"}} &nbsp;&nbsp; <a href="{{.Name}}?m={{.Action}}">{{.Name}}</a><br>{{end}}
 </body>
 </html>
 `
