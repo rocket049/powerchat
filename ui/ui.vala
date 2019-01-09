@@ -71,7 +71,7 @@ list{
 """);
 
 		this.mark1 = new Gtk.CssProvider();
-		this.mark1.load_from_data("""grid{background:#E3FB33;}
+		this.mark1.load_from_data("""grid{background:#F59433;}
 """);
 
 		this.button1 = new Gtk.CssProvider();
