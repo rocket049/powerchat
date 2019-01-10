@@ -46,7 +46,7 @@ func client() {
 		log.Fatal(err)
 	}
 	defer conn1.Close()
-	go httpProxy(conn1)
+	go httpProxy2(conn1)
 	//replace httpServe and rpcSrv.startRpcSrv4Glib
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
@@ -58,52 +58,9 @@ func client() {
 	close(res1)
 	if ok {
 		startFileServ(conn1)
-	} /* else {
-		go startFileServ(conn1)
-	loop1:
-		for i := 0; i < 50; i++ {
-			//commonds
-			var cmd string
-			fmt.Scanf("%s", &cmd)
-			switch cmd {
-			case "new":
-				register(conn1)
-			case "login":
-				login(conn1)
-			case "chat":
-				chat(conn1)
-			case "proxy":
-				httpConnect()
-			case "file":
-				//sendFile
-				sendFile(conn1)
-			case "users":
-				getUsers(conn1, []int64{5, 6})
-			case "friend":
-				addFriend(conn1)
-			case "friends":
-				getFriends(conn1)
-			case "proxyport":
-				proxyport()
-			case "q":
-				break loop1
-			default:
-				fmt.Println("error commond ", cmd)
-			}
-		}
-	} */
+	}
 	fmt.Println("quit")
 }
-
-//func httpConnect() {
-//	fmt.Printf("ID:")
-//	fmt.Scanf("%d", &httpId)
-//}
-
-//func proxyport() {
-//	fmt.Printf("Port:")
-//	fmt.Scanf("%d", &proxyPort)
-//}
 
 type UserInfo struct {
 	Id       int64
@@ -113,117 +70,6 @@ type UserInfo struct {
 	Desc     string
 	Pwdmd5   string
 }
-
-//func getFriends(conn1 io.Writer) {
-//	req, _ := MsgEncode(CmdGetFriends, 0, 0, []byte("\n"))
-//	conn1.Write(req)
-//}
-
-//func addFriend(conn1 io.Writer) {
-//	var fid int64
-//	fmt.Printf("ID:")
-//	fmt.Scanf("%d", &fid)
-//	req, _ := MsgEncode(CmdAddFriend, 0, fid, []byte("\n"))
-//	conn1.Write(req)
-//}
-
-//func getUsers(conn1 io.Writer, ids []int64) {
-//	b, err := json.Marshal(ids)
-//	if err != nil {
-//		log.Println(err)
-//		return
-//	}
-//	req, _ := MsgEncode(CmdGetNames, 0, 0, b)
-//	log.Println("send:", string(b))
-//	conn1.Write(req)
-//}
-
-//func sendFile(conn1 io.Writer) {
-//	var name string
-//	var to int64
-//	fmt.Printf("To:")
-//	fmt.Scanf("%d", &to)
-//	fmt.Printf("File Name:")
-//	fmt.Scanf("%s", &name)
-//	var sender = new(FileSender)
-//	sender.Prepare(name, to, conn1)
-//	ok, _ := sender.SendFileHeader()
-//	if ok == false {
-//		return
-//	}
-//	sender.SendFileBody()
-//	fmt.Println("finish send file.")
-//}
-
-//func register(conn1 io.Writer) {
-//	var name string
-//	var sex int
-//	var birthday string
-//	var desc string
-//	var pwd string
-//	fmt.Printf("Name:")
-//	fmt.Scanf("%s", &name)
-//	fmt.Printf("Sex(1/2):")
-//	fmt.Scanf("%d", &sex)
-//	fmt.Printf("Birthday:")
-//	fmt.Scanf("%s", &birthday)
-//	fmt.Printf("Description:")
-//	fmt.Scanf("%s", &desc)
-//	fmt.Printf("Password:")
-//	fmt.Scanf("%s", &pwd)
-//	//MD5(name+pwd) 避免重复
-//	buf := bytes.NewBufferString(name)
-//	buf.WriteString(pwd)
-//	var pwdmd5 = md5.Sum(buf.Bytes())
-//	e := make([]byte, 32)
-//	hex.Encode(e, pwdmd5[:])
-//	var user1 = &UserInfo{0, name, sex, birthday, desc, string(e)}
-//	p, err := json.Marshal(user1)
-//	if err != nil {
-//		log.Println(err)
-//		return
-//	}
-//	msg, _ := MsgEncode(CmdRegister, 0, 0, p)
-//	conn1.Write(msg)
-//}
-
-////type LogDgam struct {
-////	Name   string
-////	Pwdmd5 []byte
-////}
-
-//func login(conn1 io.Writer) {
-//	var name string
-//	var pwd string
-//	fmt.Printf("Name:")
-//	fmt.Scanf("%s", &name)
-//	fmt.Printf("Password:")
-//	fmt.Scanf("%s", &pwd)
-//	//MD5(name+pwd) 避免重复
-//	buf := bytes.NewBufferString(name)
-//	buf.WriteString(pwd)
-//	var pwdmd5 = md5.Sum(buf.Bytes())
-//	e := make([]byte, 32)
-//	hex.Encode(e, pwdmd5[:])
-//	bbuf := bytes.NewBufferString("")
-//	bbuf.Write(token)
-//	bbuf.Write(e)
-//	b := md5.Sum(bbuf.Bytes())
-//	dgam := &LogDgam{Name: name, Pwdmd5: b[:]}
-//	bmsg, _ := json.Marshal(dgam)
-//	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
-//	conn1.Write(msg)
-//}
-
-//func chat(conn1 io.Writer) {
-//	var s string
-//	fmt.Printf("to ID:")
-//	fmt.Scanf("%d", &id)
-//	fmt.Printf("Message:")
-//	fmt.Scanf("%s", &s)
-//	msg, _ := MsgEncode(CmdChat, 0, id, []byte(s))
-//	conn1.Write(msg)
-//}
 
 func OnReady(msg *MsgType) {
 	token = msg.Msg
@@ -430,6 +276,9 @@ LOOP1:
 				serveChan = make(chan MsgType, 1)
 				break LOOP1
 			}
+			if res.From != httpId {
+				continue
+			}
 			if res.Cmd == CmdHttpRespClose {
 				if string(res.Msg) == "Offline" {
 					conn2.Close()
@@ -500,15 +349,17 @@ func readConn(conn1 net.Conn) {
 		case CmdChat:
 			rpcSrv.notifyMsg(msg)
 		case CmdHttpRequest:
-			go pushHttpChan(msg)
+			pushHttpChan(msg)
+		case CmdHttpReqContinued:
+			pushHttpChan(msg)
+		case CmdHttpReqClose:
+			pushHttpChan(msg)
+
 		case CmdHttpRespContinued:
 			pushServeChan(msg)
 		case CmdHttpRespClose:
 			pushServeChan(msg)
-		case CmdHttpReqContinued:
-			httpReqChan <- *msg
-		case CmdHttpReqClose:
-			httpReqChan <- *msg
+
 		case CmdFileHeader:
 			pushFileMsg(msg)
 		case CmdFileContinued:
