@@ -145,8 +145,8 @@ func httpResponse2(conn1 io.ReadWriter, locConn net.Conn, to int64) {
 		n, err := locConn.Read(buf)
 		if err != nil {
 			log.Printf("Browser:%v\n", err)
-			//r, _ := MsgEncode(CmdHttpReqClose, 0, to, []byte("\r\n"))
-			//conn1.Write(r)
+			r, _ := MsgEncode(CmdHttpReqClose, 0, to, header)
+			conn1.Write(r)
 			return
 		}
 		if n > 0 {
