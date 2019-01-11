@@ -44,7 +44,7 @@ func proxyChan(ch1 chan MsgType, conn1 io.ReadWriter, from int64, cid uint32) {
 	}
 	defer httpConn.Close()
 	timeout_ch := make(chan int, 1)
-	defer router1.Delete(from)
+	defer router1.Delete(cid)
 	defer close(ch1)
 
 	go proxyResopnse(conn1, httpConn, from, timeout_ch, cid)
@@ -59,23 +59,23 @@ func proxyChan(ch1 chan MsgType, conn1 io.ReadWriter, from int64, cid uint32) {
 				return
 			}
 			if rbody.Cmd == CmdHttpRequest {
-				pos := bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost: localhost"))
-				if pos == -1 {
-					pos = bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost:localhost"))
-				}
-				//log.Println(pos)
-				if pos >= 0 {
-					buf := bytes.NewBufferString("")
-					buf.Write(rbody.Msg[4:pos])
-					buf.WriteString(fmt.Sprintf("\r\nHost: localhost:%d", proxyPort))
-					end := bytes.Index(rbody.Msg[pos+6:], []byte("\r\n"))
-					//log.Println("end:", end)
-					buf.Write(rbody.Msg[pos+end+6:])
-					httpConn.Write(buf.Bytes())
-				} else {
-					httpConn.Write(rbody.Msg)
-				}
-
+				//				pos := bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost: localhost"))
+				//				if pos == -1 {
+				//					pos = bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost:localhost"))
+				//				}
+				//				//log.Println(pos)
+				//				if pos >= 0 {
+				//					buf := bytes.NewBufferString("")
+				//					buf.Write(rbody.Msg[4:pos])
+				//					buf.WriteString(fmt.Sprintf("\r\nHost: localhost:%d", proxyPort))
+				//					end := bytes.Index(rbody.Msg[pos+6:], []byte("\r\n"))
+				//					//log.Println("end:", end)
+				//					buf.Write(rbody.Msg[pos+end+6:])
+				//					httpConn.Write(buf.Bytes())
+				//				} else {
+				//					httpConn.Write(rbody.Msg[4:])
+				//				}
+				httpConn.Write(rbody.Msg[4:])
 			}
 		case res := <-timeout_ch:
 			if res != 1 {
