@@ -130,7 +130,7 @@ func (s *myHandler) lsPath(resp http.ResponseWriter, req *http.Request) {
 	})
 
 	data := make(map[string]interface{})
-	data["title"] = p1
+	data["title"] = req.URL.Path
 	data["links"] = linkList
 	tpl1 := template.New("")
 	_, err = tpl1.Parse(tmpl)

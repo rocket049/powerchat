@@ -307,6 +307,7 @@ func localServe(conn1 net.Conn, res1 chan bool) {
 	res1 <- true
 	jsonrpc2glib.DebugMode(false)
 	serveID := 0
+	go httpRespRouter()
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -320,7 +321,8 @@ func localServe(conn1 net.Conn, res1 chan bool) {
 			go rpcSrv.startServe()
 			serveID += 1
 		case 1:
-			go httpResponse(conn1, conn)
+			//go httpResponse(conn1, conn)
+			go httpResponse2(conn1, conn, httpId)
 		}
 
 	}
