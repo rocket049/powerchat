@@ -59,22 +59,6 @@ func proxyChan(ch1 chan MsgType, conn1 io.ReadWriter, from int64, cid uint32) {
 				return
 			}
 			if rbody.Cmd == CmdHttpRequest {
-				//				pos := bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost: localhost"))
-				//				if pos == -1 {
-				//					pos = bytes.Index(bytes.ToLower(rbody.Msg), []byte("\r\nhost:localhost"))
-				//				}
-				//				//log.Println(pos)
-				//				if pos >= 0 {
-				//					buf := bytes.NewBufferString("")
-				//					buf.Write(rbody.Msg[4:pos])
-				//					buf.WriteString(fmt.Sprintf("\r\nHost: localhost:%d", proxyPort))
-				//					end := bytes.Index(rbody.Msg[pos+6:], []byte("\r\n"))
-				//					//log.Println("end:", end)
-				//					buf.Write(rbody.Msg[pos+end+6:])
-				//					httpConn.Write(buf.Bytes())
-				//				} else {
-				//					httpConn.Write(rbody.Msg[4:])
-				//				}
 				httpConn.Write(rbody.Msg[4:])
 			}
 		case res := <-timeout_ch:
