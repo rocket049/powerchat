@@ -24,7 +24,12 @@ import (
 
 var (
 	cmdChan chan MsgType = make(chan MsgType, 1)
+	noticer *Noticer
 )
+
+func init() {
+	noticer, _ = NewNoticer()
+}
 
 type PClient struct {
 	conn      net.Conn
@@ -374,6 +379,9 @@ func (c *PClient) notifyMsg(msg *MsgType) error {
 		From: msg.From,
 		To:   msg.To,
 		Msg:  string(msg.Msg)}
+	if noticer != nil && msg.Cmd == CmdChat {
+		go noticer.Play()
+	}
 	return c.myconn.Notify("msg", &res)
 }
 

@@ -33,6 +33,7 @@ public class MyGrid: GLib.Object{
 	Gee.HashMap<string,weak Gtk.Grid?> frd_boxes;
 	public Gtk.CssProvider provider1;
 	public Gtk.CssProvider mark1;
+	public int mark_num=0;
 	public Gtk.CssProvider button1;
 	public Gtk.CssProvider link_css1;
 	public Gtk.Button strangers_btn;
@@ -330,9 +331,14 @@ list{
 			Gtk.Grid grid = this.frd_boxes[id.to_string()];
 			var sc3 = grid.get_style_context();
 			sc3.remove_provider(this.mark1);
-			sc3.remove_class("mark");
-
-			this.msg_win.show_all();
+			if ( sc3.has_class("mark") ){
+				sc3.remove_class("mark");
+				this.mark_num--;
+				app.title = _("Everyone Publish!")+@"($(this.mark_num))";
+				app.show_all();
+			}else{
+				this.msg_win.show_all();
+			}
 		});
 	}
 	public void send_msg(){
@@ -728,8 +734,14 @@ list{
 		Gtk.Grid grid = this.frd_boxes[uid];
 		var sc3 = grid.get_style_context();
 		sc3.add_provider(this.mark1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		if ( sc3.has_class("mark")==false ){
 		sc3.add_class("mark");
-		grid.show_all();
+			this.mark_num++;
+			app.title = _("Everyone Publish!")+@"($(this.mark_num))";
+			app.show_all();
+		}else{
+			grid.show_all();
+		}
 		//print(@"mark: $(uid)\n");
 	}
 }
