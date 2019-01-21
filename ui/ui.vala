@@ -183,7 +183,7 @@ list{
 				var ids = this.frds1.keys;
 				foreach( string k1 in ids){
 					//mutex1.lock();
-					print("%s\n",k1);
+					//print("%s\n",k1);
 					if(k1 == this.uid.to_string())
 						continue;
 					GLib.Idle.add(()=>{
@@ -621,7 +621,7 @@ list{
 	//callback in rpc msg
 	public void rpc_callback(int8 typ,int64 from,string msg){
 		//Msg　开头可以带着类型标记 JSON/TEXT
-		print(@"ID: $(from) ,Msg: $(msg)\n");
+		//print(@"ID: $(from) ,Msg: $(msg)\n");
 		//from==0  "Offline id"
 		if(from==0){
 			if(msg.length<=8){
@@ -649,7 +649,7 @@ list{
 				});
 				return;
 			}
-			print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
+			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
 		}
 		//from>0
