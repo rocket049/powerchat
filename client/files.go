@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"mime"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -25,14 +26,9 @@ var (
 )
 
 func getFileDir() string {
-	exe1, err := os.Executable()
-	if err != nil {
-		os.Mkdir("RecvFiles", os.ModePerm)
-		return "RecvFiles"
-	}
-	dir1 := filepath.Dir(exe1)
-	res := filepath.Join(dir1, "RecvFiles")
-	os.Mkdir(res, os.ModePerm)
+	u1, _ := user.Current()
+	res := filepath.Join(u1.HomeDir, ".powerchat", "RecvFiles")
+	os.MkdirAll(res, os.ModePerm)
 	return res
 }
 

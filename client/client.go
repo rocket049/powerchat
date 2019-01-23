@@ -12,6 +12,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strconv"
@@ -34,7 +35,7 @@ func init() {
 	rpcSrv = new(PClient)
 }
 
-func client() {
+func client(ctl1 chan int) {
 	var cfg tls.Config
 	//	roots := x509.NewCertPool()
 	//	pem, _ := ioutil.ReadFile("pems/a-cert.pem")
@@ -57,6 +58,7 @@ func client() {
 	ok := <-res1
 	close(res1)
 	if ok {
+		ctl1 <- 1
 		startFileServ(conn1)
 	}
 	fmt.Println("quit")
@@ -425,17 +427,35 @@ func main() {
 		log.Fatal("config file parse error\n")
 	}
 	httpChan = make(chan MsgType, 10)
-	client()
+	ctl1 := make(chan int, 1)
+	go client(ctl1)
+	<-ctl1
+	close(ctl1)
+	//start ui
+	ui1 := filepath.Join(path1, "./ui")
+	ui2 := filepath.Join(path1, "./ui.exe")
+	ui3 := filepath.Join(path1, "../ui/ui")
+	ui4 := filepath.Join(path1, "../ui/ui.exe")
+	if _, err = os.Stat(ui1); err == nil {
+		cui := exec.Command(ui1, fmt.Sprintf("%d", servePort))
+		cui.Run()
+	} else if _, err = os.Stat(ui2); err == nil {
+		cui := exec.Command(ui2, fmt.Sprintf("%d", servePort))
+		cui.Run()
+	} else if _, err = os.Stat(ui3); err == nil {
+		cui := exec.Command(ui3, fmt.Sprintf("%d", servePort))
+		cui.Run()
+	} else if _, err = os.Stat(ui4); err == nil {
+		cui := exec.Command(ui4, fmt.Sprintf("%d", servePort))
+		cui.Run()
+	} else {
+		log.Fatal("Can't find ui!")
+	}
 }
 
 func getRelatePath(name1 string) string {
-	exe1, err := os.Executable()
-	if err != nil {
-		log.Println(err)
-		return "."
-	}
-	dir1 := filepath.Dir(exe1)
-	res := filepath.Join(dir1, name1)
+	u1, _ := user.Current()
+	res := filepath.Join(u1.HomeDir, ".powerchat", name1)
 	os.MkdirAll(res, os.ModePerm)
 	return res
 }
