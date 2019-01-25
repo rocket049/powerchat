@@ -267,3 +267,15 @@ msgstr "打开目录"
 
 msgid "RemoveFile"
 msgstr "删除文件"
+
+msgid "(Click to Hide/Show)"
+msgstr "(点击图标隐藏/显示窗口)"
+
+msgid "Copy Right:"
+msgstr "版权所有："
+
+msgid "Help"
+msgstr "帮助"
+
+msgid "About"
+msgstr "关于"

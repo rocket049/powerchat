@@ -436,20 +436,37 @@ func main() {
 	ui2 := filepath.Join(path1, "./ui.exe")
 	ui3 := filepath.Join(path1, "../ui/ui")
 	ui4 := filepath.Join(path1, "../ui/ui.exe")
+	var cui *exec.Cmd
 	if _, err = os.Stat(ui1); err == nil {
-		cui := exec.Command(ui1, fmt.Sprintf("%d", servePort))
-		cui.Run()
+		cui = exec.Command(ui1, fmt.Sprintf("%d", servePort))
 	} else if _, err = os.Stat(ui2); err == nil {
-		cui := exec.Command(ui2, fmt.Sprintf("%d", servePort))
-		cui.Run()
+		cui = exec.Command(ui2, fmt.Sprintf("%d", servePort))
 	} else if _, err = os.Stat(ui3); err == nil {
-		cui := exec.Command(ui3, fmt.Sprintf("%d", servePort))
-		cui.Run()
+		cui = exec.Command(ui3, fmt.Sprintf("%d", servePort))
 	} else if _, err = os.Stat(ui4); err == nil {
-		cui := exec.Command(ui4, fmt.Sprintf("%d", servePort))
-		cui.Run()
+		cui = exec.Command(ui4, fmt.Sprintf("%d", servePort))
 	} else {
 		log.Fatal("Can't find ui!")
+	}
+	out1, err := cui.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	defer out1.Close()
+	err = cui.Start()
+	if err != nil {
+		panic(err)
+	}
+	rdOut := bufio.NewReader(out1)
+	for {
+		ln1, _, err := rdOut.ReadLine()
+		if err != nil {
+			log.Println(err)
+			break
+		}
+		fmt.Printf("UI: ")
+		os.Stdout.Write(ln1)
+		fmt.Printf("\n")
 	}
 }
 

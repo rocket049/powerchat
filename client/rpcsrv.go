@@ -447,6 +447,7 @@ func (c *PClient) GetProxyPort(param []byte, res *int) error {
 //rpc service block
 func (c *PClient) Quit(param []byte, res *int) error {
 	log.Println("rpc serve normal exit")
+	noticer.Close()
 	os.Exit(0)
 	return nil
 }

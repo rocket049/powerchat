@@ -179,6 +179,7 @@ list{
 
 		this.mygrid.show.connect(()=>{
 			//var mutex1 = new GLib.Mutex();
+			stdout.printf("grid show\n");
 			var thread = new GLib.Thread<bool>("tell",()=>{
 				var ids = this.frds1.keys;
 				foreach( string k1 in ids){
@@ -334,6 +335,8 @@ list{
 			if ( sc3.has_class("mark") ){
 				sc3.remove_class("mark");
 				this.mark_num--;
+				if (this.mark_num==0)
+					app.clear_notify();
 				app.title = _("Everyone Publish!")+@"($(this.mark_num))";
 				app.show_all();
 			}else{
@@ -729,14 +732,20 @@ list{
 	}
 	public void msg_mark(string uid){
 		Gtk.ListBoxRow r = this.frd_boxes[uid].get_parent() as Gtk.ListBoxRow;
+		if(app.counter%2==1){
+			app.tray_notify();
+		}
 		if(r.is_selected())
 			return;
 		Gtk.Grid grid = this.frd_boxes[uid];
 		var sc3 = grid.get_style_context();
 		sc3.add_provider(this.mark1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 		if ( sc3.has_class("mark")==false ){
-		sc3.add_class("mark");
+			sc3.add_class("mark");
 			this.mark_num++;
+			if(this.mark_num==1)
+				app.tray_notify();
+			
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))";
 			app.show_all();
 		}else{
@@ -747,6 +756,11 @@ list{
 }
 
 public class AppWin:Gtk.Window{
+	Gtk.StatusIcon tray1;
+	Gdk.Pixbuf icon1;
+	Gdk.Pixbuf icon2;
+	Gtk.VBox box1;
+	public int counter=0;
 	public AppWin(){
 		// Sets the title of the Window:
 		this.title = _("Everyone Publish!");
@@ -760,8 +774,27 @@ public class AppWin:Gtk.Window{
 		this.hide_titlebar_when_maximized = true;
 
         this.set_resizable(false);
-        this.set_icon_from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","tank.png"));
-
+        var icon_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","tank.png");
+        this.set_icon_from_file(icon_path);
+        this.icon1 = new Gdk.Pixbuf.from_file(icon_path);
+        this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","msg.png"));
+        this.tray1 = new Gtk.StatusIcon.from_pixbuf(this.icon1);
+        this.tray1.set_tooltip_text(_("Everyone Publish!")+"\n"+_("(Click to Hide/Show)"));
+		this.tray1.set_visible(false);
+		this.tray1.activate.connect(()=>{
+			if (counter%2 == 0)
+				this.hide();
+			else
+				this.show();
+			counter++;
+		});
+		
+		this.show.connect(()=>{
+			this.tray1.set_visible(true);
+			if(grid1.mark_num==0){
+				this.clear_notify();
+			}
+		});
 		// Method called on pressing [X]
 		this.destroy.connect (() => {
 			// Print "Bye!" to our console:
@@ -770,6 +803,38 @@ public class AppWin:Gtk.Window{
 			// Terminate the mainloop: (main returns 0)
 			Gtk.main_quit ();
 		});
+		this.box1 = new Gtk.VBox(false,0);
+		this.add(this.box1);
+		this.create_menubar();
+	}
+	public void tray_notify(){
+		this.tray1.set_from_pixbuf(this.icon2);
+	}
+	public void clear_notify(){
+		this.tray1.set_from_pixbuf(this.icon1);
+	}
+	public void create_menubar(){
+		var menubar1 = new Gtk.MenuBar();
+		var menubar_item1 = new Gtk.MenuItem.with_label(_("Help"));
+		var menu_help = new Gtk.Menu();
+		var item_about = new Gtk.MenuItem.with_label(_("About"));
+		menu_help.append(item_about);
+		menubar_item1.set_submenu(menu_help);
+		menubar1.append(menubar_item1);
+		this.append(menubar1);
+		menubar1.show_all();
+		item_about.activate.connect(()=>{
+			var dlg_about = new Gtk.MessageDialog(this, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
+			dlg_about.text = _("Copy Right:");
+            dlg_about.secondary_text = "Fu Huizhong <fuhuizn@163.com>";
+            dlg_about.show();
+            dlg_about.response.connect((rid)=>{
+				dlg_about.destroy();
+			});
+		});
+	}
+	public void append(Gtk.Widget w){
+		this.box1.pack_start(w);
 	}
 }
 
@@ -879,7 +944,7 @@ public static int main(string[] args){
 	Gtk.init(ref args);
 	app = new AppWin();
 	grid1 = new MyGrid();
-	app.add(grid1.mygrid);
+	app.append(grid1.mygrid);
 
 	login1 = new LoginDialog();
 	login1.dlg1.show_all();
