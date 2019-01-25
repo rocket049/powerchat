@@ -209,6 +209,7 @@ list{
 			}
 			rpc1.get_host(out this.host);
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
+			app.update_tooltip();
 		});
 
 		bf1.clicked.connect(()=>{
@@ -783,7 +784,6 @@ public class AppWin:Gtk.Window{
         this.icon1 = new Gdk.Pixbuf.from_file(icon_path);
         this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","msg.png"));
         this.tray1 = new Gtk.StatusIcon.from_pixbuf(this.icon1);
-        this.tray1.set_tooltip_text(_("Everyone Publish!")+"\n"+_("(Click to Hide/Show)"));
 		this.tray1.set_visible(false);
 		this.tray1.activate.connect(()=>{
 			if (counter%2 == 0)
@@ -810,6 +810,9 @@ public class AppWin:Gtk.Window{
 		this.box1 = new Gtk.VBox(false,0);
 		this.add(this.box1);
 		this.create_menubar();
+	}
+	public void update_tooltip(){
+		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+grid1.host+"\n"+_("(Click to Hide/Show)"));
 	}
 	public void tray_notify(){
 		this.tray1.set_from_pixbuf(this.icon2);
@@ -946,8 +949,8 @@ public static int main(string[] args){
 	});
 
 	Gtk.init(ref args);
-	app = new AppWin();
 	grid1 = new MyGrid();
+	app = new AppWin();
 	app.append(grid1.mygrid);
 
 	login1 = new LoginDialog();
