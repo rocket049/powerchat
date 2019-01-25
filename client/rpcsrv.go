@@ -453,6 +453,12 @@ func (c *PClient) Quit(param []byte, res *int) error {
 }
 
 //rpc service block
+func (c *PClient) GetHost(param []byte, res *string) error {
+	*res = serverAddr
+	return nil
+}
+
+//rpc service block
 func (c *PClient) OpenPath(param []string, res *int) error {
 	return open.Run(param[0])
 }

@@ -272,6 +272,21 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
+	public bool get_host(out string host){
+		var params = new Variant.bytestring("");
+        Variant res;
+        try{
+            var ok = c.call("PClient.GetHost",params,null,out res);
+            if(ok == false){
+				return false;
+			}
+            host = res.get_string();
+            return true;
+        }catch (Error e) {
+            stdout.printf ("Error: %s\n", e.message);
+            return false;
+        }
+	}
 	public bool set_proxy(uint16 port){
 		var params = new Variant("(i)",port);
         

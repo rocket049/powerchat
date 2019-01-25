@@ -46,6 +46,8 @@ public class MyGrid: GLib.Object{
 	public string uname;
 	public string udesc;
 	public int16 uage;
+	
+	public string host;
 	Gtk.CssProvider cssp;
 	Gtk.ScrolledWindow msg_win;
 	public MyGrid(){
@@ -205,6 +207,8 @@ list{
 			}else{
 				Gtk.main_quit();
 			}
+			rpc1.get_host(out this.host);
+			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
 		});
 
 		bf1.clicked.connect(()=>{
@@ -337,7 +341,7 @@ list{
 				this.mark_num--;
 				if (this.mark_num==0)
 					app.clear_notify();
-				app.title = _("Everyone Publish!")+@"($(this.mark_num))";
+				app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
 				app.show_all();
 			}else{
 				this.msg_win.show_all();
@@ -746,7 +750,7 @@ list{
 			if(this.mark_num==1)
 				app.tray_notify();
 			
-			app.title = _("Everyone Publish!")+@"($(this.mark_num))";
+			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
 			app.show_all();
 		}else{
 			grid.show_all();
