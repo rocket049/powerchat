@@ -39,8 +39,8 @@ public class MyGrid: GLib.Object{
 	public Gtk.Button strangers_btn;
 	public Gtk.Button user_btn;
 
-	public string man_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","man.png");
-	public string woman_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","woman.png");
+	public string man_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","man.png");
+	public string woman_icon = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","woman.png");
 	public int64 uid;
 	public int16 usex;
 	public string uname;
@@ -783,10 +783,10 @@ public class AppWin:Gtk.ApplicationWindow{
 		this.hide_titlebar_when_maximized = true;
 
         this.set_resizable(false);
-        var icon_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","tank.png");
+        var icon_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","tank.png");
         this.set_icon_from_file(icon_path);
         this.icon1 = new Gdk.Pixbuf.from_file(icon_path);
-        this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"icons","msg.png"));
+        this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","msg.png"));
         this.tray1 = new Gtk.StatusIcon.from_pixbuf(this.icon1);
 		this.tray1.set_visible(false);
 		this.tray1.activate.connect(()=>{
@@ -924,7 +924,7 @@ public static string prog_path;
 public void set_my_locale(string path1){
 	var dir1 = GLib.Path.get_dirname(path1);
 	prog_path = dir1;
-	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"locale");
+	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","locale");
 	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
 	GLib.Intl.textdomain("powerchat");
 	GLib.Intl.bindtextdomain("powerchat",textpath);
