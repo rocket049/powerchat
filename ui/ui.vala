@@ -430,7 +430,7 @@ list{
 		if (u1.timestamp_offline.length > 10){
 			//insert offline message
 			add_right_name_icon(u1.name,u1.sex);
-			add_text(_("Offline Message:")+@"[$(u1.timestamp_offline)]\n$(u1.msg_offline)");
+			add_text(_("Rewrite Offline Message:")+@"[$(u1.timestamp_offline)]\n$(u1.msg_offline)");
 			this.msg_mark(u1.id.to_string());
 		}
 		this.msg_win.show_all();
@@ -760,14 +760,18 @@ list{
 	}
 }
 
-public class AppWin:Gtk.Window{
+public class AppWin:Gtk.ApplicationWindow{
 	Gtk.StatusIcon tray1;
 	Gdk.Pixbuf icon1;
 	Gdk.Pixbuf icon2;
 	Gtk.VBox box1;
+	Gtk.Application application1;
 	public int counter=0;
 	public AppWin(){
 		// Sets the title of the Window:
+		application1 = new Gtk.Application("app.powerchat",GLib.ApplicationFlags.FLAGS_NONE);
+		application1.register();
+		application1.add_window(this as Gtk.Window);
 		this.title = _("Everyone Publish!");
 
 		// Center window at startup:
@@ -809,7 +813,8 @@ public class AppWin:Gtk.Window{
 		});
 		this.box1 = new Gtk.VBox(false,0);
 		this.add(this.box1);
-		this.create_menubar();
+		//this.create_menubar();
+		setup_menubar();
 	}
 	public void update_tooltip(){
 		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+grid1.host+"\n"+_("(Click to Hide/Show)"));
@@ -820,17 +825,24 @@ public class AppWin:Gtk.Window{
 	public void clear_notify(){
 		this.tray1.set_from_pixbuf(this.icon1);
 	}
-	public void create_menubar(){
-		var menubar1 = new Gtk.MenuBar();
-		var menubar_item1 = new Gtk.MenuItem.with_label(_("Help"));
-		var menu_help = new Gtk.Menu();
-		var item_about = new Gtk.MenuItem.with_label(_("About"));
-		menu_help.append(item_about);
-		menubar_item1.set_submenu(menu_help);
-		menubar1.append(menubar_item1);
-		this.append(menubar1);
-		menubar1.show_all();
-		item_about.activate.connect(()=>{
+	public void append(Gtk.Widget w){
+		this.box1.pack_start(w);
+	}
+	public void setup_menubar(){
+        var menu1 = new GLib.Menu();
+        var item1 = new GLib.MenuItem(_("About"),"app.about");
+        menu1.append_item(item1);
+        var menubar =new GLib.Menu();
+        menubar.append_submenu(_("Help"),menu1);
+        
+        application1.set_menubar(menubar as GLib.MenuModel);
+        
+        add_actions();
+    }
+    private void add_actions () {
+		SimpleAction act2 = new SimpleAction ("about", null);
+		act2.activate.connect (() => {
+			application1.hold ();
 			var dlg_about = new Gtk.MessageDialog(this, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
 			dlg_about.text = _("Copy Right:");
             dlg_about.secondary_text = "Fu Huizhong <fuhuizn@163.com>";
@@ -838,10 +850,10 @@ public class AppWin:Gtk.Window{
             dlg_about.response.connect((rid)=>{
 				dlg_about.destroy();
 			});
+			application1.release ();
 		});
-	}
-	public void append(Gtk.Widget w){
-		this.box1.pack_start(w);
+        act2.set_enabled(true);
+		application1.add_action (act2);
 	}
 }
 

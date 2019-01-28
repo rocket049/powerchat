@@ -131,8 +131,8 @@ msgid "Chat To: "
 msgstr "聊天对象："
 
 #: ui.vala:369
-msgid "Offline Message:"
-msgstr "离线信息"
+msgid "Rewrite Offline Message:"
+msgstr "覆盖上一条离线信息"
 
 #: ui.vala:564
 msgid "[Offline]"
