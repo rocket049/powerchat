@@ -850,6 +850,9 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("About"),"app.about");
         menu1.append_item(item1);
         
+        item1 = new GLib.MenuItem(_("Pay"),"app.pay");
+        menu1.append_item(item1);
+        
         var menubar =new GLib.Menu();
         menubar.append_submenu(_("Help"),menu1);
         
@@ -881,6 +884,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act3.set_enabled(true);
 		application1.add_action (act3);
+		
+		SimpleAction act4 = new SimpleAction ("pay", null);
+		act4.activate.connect (() => {
+			application1.hold ();
+			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
+			application1.release ();
+		});
+        act4.set_enabled(true);
+		application1.add_action (act4);
 	}
 }
 
@@ -996,7 +1008,10 @@ public static int main(string[] args){
 	login1.dlg1.show_all();
 
 	popup1 = new MyFriendMenu();
-
+	GLib.Timeout.add_seconds(60,()=>{
+		rpc1.ping();
+		return true;
+	});
 	Gtk.main ();
 	rpc1.quit();
 	rpc1.c.close();

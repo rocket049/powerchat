@@ -310,7 +310,7 @@ func (c *ClientType) ServeReady(conn1 io.Writer) error {
 }
 
 func (c *ClientType) Pong(conn1 io.Writer) error {
-	msg, _ := MsgEncode(CmdPong, 0, c.Id, []byte("PONG"))
+	msg, _ := MsgEncode(CmdPong, 0, c.Id, []byte("\n"))
 	_, err := io.Copy(conn1, bytes.NewBuffer(msg))
 	return err
 }

@@ -344,6 +344,14 @@ func (c *PClient) Tell(uid []int64, res *int) error {
 }
 
 //rpc service
+func (c *PClient) Ping(param []byte, res *int) error {
+	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
+	c.conn.Write(msg)
+	log.Println("ping")
+	return nil
+}
+
+//rpc service
 func (c *PClient) HttpConnect(uid []int64, res *int) error {
 	httpId = uid[0]
 	c.httpId = uid[0]

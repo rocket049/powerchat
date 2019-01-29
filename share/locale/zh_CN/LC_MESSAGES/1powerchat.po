@@ -279,3 +279,12 @@ msgstr "帮助"
 
 msgid "About"
 msgstr "关于"
+
+msgid "Homepage"
+msgstr "主页"
+
+msgid "Pay"
+msgstr "打赏"
+
+msgid "TCP Tunnel, PORT:"
+msgstr "TCP隧道，本地端口："
