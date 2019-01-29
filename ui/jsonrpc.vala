@@ -210,6 +210,19 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
+	public bool set_tcp_id(int64 uid){
+		var params = new GLib.Variant("(i)",uid);
+		//GLib.Variant res;
+		try{
+            c.call_async.begin("PClient.HttpConnect",params,null,(s,r)=>{
+				c.call_async.end(r,null);
+			});
+            return true;
+        }catch (Error e) {
+            stdout.printf ("Error: %s\n", e.message);
+            return false;
+        }
+	}
 	public bool send_file(int64 to , string pathname){
 		var v1 = new Variant.int64(to);
 		var v2 = new Variant.string(pathname);

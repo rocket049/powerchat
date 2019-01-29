@@ -469,8 +469,13 @@ list{
         grid2.attach(l2,1,0);
 
         var b2 = new Gtk.Button.with_label("WEB");
+        b2.set_tooltip_text(@"http://localhost:$(server_port)");
         grid2.attach(b2,2,0);
         grid2.set_column_spacing(5);
+        
+        var b3 = new Gtk.Button.with_label("TCP");
+        b3.set_tooltip_text(_("TCP Tunnel, PORT:")+@"$(server_port)");
+        grid2.attach(b3,3,0);
 
         this.frd_boxes[@"$(user1.id)"] = grid2;
         this.friends.add(grid2);
@@ -487,6 +492,13 @@ list{
         b2.clicked.connect(()=>{
 			//stdout.printf(@"open %$(uint64.FORMAT)\n",user1.id);
 			if( false == rpc1.set_http_id(user1.id) ){
+				Gtk.main_quit();
+			}
+		});
+		
+		b3.clicked.connect(()=>{
+			//stdout.printf(@"open %$(uint64.FORMAT)\n",user1.id);
+			if( false == rpc1.set_tcp_id(user1.id) ){
 				Gtk.main_quit();
 			}
 		});
@@ -769,7 +781,9 @@ public class AppWin:Gtk.ApplicationWindow{
 	public int counter=0;
 	public AppWin(){
 		// Sets the title of the Window:
-		application1 = new Gtk.Application("app.powerchat",GLib.ApplicationFlags.FLAGS_NONE);
+		var dt1 = new DateTime.now_local();
+		
+		application1 = new Gtk.Application(@"app.powerchat.id$(dt1.to_unix())",GLib.ApplicationFlags.FLAGS_NONE);
 		application1.register();
 		application1.add_window(this as Gtk.Window);
 		this.title = _("Everyone Publish!");
@@ -830,8 +844,12 @@ public class AppWin:Gtk.ApplicationWindow{
 	}
 	public void setup_menubar(){
         var menu1 = new GLib.Menu();
-        var item1 = new GLib.MenuItem(_("About"),"app.about");
+        var item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
         menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("About"),"app.about");
+        menu1.append_item(item1);
+        
         var menubar =new GLib.Menu();
         menubar.append_submenu(_("Help"),menu1);
         
@@ -854,6 +872,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act2.set_enabled(true);
 		application1.add_action (act2);
+		
+		SimpleAction act3 = new SimpleAction ("homepage", null);
+		act3.activate.connect (() => {
+			application1.hold ();
+			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			application1.release ();
+		});
+        act3.set_enabled(true);
+		application1.add_action (act3);
 	}
 }
 
