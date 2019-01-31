@@ -856,6 +856,12 @@ public class AppWin:Gtk.ApplicationWindow{
         var menubar =new GLib.Menu();
         menubar.append_submenu(_("Help"),menu1);
         
+        menu1 = new GLib.Menu();
+        item1 = new GLib.MenuItem(_("PreviewWeb"),"app.preview-web");
+        menu1.append_item(item1);
+        
+        menubar.append_submenu(_("Operate"),menu1);
+        
         application1.set_menubar(menubar as GLib.MenuModel);
         
         add_actions();
@@ -893,6 +899,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act4.set_enabled(true);
 		application1.add_action (act4);
+		
+		SimpleAction act5 = new SimpleAction ("preview-web", null);
+		act5.activate.connect (() => {
+			application1.hold ();
+			Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
+			application1.release ();
+		});
+        act5.set_enabled(true);
+		application1.add_action (act5);
 	}
 }
 

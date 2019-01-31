@@ -288,3 +288,9 @@ msgstr "打赏"
 
 msgid "TCP Tunnel, PORT:"
 msgstr "TCP隧道，本地端口："
+
+msgid "PreviewWeb"
+msgstr "预览本地网站"
+
+msgid "Operate"
+msgstr "操作"
