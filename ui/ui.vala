@@ -84,7 +84,7 @@ list{
 		this.link_css1.load_from_data("label>link{color:#0000FF;}");
 
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
-		scrollWin1.width_request = 160;
+		scrollWin1.width_request = 240;
 		scrollWin1.expand = true;
 		this.mygrid.attach(scrollWin1,0,0,2,3);
 		this.friends = new Gtk.ListBox();
