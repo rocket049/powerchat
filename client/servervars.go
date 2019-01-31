@@ -15,6 +15,7 @@ const tmpl string = `<html>
 
 const header string = `<html>
 <head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
 <link type="text/css" rel="stylesheet" href="/style.css"/>
 <title>{{.title}}</title>
 <head>
