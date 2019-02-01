@@ -818,12 +818,10 @@ public class AppWin:Gtk.ApplicationWindow{
 			}
 		});
 		// Method called on pressing [X]
-		this.destroy.connect (() => {
-			// Print "Bye!" to our console:
-			print ("Bye!\n");
-			grid1.release_resource();
-			// Terminate the mainloop: (main returns 0)
-			Gtk.main_quit ();
+		this.set_destroy_with_parent(false);
+		this.delete_event.connect((e)=>{ 
+			counter++;
+			return this.hide_on_delete ();
 		});
 		this.box1 = new Gtk.VBox(false,0);
 		this.add(this.box1);
@@ -861,6 +859,9 @@ public class AppWin:Gtk.ApplicationWindow{
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("Quit"),"app.quit");
         menu1.append_item(item1);
         
         menubar.append_submenu(_("Operate"),menu1);
@@ -925,6 +926,19 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act6.set_enabled(true);
 		application1.add_action (act6);
+		
+		SimpleAction act7 = new SimpleAction ("quit", null);
+		act7.activate.connect (() => {
+			application1.hold ();
+			// Print "Bye!" to our console:
+			print ("Bye!\n");
+			grid1.release_resource();
+			// Terminate the mainloop: (main returns 0)
+			Gtk.main_quit ();
+			application1.release ();
+		});
+        act7.set_enabled(true);
+		application1.add_action (act7);
 	}
 }
 

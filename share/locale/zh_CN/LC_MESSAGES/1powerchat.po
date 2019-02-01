@@ -297,3 +297,6 @@ msgstr "操作"
 
 msgid "OpenBlogDir"
 msgstr "我的博客目录"
+
+msgid "Quit"
+msgstr "退出"
