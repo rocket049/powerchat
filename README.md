@@ -2,7 +2,7 @@
 
 英文名：`powerchat`
 
-加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
+linux / windows 加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
 
 ## 通用功能
 
