@@ -860,6 +860,9 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("PreviewWeb"),"app.preview-web");
         menu1.append_item(item1);
         
+        item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
+        menu1.append_item(item1);
+        
         menubar.append_submenu(_("Operate"),menu1);
         
         application1.set_menubar(menubar as GLib.MenuModel);
@@ -885,7 +888,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act3 = new SimpleAction ("homepage", null);
 		act3.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			rpc1.open_path("https://gitee.com/rocket049/powerchat");
 			application1.release ();
 		});
         act3.set_enabled(true);
@@ -894,7 +898,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act4 = new SimpleAction ("pay", null);
 		act4.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
+			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
+			rpc1.open_path("https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779");
 			application1.release ();
 		});
         act4.set_enabled(true);
@@ -903,11 +908,23 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act5 = new SimpleAction ("preview-web", null);
 		act5.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
+			//Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
+			rpc1.open_path(@"http://localhost:$(proxy_port)/");
 			application1.release ();
 		});
         act5.set_enabled(true);
 		application1.add_action (act5);
+		
+		SimpleAction act6 = new SimpleAction ("blog-dir", null);
+		act6.activate.connect (() => {
+			application1.hold ();
+			var home1 = GLib.Environment.get_home_dir();
+			var blog1 = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,home1,"ChatShare");
+			rpc1.open_path(blog1);
+			application1.release ();
+		});
+        act6.set_enabled(true);
+		application1.add_action (act6);
 	}
 }
 

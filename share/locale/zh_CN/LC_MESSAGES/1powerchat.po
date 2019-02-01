@@ -294,3 +294,6 @@ msgstr "预览本地网站"
 
 msgid "Operate"
 msgstr "操作"
+
+msgid "OpenBlogDir"
+msgstr "我的博客目录"

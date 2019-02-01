@@ -212,7 +212,8 @@ public class RpcClient:GLib.Object{
 		try{
             c.call_async.begin("PClient.HttpConnect",params,null,(s,r)=>{
 				c.call_async.end(r,null);
-				Gtk.show_uri(null,@"http://localhost:$(server_port)/",Gdk.CURRENT_TIME);
+				//Gtk.show_uri(null,@"http://localhost:$(server_port)/",Gdk.CURRENT_TIME);
+				this.open_path(@"http://localhost:$(server_port)/");
 			});
             return true;
         }catch (Error e) {
