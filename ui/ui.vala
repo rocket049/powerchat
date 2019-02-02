@@ -165,12 +165,32 @@ list{
 
 		var grid1 = new Gtk.Grid();
 		this.mygrid.attach(grid1,2,2,5,2);
-
-		var bf1  = new Gtk.Button.with_label(_("File"));
-		grid1.attach(bf1,0,0,1,1);
-
-		var bp1  = new Gtk.Button.with_label(_("Image"));
-		grid1.attach(bp1,1,0,1,1);
+		//文件拖放区
+		Gtk.EventBox dropbox = new Gtk.EventBox();
+		dropbox.set_size_request(100,40);
+		grid1.attach(dropbox,0,0,4,1);
+		dropbox.add(new Gtk.Label(_("Send File or Image: Drag a file here")));
+		Gtk.drag_dest_set (dropbox, Gtk.DestDefaults.ALL, null, Gdk.DragAction.COPY);
+		Gtk.drag_dest_add_uri_targets(dropbox);
+		dropbox.drag_data_received.connect((context, x,y,data, info, time)=>{
+			var uris = data.get_uris();
+			if(uris.length>1){
+				this.add_text(_("too many files"));
+				return;
+			}
+			var fname = GLib.Filename.from_uri(uris[0]);
+			if(FileUtils.test(fname, FileTest.IS_REGULAR)==false){
+				this.add_text(_("this is not a file"));
+				return;
+			}
+			if( rpc1.send_file(this.to, fname) ){
+				string text1 = @"<a href='$(uris[0])'>$(GLib.Path.get_basename(fname))</a>";
+				this.add_left_name_icon(this.uname,this.usex);
+				this.add_text(text1,true,true);
+			}else{
+				Gtk.main_quit();
+			}
+		});
 
 		this.entry1 = new Gtk.Entry();
 		grid1.attach(this.entry1,0,1,3,1);
@@ -210,70 +230,6 @@ list{
 			rpc1.get_host(out this.host);
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
 			app.update_tooltip();
-		});
-
-		bf1.clicked.connect(()=>{
-			if(this.to==0 || this.to==this.uid)
-				return;
-			//file choose
-			Gtk.FileChooserDialog chooser = new Gtk.FileChooserDialog (
-				_("Select a file to send"), app, Gtk.FileChooserAction.OPEN,
-				_("Cancel"),
-				Gtk.ResponseType.CANCEL,
-				_("Open"),
-				Gtk.ResponseType.ACCEPT);
-			// Multiple files can be selected:
-			chooser.select_multiple = false;
-			if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-				var uri = chooser.get_uri ();
-				//print ("Selection: %s\n",uri);
-				if (uri[0:7]=="file://"){
-					//print ("Selection: %s\n",uri[7:uri.length]);
-					var fname = GLib.Filename.from_uri(uri);
-					//stdout.printf(fname);
-					if( rpc1.send_file(this.to, fname) ){
-						string text1 = @"<a href='$(uri)'>$(GLib.Path.get_basename(fname))</a>";
-						this.add_left_name_icon(this.uname,this.usex);
-						this.add_text(text1,true,true);
-					}else{
-						Gtk.main_quit();
-					}
-				}
-			}
-			chooser.close();
-		});
-
-		bp1.clicked.connect(()=>{
-			if(this.to==0 || this.to==this.uid)
-				return;
-			//file choose
-			Gtk.FileChooserDialog chooser = new Gtk.FileChooserDialog (
-				_("Select a file to send"), app, Gtk.FileChooserAction.OPEN,
-				_("Cancel"),
-				Gtk.ResponseType.CANCEL,
-				_("Open"),
-				Gtk.ResponseType.ACCEPT);
-			// Multiple files can be selected:
-			chooser.select_multiple = false;
-			Gtk.FileFilter filter = new Gtk.FileFilter ();
-			chooser.set_filter (filter);
-			filter.add_mime_type ("image/*");
-			if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-				var uri = chooser.get_uri ();
-				//print ("Selection: %s\n",uri);
-				if (uri[0:7]=="file://"){
-					//print ("Selection: %s\n",uri[7:uri.length]);
-					var fname = GLib.Filename.from_uri(uri);
-					if( rpc1.send_file(this.to, fname) ){
-						string text1 = @"<a href='$(uri)'>$(GLib.Path.get_basename(fname))</a>";
-						this.add_left_name_icon(this.uname,this.usex);
-						this.add_text(text1,true,true);
-					}else{
-						Gtk.main_quit();
-					}
-				}
-			}
-			chooser.close();
 		});
 
 		b1.clicked.connect(()=>{

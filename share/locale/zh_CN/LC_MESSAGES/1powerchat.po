@@ -300,3 +300,13 @@ msgstr "我的博客目录"
 
 msgid "Quit"
 msgstr "退出"
+
+msgid "Send File or Image: Drag a file here"
+msgstr "发送文件或图片：把文件拖放到此处"
+
+msgid "too many files"
+msgstr "一次只能发送一个文件"
+
+msgid "this is not a file"
+msgstr "这不是文件"
+
