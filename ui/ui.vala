@@ -589,7 +589,9 @@ list{
 		lb1.expand=true;
 		lb2.expand=true;
 		var bt_open = new Gtk.Button.with_label(_("OpenFile"));
+		bt_open.tooltip_text = pathname;
 		var bt_dir = new Gtk.Button.with_label(_("OpenDir"));
+		bt_dir.tooltip_text = dir1;
 		var bt_del = new Gtk.Button.with_label(_("RemoveFile"));
 		grid.attach(lb1,0,0);
 		grid.attach(bt_open,1,0);
