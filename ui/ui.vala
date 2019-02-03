@@ -167,29 +167,27 @@ list{
 		this.mygrid.attach(grid1,2,2,5,2);
 		//文件拖放区
 		Gtk.EventBox dropbox = new Gtk.EventBox();
-		dropbox.set_size_request(100,40);
+		dropbox.set_size_request(240,40);
 		grid1.attach(dropbox,0,0,4,1);
-		dropbox.add(new Gtk.Label(_("Send File or Image: Drag a file here")));
+		var droplabel = new Gtk.Label(_("Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"));
+		droplabel.wrap = true;
+        droplabel.wrap_mode = Pango.WrapMode.CHAR;
+		droplabel.selectable = true;
+		dropbox.add(droplabel);
 		Gtk.drag_dest_set (dropbox, Gtk.DestDefaults.ALL, null, Gdk.DragAction.COPY);
 		Gtk.drag_dest_add_uri_targets(dropbox);
 		dropbox.drag_data_received.connect((context, x,y,data, info, time)=>{
 			var uris = data.get_uris();
-			if(uris.length>1){
-				this.add_text(_("too many files"));
-				return;
+			send_uri1(uris);
+		});
+		dropbox.key_press_event.connect((e)=>{
+			if(e.keyval==Gdk.Key.v && e.state==Gdk.ModifierType.CONTROL_MASK){
+				var clipboard1 = Gtk.Clipboard.@get(Gdk.Atom.NONE);
+				clipboard1.request_uris((b, uris)=>{
+					send_uri1(uris);
+				});
 			}
-			var fname = GLib.Filename.from_uri(uris[0]);
-			if(FileUtils.test(fname, FileTest.IS_REGULAR)==false){
-				this.add_text(_("this is not a file"));
-				return;
-			}
-			if( rpc1.send_file(this.to, fname) ){
-				string text1 = @"<a href='$(uris[0])'>$(GLib.Path.get_basename(fname))</a>";
-				this.add_left_name_icon(this.uname,this.usex);
-				this.add_text(text1,true,true);
-			}else{
-				Gtk.main_quit();
-			}
+			return true;
 		});
 
 		this.entry1 = new Gtk.Entry();
@@ -304,6 +302,24 @@ list{
 				this.msg_win.show_all();
 			}
 		});
+	}
+	public void send_uri1(string[] uris){
+		if(uris.length!=1){
+			this.add_text(_("too many files"));
+			return;
+		}
+		var fname = GLib.Filename.from_uri(uris[0]);
+		if(FileUtils.test(fname, FileTest.IS_REGULAR)==false){
+			this.add_text(_("this is not a file")+@" : $(fname)");
+			return;
+		}
+		if( rpc1.send_file(this.to, fname) ){
+			string text1 = @"<a href='$(uris[0])'>$(GLib.Path.get_basename(fname))</a>";
+			this.add_left_name_icon(this.uname,this.usex);
+			this.add_text(text1,true,true);
+		}else{
+			Gtk.main_quit();
+		}
 	}
 	public void send_msg(){
 		// 发送信息

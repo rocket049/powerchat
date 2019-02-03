@@ -301,8 +301,8 @@ msgstr "我的博客目录"
 msgid "Quit"
 msgstr "退出"
 
-msgid "Send File or Image: Drag a file here"
-msgstr "发送文件或图片：把文件拖放到此处"
+msgid "Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"
+msgstr "发送文件或图片：拖放文件到此处，或按'Ctrl-V'粘贴文件到此处"
 
 msgid "too many files"
 msgstr "一次只能发送一个文件"
