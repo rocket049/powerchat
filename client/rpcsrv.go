@@ -468,5 +468,5 @@ func (c *PClient) GetHost(param []byte, res *string) error {
 
 //rpc service block
 func (c *PClient) OpenPath(param []string, res *int) error {
-	return open.Run(param[0])
+	return open.Start(param[0])
 }

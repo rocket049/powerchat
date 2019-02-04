@@ -150,7 +150,7 @@ func (s *myHandler) readMd(resp http.ResponseWriter, req *http.Request) {
 		resp.WriteHeader(404)
 		return
 	}
-	header1 := strings.Replace(header, "{{.title}}", path.Base(p1), -1)
+	header1 := strings.Replace(header, "{{.title}}", req.URL.Path, -1)
 	p, err := ioutil.ReadFile(p1)
 	if err != nil {
 		resp.WriteHeader(404)
