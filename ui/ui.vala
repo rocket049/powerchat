@@ -938,7 +938,8 @@ public class LoginDialog :GLib.Object{
 		this.dlg1.add_button(_("Login"),2);
 		this.dlg1.add_button(_("Register"),4);
 		this.dlg1.add_button(_("Cancel"),3);
-
+        this.load_name();
+        
 		this.dlg1.response.connect((rid)=>{
 			if (rid==2){
 				//stdout.printf("next %d\n%s\n%s\n",rid,this.name.text,this.passwd.text);
@@ -961,6 +962,7 @@ public class LoginDialog :GLib.Object{
 					print("RPC error");
 					Gtk.main_quit();
 				}
+                this.save_name();
 				app.show_all();
 				this.dlg1.hide();
 			}else if(rid==4){
@@ -978,6 +980,39 @@ public class LoginDialog :GLib.Object{
 	public void hide(){
 		this.dlg1.hide();
 	}
+    public void save_name(){
+        var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
+        GLib.File fp = GLib.File.new_for_path(loguser);
+        GLib.FileOutputStream fs;
+        try{
+            fs = fp.create(FileCreateFlags.PRIVATE);
+        }catch (Error e1) {
+            try{
+                fs = fp.replace(null,false,FileCreateFlags.PRIVATE);
+            }catch (Error e2){
+                print ("write name Error: %s\n", e2.message);
+                return;
+            }
+        }
+        DataOutputStream dos = new DataOutputStream (fs as OutputStream);
+        dos.put_string( this.name.text );
+        print("write name. \n");
+    } 
+    public void load_name(){
+        var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
+        try{
+            GLib.File fp = GLib.File.new_for_path(loguser);
+            var fs = fp.read();
+            DataInputStream dis = new DataInputStream (fs as InputStream);
+            string ns = dis.read_line();
+            if (ns != null ){
+                this.name.text = ns;
+                this.passwd.grab_focus_without_selecting();
+            }
+        }catch (Error e) {
+            print ("load name Error: %s\n", e.message);
+        }
+    } 
 }
 public static string prog_path;
 public void set_my_locale(string path1){
