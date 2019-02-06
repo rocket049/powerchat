@@ -1012,7 +1012,7 @@ public class LoginDialog :GLib.Object{
 					print("RPC error");
 					Gtk.main_quit();
 				}
-                this.save_name();
+                save_name(this.name.text);
 				app.show_all();
 				this.dlg1.hide();
 			}else if(rid==4){
@@ -1030,24 +1030,7 @@ public class LoginDialog :GLib.Object{
 	public void hide(){
 		this.dlg1.hide();
 	}
-    public void save_name(){
-        var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
-        GLib.File fp = GLib.File.new_for_path(loguser);
-        GLib.FileOutputStream fs;
-        try{
-            fs = fp.create(FileCreateFlags.PRIVATE);
-        }catch (Error e1) {
-            try{
-                fs = fp.replace(null,false,FileCreateFlags.PRIVATE);
-            }catch (Error e2){
-                print ("write name Error: %s\n", e2.message);
-                return;
-            }
-        }
-        DataOutputStream dos = new DataOutputStream (fs as OutputStream);
-        dos.put_string( this.name.text );
-        print("write name. \n");
-    } 
+    
     public void load_name(){
         var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
         try{
@@ -1064,6 +1047,25 @@ public class LoginDialog :GLib.Object{
         }
     } 
 }
+public void save_name(string name1){
+	var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
+	GLib.File fp = GLib.File.new_for_path(loguser);
+	GLib.FileOutputStream fs;
+	try{
+		fs = fp.create(FileCreateFlags.PRIVATE);
+	}catch (Error e1) {
+		try{
+			fs = fp.replace(null,false,FileCreateFlags.PRIVATE);
+		}catch (Error e2){
+			print ("write name Error: %s\n", e2.message);
+			return;
+		}
+	}
+	DataOutputStream dos = new DataOutputStream (fs as OutputStream);
+	dos.put_string( name1 );
+	print("write name. \n");
+}
+
 public static string prog_path;
 public void set_my_locale(string path1){
 	var dir1 = GLib.Path.get_dirname(path1);

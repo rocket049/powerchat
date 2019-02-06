@@ -82,6 +82,7 @@ public class AddUserDialog: GLib.Object{
 					grid1.uage = u.age;
 					grid1.udesc = u.desc;
 					grid1.user_btn.label = _("About: ")+u.name;
+					save_name(this.name.text);
 				}else{
 					this.dlg1.title = _("Name/Password Error!");
 					stdout.printf("login fail\n");
@@ -91,7 +92,7 @@ public class AddUserDialog: GLib.Object{
 					print("RPC error");
 					Gtk.main_quit();
 				}
-				this.dlg1.hide();
+				this.dlg1.destroy();
 				app.show_all();
 			}else{
 				Gtk.main_quit();
