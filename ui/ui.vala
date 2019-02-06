@@ -659,6 +659,7 @@ list{
 			fname = u.name;
 			fsex = u.sex;
 			this.msgs = display;
+			msg_notify(fname);
 		}else if (typ1 == "TEXT"){
 			fname = @"ID:$(from)";
 			bool ret = rpc1.offline_msg_with_id(from,msg1,(ux)=>{
@@ -723,7 +724,7 @@ list{
 	}
 	public void msg_mark(string uid){
 		Gtk.ListBoxRow r = this.frd_boxes[uid].get_parent() as Gtk.ListBoxRow;
-		if(app.counter%2==1){
+		if(app.counter==1){
 			app.tray_notify();
 		}
 		if(r.is_selected())
@@ -745,13 +746,21 @@ list{
 		//print(@"mark: $(uid)\n");
 	}
 }
-
+Gtk.Application application1;
+public void msg_notify(string uname){
+	var app = application1;
+	app.hold();
+	var notify1 = new Notification(_("New message"));
+	notify1.set_body(_("From: ")+uname);
+	notify1.set_default_action("app.show-win");
+	app.send_notification(null,notify1);
+	app.release();
+}
 public class AppWin:Gtk.ApplicationWindow{
 	Gtk.StatusIcon tray1;
 	Gdk.Pixbuf icon1;
 	Gdk.Pixbuf icon2;
 	Gtk.VBox box1;
-	Gtk.Application application1;
 	public int counter=0;
 	public AppWin(){
 		// Sets the title of the Window:
@@ -778,11 +787,13 @@ public class AppWin:Gtk.ApplicationWindow{
         this.tray1 = new Gtk.StatusIcon.from_pixbuf(this.icon1);
 		this.tray1.set_visible(false);
 		this.tray1.activate.connect(()=>{
-			if (counter%2 == 0)
+			if (counter == 0){
 				this.hide();
-			else
+				counter = 1;
+			} else{
 				this.show();
-			counter++;
+				counter = 0;
+			}
 		});
 		
 		this.show.connect(()=>{
@@ -794,7 +805,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		// Method called on pressing [X]
 		this.set_destroy_with_parent(false);
 		this.delete_event.connect((e)=>{ 
-			counter++;
+			counter = 1;
 			return this.hide_on_delete ();
 		});
 		this.box1 = new Gtk.VBox(false,0);
@@ -850,6 +861,16 @@ public class AppWin:Gtk.ApplicationWindow{
         add_actions();
     }
     private void add_actions () {
+		SimpleAction act1 = new SimpleAction ("show-win", null);
+		act1.activate.connect (() => {
+			application1.hold ();
+			this.show();
+			counter=0;
+			application1.release ();
+		});
+        act1.set_enabled(true);
+		application1.add_action (act1);
+		
 		SimpleAction act2 = new SimpleAction ("about", null);
 		act2.activate.connect (() => {
 			application1.hold ();
