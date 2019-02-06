@@ -659,7 +659,6 @@ list{
 			fname = u.name;
 			fsex = u.sex;
 			this.msgs = display;
-			msg_notify(fname);
 		}else if (typ1 == "TEXT"){
 			fname = @"ID:$(from)";
 			bool ret = rpc1.offline_msg_with_id(from,msg1,(ux)=>{
@@ -675,14 +674,10 @@ list{
 
 		switch(typ1){
 		case "TEXT":
-			//GLib.Idle.add(()=>{
-			//this.msgs = display;
 			this.add_right_name_icon(fname,fsex);
 			this.add_text(msg1);
-			//this.msgs = bak_msgs;
-				//return false;
-			//});
 			msg_mark(from.to_string());
+			msg_notify(fname);
 			break;
 		case "JSON":
 			var p2 = new Json.Parser();
@@ -704,6 +699,7 @@ list{
 			add_operate_buttons(name1);
 			msg_mark(from.to_string());
 			this.msgs.show_all();
+			msg_notify(fname);
 			break;
 		case "LOGI":
 			if( u==null )
