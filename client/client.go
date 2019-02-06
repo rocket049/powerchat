@@ -52,8 +52,6 @@ func client(ctl1 chan int) {
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
 	//go httpServe(conn1)
-	u1, _ := user.Current()
-	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	go readConn(conn1)
 	ok := <-res1
 	close(res1)
@@ -301,11 +299,23 @@ LOOP1:
 
 //goroutine replace httpServe and startRpcSrv4Glib
 func localServe(conn1 net.Conn, res1 chan bool) {
-	l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
+	var l net.Listener
+	var err error
+	for i := 0; i < 8; i++ {
+		l, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
+		if err == nil {
+			break
+		} else {
+			servePort++
+			proxyPort = servePort + 2000
+		}
+	}
 	if err != nil {
 		panic(err)
 	}
 	defer l.Close()
+	u1, _ := user.Current()
+	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	res1 <- true
 	jsonrpc2glib.DebugMode(false)
 	serveID := 0
