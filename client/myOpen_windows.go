@@ -1,6 +1,10 @@
 package main
 
-import "github.com/skratchdot/open-golang/open"
+import (
+	"os"
+
+	"github.com/skratchdot/open-golang/open"
+)
 
 func myOpen(path1 string) error {
 	st, err := os.Stat(path1)
