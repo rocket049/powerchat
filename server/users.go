@@ -16,6 +16,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+//db struct
+//create table if not exists users (
+//	id INTEGER PRIMARY KEY AUTOINCREMENT,
+//	name text not null unique,
+//	sex integer,
+//	birthday DATE not null,
+//	desc text,
+//	pwdmd5 text not null);
+
 var (
 	db      *sql.DB
 	dbMutex = &sync.Mutex{}
@@ -47,6 +56,20 @@ func updatePasswd(id int64, pwdmd5 string) error {
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
 	_, err := db.Exec("update users set pwdmd5=? where id=?;", pwdmd5, id)
+	return err
+}
+
+func updateDesc(id int64, desc string) error {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+	_, err := db.Exec("update users set desc=? where id=?;", desc, id)
+	return err
+}
+
+func deleteUser(id int64) error {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+	_, err := db.Exec("delete from users where id=?;", id)
 	return err
 }
 

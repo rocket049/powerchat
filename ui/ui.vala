@@ -799,7 +799,6 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
 		this.box1 = new Gtk.VBox(false,0);
 		this.add(this.box1);
-		//this.create_menubar();
 		setup_menubar();
 	}
 	public void update_tooltip(){
@@ -833,6 +832,12 @@ public class AppWin:Gtk.ApplicationWindow{
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("ModifyDesc"),"app.modify-desc");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("Quit"),"app.quit");
@@ -913,6 +918,51 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act7.set_enabled(true);
 		application1.add_action (act7);
+		
+		SimpleAction act8 = new SimpleAction ("delete-me", null);
+		act8.activate.connect (() => {
+			application1.hold ();
+			var dlg = new Gtk.Dialog ();
+			dlg.add_button(_("Yes"),1);
+			dlg.add_button(_("No"),2);
+			var text1 = new Gtk.Label(_("  You will Delete this user!  \n  Are you sure?"));
+			dlg.get_content_area().pack_start(text1);
+			text1.show();
+			int r = dlg.run();
+			if(r==1)
+				rpc1.delete_me();
+			else
+				dlg.destroy();
+			application1.release ();
+		});
+        act8.set_enabled(true);
+		application1.add_action (act8);
+		
+		SimpleAction act9 = new SimpleAction ("modify-desc", null);
+		act9.activate.connect (() => {
+			application1.hold ();
+			//rpc1.update_desc(desc);
+			var dlg = new Gtk.Dialog ();
+			dlg.add_button(_("Yes"),1);
+			dlg.add_button(_("No"),2);
+			var text1 = new Gtk.Label(_("New description:"));
+			var desc1 = new Gtk.Entry();
+			desc1.width_chars = 40;
+			var g1 = new Gtk.Grid();
+			g1.attach(text1,0,0);
+			g1.attach(desc1,0,1);
+			dlg.get_content_area().pack_start(g1);
+			g1.show_all();
+			int r = dlg.run();
+			if(r==1){
+				if(rpc1.update_desc(desc1.text)==true)
+					grid1.udesc = desc1.text;
+			}
+			dlg.destroy();
+			application1.release ();
+		});
+        act9.set_enabled(true);
+		application1.add_action (act9);
 	}
 }
 

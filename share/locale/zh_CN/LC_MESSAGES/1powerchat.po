@@ -310,3 +310,23 @@ msgstr "一次只能发送一个文件"
 msgid "this is not a file"
 msgstr "这不是文件"
 
+msgid "Yes"
+msgstr "确定"
+
+msgid "No"
+msgstr "取消"
+
+msgid "DeleteMe"
+msgstr "删除当前用户"
+
+msgid "ModifyDesc"
+msgstr "修改我的自述"
+
+msgid "New description:"
+msgstr "新自述："
+
+msgid ""
+"  You will Delete this user!  \n"
+"  Are you sure?"
+msgstr "  是否确定要删除当前用户？  "
+

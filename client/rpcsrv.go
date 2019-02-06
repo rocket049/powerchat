@@ -467,3 +467,17 @@ func (c *PClient) GetHost(param []byte, res *string) error {
 func (c *PClient) OpenPath(param []string, res *int) error {
 	return myOpen(param[0])
 }
+
+//rpc service block
+func (c *PClient) UpdateDesc(param []string, res *int) error {
+	req, _ := MsgEncode(CmdUpdateDesc, 0, 0, []byte(param[0]))
+	_, err := c.conn.Write(req)
+	return err
+}
+
+//rpc service block
+func (c *PClient) DeleteMe(param []byte, res *int) error {
+	req, _ := MsgEncode(CmdDeleteMe, 0, 0, []byte("\n"))
+	_, err := c.conn.Write(req)
+	return err
+}

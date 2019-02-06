@@ -43,7 +43,9 @@ const (
 	CmdRemoveFriend                         //删除好友
 	CmdQueryID                              //查询基本身份信息
 	CmdReturnQueryID                        //返回身份信息
-	CmdUpdatePasswd                         //跟新密码
+	CmdUpdatePasswd                         //更新密码
+	CmdUpdateDesc                           //更新自述文字
+	CmdDeleteMe                             //删除当前登录用户
 )
 
 const HeadSize uint16 = 19

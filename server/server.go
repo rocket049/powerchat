@@ -163,6 +163,16 @@ func serveConn(conn1 net.Conn) {
 			if err != nil {
 				log.Printf("on CmdUpdatePasswd:%v\n", err)
 			}
+		case CmdUpdateDesc:
+			err := client.UpdateDesc(smsg)
+			if err != nil {
+				log.Printf("on CmdUpdateDesc:%v\n", err)
+			}
+		case CmdDeleteMe:
+			err := client.DeleteUser()
+			if err != nil {
+				log.Printf("on CmdDeleteMe:%v\n", err)
+			}
 		default:
 			err := client.Redirect(conn1, smsg)
 			if err != nil {
@@ -347,7 +357,7 @@ type LogDgam struct {
 	Pwdmd5 []byte
 }
 
-func (c *ClientType) Login(conn1 io.Writer, msg *MsgType) error {
+func (c *ClientType) Login(conn1 io.WriteCloser, msg *MsgType) error {
 	u1 := new(LogDgam)
 	err := json.Unmarshal(msg.Msg, u1)
 	if err != nil {
@@ -399,6 +409,21 @@ func (c *ClientType) UpdatePass(msg *MsgType) error {
 	}
 
 	return updatePasswd(c.Id, string(new1))
+}
+
+func (c *ClientType) UpdateDesc(msg *MsgType) error {
+	desc := string(msg.Msg)
+	return updateDesc(c.Id, desc)
+}
+
+func (c *ClientType) DeleteUser() error {
+	v1, ok := clients.Load(c.Id)
+	if ok {
+		link1 := v1.(io.WriteCloser)
+		link1.Close()
+		clients.Delete(c.Id)
+	}
+	return deleteUser(c.Id)
 }
 
 func (c *ClientType) SysResp(conn1 io.Writer, cmd ChatCommand, s string) {
