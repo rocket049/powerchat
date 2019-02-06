@@ -15,10 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skratchdot/open-golang/open"
-
 	"github.com/powerman/rpc-codec/jsonrpc2"
-
 	"github.com/rocket049/go-jsonrpc2glib"
 )
 
@@ -468,5 +465,5 @@ func (c *PClient) GetHost(param []byte, res *string) error {
 
 //rpc service block
 func (c *PClient) OpenPath(param []string, res *int) error {
-	return open.Run(param[0])
+	return myOpen(param[0])
 }
