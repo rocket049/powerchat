@@ -735,7 +735,7 @@ list{
 				app.tray_notify();
 			
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
-			app.show_all();
+			grid.show_all();
 		}else{
 			grid.show_all();
 		}
@@ -861,6 +861,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		act1.activate.connect (() => {
 			application1.hold ();
 			this.show();
+            //窗口顶置
+            this.set_keep_above(true);
 			counter=0;
 			application1.release ();
 		});

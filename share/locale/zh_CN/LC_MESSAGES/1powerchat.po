@@ -330,3 +330,8 @@ msgid ""
 "  Are you sure?"
 msgstr "  是否确定要删除当前用户？  "
 
+msgid "New message"
+msgstr "新信息"
+
+msgid "From: "
+msgstr "来自："
