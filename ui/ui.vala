@@ -567,7 +567,7 @@ list{
         if(!center){
             lb.xalign = (float)0;
         }
-        lb.width_request = 300;
+        lb.width_request = 360;
         lb.max_width_chars = 15;
         var grid=new Gtk.Grid();
         var lb1 = new Gtk.Label("");
@@ -746,10 +746,13 @@ Gtk.Application application1;
 public void msg_notify(string uname){
 	var app = application1;
 	app.hold();
-	var notify1 = new Notification(_("New message"));
-	notify1.set_body(_("From: ")+uname);
-	notify1.set_default_action("app.show-win");
-	app.send_notification(null,notify1);
+	var pname = GLib.Environment.get_prgname();
+	if( pname=="ui" ){
+		var notify1 = new Notification(_("New message"));
+		notify1.set_body(_("From: ")+uname);
+		notify1.set_default_action("app.show-win");
+		app.send_notification(null,notify1);
+	}
 	app.release();
 }
 public class AppWin:Gtk.ApplicationWindow{
