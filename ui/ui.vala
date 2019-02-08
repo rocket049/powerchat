@@ -744,16 +744,16 @@ list{
 }
 Gtk.Application application1;
 public void msg_notify(string uname){
-	var app = application1;
-	app.hold();
 	var pname = GLib.Environment.get_prgname();
 	if( pname=="ui" ){
+        var app = application1;
+	    app.hold();
 		var notify1 = new Notification(_("New message"));
 		notify1.set_body(_("From: ")+uname);
 		notify1.set_default_action("app.show-win");
 		app.send_notification(null,notify1);
+        app.release();
 	}
-	app.release();
 }
 public class AppWin:Gtk.ApplicationWindow{
 	Gtk.StatusIcon tray1;
@@ -792,6 +792,7 @@ public class AppWin:Gtk.ApplicationWindow{
 			} else{
 				this.show();
 				counter = 0;
+                this.set_keep_above(true);
 			}
 		});
 		
