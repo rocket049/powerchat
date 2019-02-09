@@ -33,7 +33,7 @@ public class SearchDialg:GLib.Object{
 		scroll1.add(view);
 		view.expand = true;
 		scroll1.expand = true;
-		scroll1.set_size_request(250,250);
+		scroll1.set_size_request(350,400);
 		grid.attach(scroll1,0,1,3,1);
 		
 		var content = this.dlg1.get_content_area () as Gtk.Box;

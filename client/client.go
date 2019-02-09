@@ -407,6 +407,8 @@ func readConn(conn1 net.Conn) {
 			cmdChan <- *msg
 		case CmdReturnQueryID:
 			cmdChan <- *msg
+		case CmdUserStatus:
+			cmdChan <- *msg
 		default:
 			log.Printf("Cmd:%d From:%d To:%d Msg:%s\n", msg.Cmd, msg.From, msg.To, string(msg.Msg))
 		}

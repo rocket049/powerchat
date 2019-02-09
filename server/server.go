@@ -173,6 +173,9 @@ func serveConn(conn1 net.Conn) {
 			if err != nil {
 				log.Printf("on CmdDeleteMe:%v\n", err)
 			}
+		case CmdUserStatus:
+			//return status
+			client.UserStatus(conn1, smsg)
 		default:
 			err := client.Redirect(conn1, smsg)
 			if err != nil {
@@ -189,6 +192,17 @@ type ClientType struct {
 	Id    int64
 	Token [32]byte
 	Auth  bool
+}
+
+func (c *ClientType) UserStatus(conn1 io.Writer, msg *MsgType) error {
+	if c.IsOnline(msg.To) {
+		//online
+		c.SysResp(conn1, CmdUserStatus, "Y")
+	} else {
+		//offline
+		c.SysResp(conn1, CmdUserStatus, "N")
+	}
+	return nil
 }
 
 func (c *ClientType) QueryUserById(conn1 io.Writer, msg *MsgType) error {

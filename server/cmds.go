@@ -46,6 +46,7 @@ const (
 	CmdUpdatePasswd                         //更新密码
 	CmdUpdateDesc                           //更新自述文字
 	CmdDeleteMe                             //删除当前登录用户
+	CmdUserStatus                           //查询、返回用户状态
 )
 
 const HeadSize uint16 = 19

@@ -704,11 +704,7 @@ list{
 		case "LOGI":
 			if( u==null )
 				break;
-			Gtk.Grid grid = this.frd_boxes[from.to_string()];
-			var sc3 = grid.get_style_context();
-			sc3.remove_provider(this.provider1);
-			sc3.remove_class("off");
-			this.friends.invalidate_sort ();
+			user_online(from);
 			break;
 		}
 		GLib.Idle.add(()=>{
@@ -718,6 +714,13 @@ list{
 		});
 		this.msgs = bak_msgs;
 	}
+    public void user_online(int64 uid1){
+        Gtk.Grid grid = this.frd_boxes[uid1.to_string()];
+        var sc3 = grid.get_style_context();
+        sc3.remove_provider(this.provider1);
+        sc3.remove_class("off");
+        this.friends.invalidate_sort ();
+    }
 	public void msg_mark(string uid){
 		Gtk.ListBoxRow r = this.frd_boxes[uid].get_parent() as Gtk.ListBoxRow;
 		if(app.counter==1){

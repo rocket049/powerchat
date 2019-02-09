@@ -206,12 +206,19 @@ type UserBaseInfo struct {
 func (c *PClient) GetFriends(p []byte, res *[]FriendData) error {
 	req, _ := MsgEncode(CmdGetFriends, c.id, 0, []byte("\n"))
 	c.conn.Write(req)
-	resp, ok := <-cmdChan
-	if ok == false {
-		return errors.New("internal error 1")
-	}
-	if resp.Cmd != CmdRetFriends {
-		return errors.New("internal error 2")
+	var resp MsgType
+	var ok bool
+	for {
+		resp, ok = <-cmdChan
+		if ok == false {
+			return errors.New("query internal error 1")
+		}
+		if resp.Cmd == CmdRetFriends {
+			break
+		} else {
+			cmdChan <- resp
+			time.Sleep(time.Millisecond * 100)
+		}
 	}
 	//json
 	frds := make(map[int64]UserBaseInfo)
@@ -234,15 +241,48 @@ func (c *PClient) GetFriends(p []byte, res *[]FriendData) error {
 	return nil
 }
 
+func (c *PClient) UserStatus(uid []int64, res *int8) error {
+	req, _ := MsgEncode(CmdUserStatus, 0, uid[0], []byte("\n"))
+	c.conn.Write(req)
+	var resp MsgType
+	var ok bool
+	for {
+		resp, ok = <-cmdChan
+		if ok == false {
+			return errors.New("query internal error 1")
+		}
+		if resp.Cmd == CmdUserStatus {
+			break
+		} else {
+			cmdChan <- resp
+			time.Sleep(time.Millisecond * 100)
+		}
+	}
+
+	if string(resp.Msg) == "Y" {
+		*res = 1
+	} else {
+		*res = 0
+	}
+	return nil
+}
+
 func (c *PClient) QueryID(uid []int64, res *FriendData) error {
 	req, _ := MsgEncode(CmdQueryID, c.id, uid[0], []byte("\n"))
 	c.conn.Write(req)
-	resp, ok := <-cmdChan
-	if ok == false {
-		return errors.New("query internal error 1")
-	}
-	if resp.Cmd != CmdReturnQueryID {
-		return errors.New("query internal error 2")
+	var resp MsgType
+	var ok bool
+	for {
+		resp, ok = <-cmdChan
+		if ok == false {
+			return errors.New("query internal error 1")
+		}
+		if resp.Cmd == CmdReturnQueryID {
+			break
+		} else {
+			cmdChan <- resp
+			time.Sleep(time.Millisecond * 100)
+		}
 	}
 	var v UserBaseInfo
 	err := json.Unmarshal(resp.Msg, &v)
@@ -265,12 +305,19 @@ func (c *PClient) MoveStrangerToFriend(fid []int64, res *int) error {
 func (c *PClient) GetStrangerMsgs(p []byte, res *[]FriendData) error {
 	req, _ := MsgEncode(CmdGetStrangers, c.id, 0, []byte("\n"))
 	c.conn.Write(req)
-	resp, ok := <-cmdChan
-	if ok == false {
-		return errors.New("internal error 1")
-	}
-	if resp.Cmd != CmdReturnStrangers {
-		return errors.New("internal error 2")
+	var resp MsgType
+	var ok bool
+	for {
+		resp, ok = <-cmdChan
+		if ok == false {
+			return errors.New("query internal error 1")
+		}
+		if resp.Cmd == CmdReturnStrangers {
+			break
+		} else {
+			cmdChan <- resp
+			time.Sleep(time.Millisecond * 100)
+		}
 	}
 	//json
 	frds := make(map[int64]UserBaseInfo)
@@ -296,12 +343,19 @@ func (c *PClient) GetStrangerMsgs(p []byte, res *[]FriendData) error {
 func (c *PClient) SearchPersons(key []string, res *[]FriendData) error {
 	req, _ := MsgEncode(CmdSearchPersons, c.id, 0, []byte(key[0]))
 	c.conn.Write(req)
-	resp, ok := <-cmdChan
-	if ok == false {
-		return errors.New("internal error 1")
-	}
-	if resp.Cmd != CmdReturnPersons {
-		return errors.New("internal error 2")
+	var resp MsgType
+	var ok bool
+	for {
+		resp, ok = <-cmdChan
+		if ok == false {
+			return errors.New("query internal error 1")
+		}
+		if resp.Cmd == CmdReturnPersons {
+			break
+		} else {
+			cmdChan <- resp
+			time.Sleep(time.Millisecond * 100)
+		}
 	}
 	//json
 	frds := make(map[int64]UserBaseInfo)

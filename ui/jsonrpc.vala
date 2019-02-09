@@ -373,6 +373,23 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
+    public bool user_status(int64 uid){
+        var params = new Variant("(i)",uid);
+        try{
+            c.call_async.begin("PClient.UserStatus",params,null,(s,r)=>{
+                Variant res;
+				c.call_async.end(r,out res);
+				var status = res.get_int64();
+                if (status==1){
+                    grid1.user_online(uid);
+                }
+			});
+            return true;
+        }catch (Error e) {
+            stdout.printf ("Error: %s\n", e.message);
+            return false;
+        }
+    }
 	
 	public delegate void QueryCallback(UserData u);
 	public bool offline_msg_with_id(int64 uid,string msg, QueryCallback f){
