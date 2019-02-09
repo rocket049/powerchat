@@ -10,9 +10,11 @@ public class SearchDialg:GLib.Object{
 	public GLib.List<UserData?> persons;
 	public SearchDialg(){
 		this.dlg1 = new Gtk.Dialog.with_buttons(_("Find Persons"),app,Gtk.DialogFlags.MODAL);
+        this.dlg1.set_size_request(350,400);
 		var grid = new Gtk.Grid();
 		grid.attach(new Gtk.Label(_("(part of)Name：")),0,0);
 		this.key1 = new Gtk.Entry();
+        key1.hexpand = true;
 		grid.attach(this.key1,1,0);
 		var b1 = new Gtk.Button.with_label(_("Search"));
 		grid.attach(b1,2,0);
@@ -33,7 +35,6 @@ public class SearchDialg:GLib.Object{
 		scroll1.add(view);
 		view.expand = true;
 		scroll1.expand = true;
-		scroll1.set_size_request(350,400);
 		grid.attach(scroll1,0,1,3,1);
 		
 		var content = this.dlg1.get_content_area () as Gtk.Box;
