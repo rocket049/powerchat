@@ -9,7 +9,7 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
-static int RELEASE=8;
+static int RELEASE=9;
 static int LATESTVER=0;
 
 public struct UserData {
