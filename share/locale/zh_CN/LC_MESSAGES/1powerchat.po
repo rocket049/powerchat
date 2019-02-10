@@ -335,3 +335,15 @@ msgstr "新信息"
 
 msgid "From: "
 msgstr "来自："
+
+msgid "Upgrade"
+msgstr "升级"
+
+msgid "This is the latest version!"
+msgstr "已是最新版本！"
+
+msgid "New Version Released!"
+msgstr "发现新版本！"
+
+msgid "Click here or click menu item 'Help->Upgrade' to get new version."
+msgstr "点击这里或菜单'帮助->升级'下载新版本。"

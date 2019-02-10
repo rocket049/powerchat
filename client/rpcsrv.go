@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"net/rpc"
 	"os"
 	"strconv"
@@ -238,6 +239,7 @@ func (c *PClient) GetFriends(p []byte, res *[]FriendData) error {
 	}
 	*res = ret
 	//log.Println("GetFriends")
+	go c.notifyVersion()
 	return nil
 }
 
@@ -441,6 +443,34 @@ func (c *PClient) notifyMsg(msg *MsgType) error {
 	if noticer != nil && msg.Cmd == CmdChat {
 		go noticer.Play()
 	}
+	return c.myconn.Notify("msg", &res)
+}
+
+//notifyVersion:rpc notify the client, go routine
+type Version struct {
+	Version uint `json:"version"`
+}
+
+func (c *PClient) notifyVersion() error {
+	r, err := http.Get("https://gitee.com/rocket049/powerchat/raw/master/release.json")
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer r.Body.Close()
+	buf := make([]byte, 50)
+	n, err := r.Body.Read(buf)
+	if n == 0 {
+		log.Println(err)
+		return err
+	}
+	//fmt.Println(string(buf[:n]))
+	var v1 Version
+	json.Unmarshal(buf[:n], &v1)
+	res := MsgReturn{T: uint8(CmdSysReturn),
+		From: 0,
+		To:   0,
+		Msg:  fmt.Sprintf("Version:%v", v1.Version)}
 	return c.myconn.Notify("msg", &res)
 }
 

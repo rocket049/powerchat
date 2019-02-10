@@ -9,6 +9,8 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
+static int RELEASE=8;
+static int LATESTVER=0;
 
 public struct UserData {
 	public int64 id;
@@ -642,6 +644,11 @@ list{
 					return false;
 				});
 				return;
+			}else if(msg[0:8]=="Version:"){
+				LATESTVER = msg[8:msg.length].to_int();
+				if (LATESTVER>RELEASE){
+					version_notify();
+				}
 			}
 			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
@@ -758,6 +765,18 @@ public void msg_notify(string uname){
         app.release();
 	}
 }
+public void version_notify(){
+	var pname = GLib.Environment.get_prgname();
+	if( pname=="ui" ){
+        var app = application1;
+	    app.hold();
+		var notify1 = new Notification(_("New Version Released!"));
+		notify1.set_body(_("Click here or click menu item 'Help->Upgrade' to get new version."));
+		notify1.set_default_action("app.down-page");
+		app.send_notification(null,notify1);
+        app.release();
+	}
+}
 public class AppWin:Gtk.ApplicationWindow{
 	Gtk.StatusIcon tray1;
 	Gdk.Pixbuf icon1;
@@ -830,6 +849,9 @@ public class AppWin:Gtk.ApplicationWindow{
 	public void setup_menubar(){
         var menu1 = new GLib.Menu();
         var item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("About"),"app.about");
@@ -989,6 +1011,36 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act9.set_enabled(true);
 		application1.add_action (act9);
+		
+		SimpleAction act10 = new SimpleAction ("down-page", null);
+		act10.activate.connect (() => {
+			application1.hold ();
+			//rpc1.open_path("https://github.com/rocket049/powerchat/releases");
+			Gtk.Dialog dlg1 = new Gtk.Dialog.with_buttons(_("Upgrade"),app,Gtk.DialogFlags.MODAL);
+			dlg1.set_size_request(300,200);
+			var area = dlg1.get_content_area() as Gtk.Box;
+			Gtk.Label label1 = new Gtk.Label("");
+			label1.expand = true;
+			string ln1 = _("This is the latest version!");
+			string text1 = ln1;
+			if(LATESTVER>RELEASE){
+				ln1 = _("New Version Released!");
+				string github = "https://github.com/rocket049/powerchat/releases";
+				string gitee = "https://gitee.com/rocket049/powerchat/releases";
+				text1 = @"\n  $(ln1)\n\n  <a href='$(github)'>$(github)</a>  \n\n  <a href='$(gitee)'>$(gitee)</a>  \n\n";
+			}
+			print(text1);
+			label1.set_markup(text1);
+			Gtk.Grid g1 = new Gtk.Grid();
+			g1.attach(label1,0,0);
+			g1.show_all();
+			area.pack_start(g1);
+			area.show_all();
+			dlg1.show();
+			application1.release ();
+		});
+        act10.set_enabled(true);
+		application1.add_action (act10);
 	}
 }
 
