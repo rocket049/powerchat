@@ -916,8 +916,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act3 = new SimpleAction ("homepage", null);
 		act3.activate.connect (() => {
 			application1.hold ();
-			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
-			rpc1.open_path("https://gitee.com/rocket049/powerchat");
+			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			//rpc1.open_path("https://gitee.com/rocket049/powerchat");
 			application1.release ();
 		});
         act3.set_enabled(true);
@@ -926,8 +926,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act4 = new SimpleAction ("pay", null);
 		act4.activate.connect (() => {
 			application1.hold ();
-			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
-			rpc1.open_path("https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779");
+			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
+			//rpc1.open_path("https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779");
 			application1.release ();
 		});
         act4.set_enabled(true);
@@ -936,8 +936,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act5 = new SimpleAction ("preview-web", null);
 		act5.activate.connect (() => {
 			application1.hold ();
-			//Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
-			rpc1.open_path(@"http://localhost:$(proxy_port)/");
+			Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
+			//rpc1.open_path(@"http://localhost:$(proxy_port)/");
 			application1.release ();
 		});
         act5.set_enabled(true);
