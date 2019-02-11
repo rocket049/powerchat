@@ -444,10 +444,10 @@ func main() {
 	<-ctl1
 	close(ctl1)
 	//start ui
-	ui1 := filepath.Join(path1, "./ui")
-	ui2 := filepath.Join(path1, "./ui.exe")
-	ui3 := filepath.Join(path1, "../ui/ui")
-	ui4 := filepath.Join(path1, "../ui/ui.exe")
+	ui1 := filepath.Join(path1, "ui")
+	ui2 := filepath.Join(path1, "ui.exe")
+	ui3 := filepath.Join(path1, "..", "ui", "ui")
+	ui4 := filepath.Join(path1, "..", "ui", "ui.exe")
 	var cui *exec.Cmd
 	if _, err = os.Stat(ui1); err == nil {
 		cui = exec.Command(ui1, fmt.Sprintf("%d", servePort))
