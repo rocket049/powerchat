@@ -136,17 +136,10 @@ list{
 		this.mygrid.attach(strangers_btn,1,3,1,1);
 
 		user_btn = new Gtk.Button.with_label(_("Current User"));
-		this.mygrid.attach(user_btn,2,0,1,1);
+		this.mygrid.attach(user_btn,2,0,2,1);
 		user_btn.hexpand = true;
 
-		var pwd_btn = new Gtk.Button.with_label(_("UpdatePasswd"));
-		this.mygrid.attach(pwd_btn,3,0,1,1);
-		pwd_btn.clicked.connect(()=>{
-			this.update_pwd();
-		});
-
 		var b4 = new Gtk.Label(_("Proxy Port"));
-		b4.hexpand = true;
 		this.mygrid.attach(b4,4,0,1,1);
 
 		port1 = new Gtk.Entry();
@@ -860,6 +853,9 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("Pay"),"app.pay");
         menu1.append_item(item1);
         
+        item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
+        menu1.append_item(item1);
+        
         var menubar =new GLib.Menu();
         menubar.append_submenu(_("Help"),menu1);
         
@@ -873,7 +869,7 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("ModifyDesc"),"app.modify-desc");
         menu1.append_item(item1);
         
-        item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
+        item1 = new GLib.MenuItem(_("UpdatePasswd"),"app.update-pwd");
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("Quit"),"app.quit");
@@ -1041,6 +1037,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act10.set_enabled(true);
 		application1.add_action (act10);
+        
+        SimpleAction act11 = new SimpleAction ("update-pwd", null);
+		act11.activate.connect (() => {
+			application1.hold ();
+            grid1.update_pwd();
+            application1.release ();
+        });
+        act11.set_enabled(true);
+		application1.add_action (act11);
 	}
 }
 
