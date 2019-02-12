@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -559,9 +561,23 @@ func (c *PClient) UpdateDesc(param []string, res *int) error {
 	return err
 }
 
+type CheckDelData struct {
+	Md5   []byte
+	Token []byte
+}
+
 //rpc service block
-func (c *PClient) DeleteMe(param []byte, res *int) error {
-	req, _ := MsgEncode(CmdDeleteMe, 0, 0, []byte("\n"))
-	_, err := c.conn.Write(req)
+//DeleteMe param=[]string{name,pwd}
+func (c *PClient) DeleteMe(param []string, res *int) error {
+	var token [8]byte
+	io.ReadFull(rand.Reader, token[:])
+	md5v := loginMd5(param[0], param[1], token[:])
+	var checkd = &CheckDelData{Md5: md5v, Token: token[:]}
+	jsond, err := json.Marshal(checkd)
+	if err != nil {
+		return err
+	}
+	req, _ := MsgEncode(CmdDeleteMe, 0, 0, jsond)
+	_, err = c.conn.Write(req)
 	return err
 }

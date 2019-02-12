@@ -6,7 +6,7 @@ cp ../server/pems/a-cert.pem powerchatserver/pems/
 cp ../server/pems/a-key.pem powerchatserver/pems/
 tar cvfz powerchatserver.tar.gz powerchatserver
 
-docker build -t powerchatserver:v$1 .
+docker build -t rocket049/powerchatserver:v$1 .
  
 rm -rf powerchatserver
 rm powerchatserver.tar.gz

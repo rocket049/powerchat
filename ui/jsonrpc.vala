@@ -360,12 +360,11 @@ public class RpcClient:GLib.Object{
             return false;
         }
 	}
-	public bool delete_me(){
-		var params = new Variant.bytestring("");
+	public bool delete_me(string name,string pwd){
+		var params = new Variant("(ss)",name,pwd);
         try{
             c.call_async.begin("PClient.DeleteMe",params,null,(s,r)=>{
 				c.call_async.end(r,null);
-				Gtk.main_quit();
 			});
             return true;
         }catch (Error e) {

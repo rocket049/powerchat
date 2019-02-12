@@ -347,3 +347,6 @@ msgstr "发现新版本！"
 
 msgid "Click here or click menu item 'Help->Upgrade' to get new version."
 msgstr "点击这里或菜单'帮助->升级'下载新版本。"
+
+msgid "[Operate Fail]"
+msgstr "[操作失败]"

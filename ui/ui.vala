@@ -636,13 +636,16 @@ list{
 					adj1.value = adj1.upper;
 					return false;
 				});
-				return;
 			}else if(msg[0:8]=="Version:"){
 				LATESTVER = msg[8:msg.length].to_int();
 				if (LATESTVER>RELEASE){
 					version_notify();
 				}
-			}
+			}else if(msg[0:8]=="DELETE 1"){
+                Gtk.main_quit();
+            }else if(msg[0:8]=="DELETE 0"){
+                this.add_text(_("[Operate Fail]"));
+            }
 			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
 		}
@@ -970,13 +973,19 @@ public class AppWin:Gtk.ApplicationWindow{
 			dlg.add_button(_("Yes"),1);
 			dlg.add_button(_("No"),2);
 			var text1 = new Gtk.Label(_("  You will Delete this user!  \n  Are you sure?"));
-			dlg.get_content_area().pack_start(text1);
-			text1.show();
+            var text2 = new Gtk.Label(_("Password："));
+            var pwd1 = new Gtk.Entry();
+            var grid = new Gtk.Grid();
+            grid.attach(text1,0,0,2,1);
+            grid.attach(text2,0,1);
+            grid.attach(pwd1,1,1);
+			dlg.get_content_area().pack_start(grid);
+			grid.show_all();
 			int r = dlg.run();
-			if(r==1)
-				rpc1.delete_me();
-			else
-				dlg.destroy();
+			if(r==1){
+				rpc1.delete_me(grid1.uname,pwd1.text);
+			}
+            dlg.destroy();
 			application1.release ();
 		});
         act8.set_enabled(true);

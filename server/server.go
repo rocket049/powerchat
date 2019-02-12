@@ -169,10 +169,8 @@ func serveConn(conn1 net.Conn) {
 				log.Printf("on CmdUpdateDesc:%v\n", err)
 			}
 		case CmdDeleteMe:
-			err := client.DeleteUser()
-			if err != nil {
-				log.Printf("on CmdDeleteMe:%v\n", err)
-			}
+			client.DeleteUser(conn1, smsg)
+
 		case CmdUserStatus:
 			//return status
 			client.UserStatus(conn1, smsg)
@@ -430,14 +428,48 @@ func (c *ClientType) UpdateDesc(msg *MsgType) error {
 	return updateDesc(c.Id, desc)
 }
 
-func (c *ClientType) DeleteUser() error {
+type CheckDelData struct {
+	Md5   []byte
+	Token []byte
+}
+
+//DeleteUser smsg.Msg={md5:md5_v,token:token_v}
+func (c *ClientType) DeleteUser(conn1 io.Writer, msg *MsgType) error {
+
+	var checkd CheckDelData
+	err := json.Unmarshal(msg.Msg, &checkd)
+	if err != nil {
+		c.SysResp(conn1, CmdSysReturn, "DELETE 0\n")
+		return err
+	}
+	u, err := getUserById(c.Id)
+	if err != nil {
+		c.SysResp(conn1, CmdSysReturn, "DELETE 0\n")
+		return err
+	}
+	//check pwd
+	buf := bytes.NewBufferString("")
+	buf.Write(checkd.Token)
+	buf.WriteString(u.Pwdmd5)
+	b := md5.Sum(buf.Bytes())
+	if bytes.Compare(b[:], checkd.Md5) != 0 {
+		c.SysResp(conn1, CmdSysReturn, "DELETE 0\n")
+		return errors.New("auth fail")
+	}
+	err = deleteUser(c.Id)
+	if err != nil {
+		c.SysResp(conn1, CmdSysReturn, "DELETE 0\n")
+		return err
+	}
+
+	c.SysResp(conn1, CmdSysReturn, "DELETE 1\n")
 	v1, ok := clients.Load(c.Id)
 	if ok {
 		link1 := v1.(io.WriteCloser)
 		link1.Close()
 		clients.Delete(c.Id)
 	}
-	return deleteUser(c.Id)
+	return nil
 }
 
 func (c *ClientType) SysResp(conn1 io.Writer, cmd ChatCommand, s string) {
