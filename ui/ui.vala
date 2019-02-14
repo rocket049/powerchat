@@ -221,7 +221,7 @@ list{
 				Gtk.main_quit();
 			}
 			rpc1.get_host(out this.host);
-			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
+			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 			app.update_tooltip();
 		});
 
@@ -831,7 +831,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		setup_menubar();
 	}
 	public void update_tooltip(){
-		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+grid1.host+"\n"+_("User Name: ")+grid1.uname+"\n"+_("(Click to Hide/Show)"));
+		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+@"$(grid1.uname)@$(grid1.host)"+"\n"+_("(Click to Hide/Show)"));
 	}
 	public void tray_notify(){
 		this.tray1.set_from_pixbuf(this.icon2);
