@@ -9,7 +9,7 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
-static int RELEASE=10;
+static int RELEASE=11;
 static int LATESTVER=0;
 
 public struct UserData {
@@ -831,7 +831,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		setup_menubar();
 	}
 	public void update_tooltip(){
-		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+grid1.host+"\n"+_("(Click to Hide/Show)"));
+		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+grid1.host+"\n"+_("User Name: ")+grid1.uname+"\n"+_("(Click to Hide/Show)"));
 	}
 	public void tray_notify(){
 		this.tray1.set_from_pixbuf(this.icon2);

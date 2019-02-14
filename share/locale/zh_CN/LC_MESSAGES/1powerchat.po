@@ -350,3 +350,6 @@ msgstr "点击这里或菜单'帮助->升级'下载新版本。"
 
 msgid "[Operate Fail]"
 msgstr "[操作失败]"
+
+msgid "User Name: "
+msgstr "用户名： "
