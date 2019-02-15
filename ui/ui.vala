@@ -750,8 +750,9 @@ list{
 }
 Gtk.Application application1;
 public void msg_notify(string uname){
-	var pname = GLib.Environment.get_prgname();
-	if( pname=="ui" ){
+	//var pname = GLib.Environment.get_prgname();
+    var x = GLib.Environ.get_variable(GLib.Environ.@get(),"DISPLAY");
+	if( x != null ){
         var app = application1;
 	    app.hold();
 		var notify1 = new Notification(_("New message"));
