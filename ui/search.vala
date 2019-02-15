@@ -21,6 +21,7 @@ public class SearchDialg:GLib.Object{
 		b1.clicked.connect( this.search );
 		
 		this.store1 = new Gtk.ListStore (5, typeof(int64), typeof (string), typeof (string), typeof(int16), typeof(string));
+		
 		var view = new Gtk.TreeView.with_model(this.store1);
 		//Gtk.CellRendererText cell = new Gtk.CellRendererText ();
 		view.insert_column_with_attributes (0, "ID", new Gtk.CellRendererText(), "text",0);
@@ -81,6 +82,7 @@ public class SearchDialg:GLib.Object{
 	public void search(){
 		this.store1.clear();
 		this.persons = new GLib.List<UserData?>();
+		this.store1.set_sort_column_id(0,Gtk.SortType.ASCENDING);
 		
 		rpc1.search_person_async(this.key1.text,this.seach_callback);
 	}
