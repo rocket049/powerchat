@@ -445,21 +445,29 @@ func main() {
 	close(ctl1)
 	//start ui
 	ui1 := filepath.Join(path1, "ui")
-	ui2 := filepath.Join(path1, "ui.exe")
-	ui3 := filepath.Join(path1, "..", "ui", "ui")
+	ui2 := filepath.Join(path1, "..", "ui", "ui")
+	ui3 := filepath.Join(path1, "ui.exe")
 	ui4 := filepath.Join(path1, "..", "ui", "ui.exe")
 	var cui *exec.Cmd
-	if _, err = os.Stat(ui1); err == nil {
-		cui = exec.Command(ui1, fmt.Sprintf("%d", servePort))
-	} else if _, err = os.Stat(ui2); err == nil {
-		cui = exec.Command(ui2, fmt.Sprintf("%d", servePort))
-	} else if _, err = os.Stat(ui3); err == nil {
-		cui = exec.Command(ui3, fmt.Sprintf("%d", servePort))
-	} else if _, err = os.Stat(ui4); err == nil {
-		cui = exec.Command(ui4, fmt.Sprintf("%d", servePort))
-	} else {
-		log.Fatal("Can't find ui!")
+	switch osID {
+	case 0:
+		if _, err = os.Stat(ui1); err == nil {
+			cui = exec.Command(ui1, fmt.Sprintf("%d", servePort))
+		} else if _, err = os.Stat(ui2); err == nil {
+			cui = exec.Command(ui2, fmt.Sprintf("%d", servePort))
+		} else {
+			log.Fatal("Can't find ui.\n")
+		}
+	case 1:
+		if _, err = os.Stat(ui3); err == nil {
+			cui = exec.Command(ui3, fmt.Sprintf("%d", servePort))
+		} else if _, err = os.Stat(ui4); err == nil {
+			cui = exec.Command(ui4, fmt.Sprintf("%d", servePort))
+		} else {
+			log.Fatal("Can't find ui.\n")
+		}
 	}
+
 	out1, err := cui.StdoutPipe()
 	if err != nil {
 		panic(err)
