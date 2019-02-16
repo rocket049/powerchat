@@ -353,3 +353,6 @@ msgstr "[操作失败]"
 
 msgid "User Name: "
 msgstr "用户名： "
+
+msgid "OpenDownloadDir"
+msgstr "我的下载目录"

@@ -870,6 +870,9 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
         menu1.append_item(item1);
         
+        item1 = new GLib.MenuItem(_("OpenDownloadDir"),"app.down-dir");
+        menu1.append_item(item1);
+        
         item1 = new GLib.MenuItem(_("ModifyDesc"),"app.modify-desc");
         menu1.append_item(item1);
         
@@ -1056,6 +1059,17 @@ public class AppWin:Gtk.ApplicationWindow{
         });
         act11.set_enabled(true);
 		application1.add_action (act11);
+        
+        SimpleAction act12 = new SimpleAction ("down-dir", null);
+		act12.activate.connect (() => {
+			application1.hold ();
+			var home1 = GLib.Environment.get_home_dir();
+			var blog1 = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,home1,".powerchat", "RecvFiles");
+			rpc1.open_path(blog1);
+			application1.release ();
+		});
+        act12.set_enabled(true);
+		application1.add_action (act12);
 	}
 }
 
