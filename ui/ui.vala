@@ -671,6 +671,7 @@ list{
 			fname = @"ID:$(from)";
 			bool ret = rpc1.offline_msg_with_id(from,msg1,(ux)=>{
 				strangers1.prepend_row(ux);
+				msg_notify(_("Strangers"));
 			});
 			if (ret==false)
 				Gtk.main_quit();
