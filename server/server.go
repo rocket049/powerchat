@@ -15,7 +15,13 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
+
+type ClientData struct {
+	Conn    io.WriteCloser
+	Counter uint8
+}
 
 var clients = &sync.Map{}
 
@@ -65,7 +71,9 @@ func serveConn(conn1 net.Conn) {
 	var client = new(ClientType)
 	client.ServeReady(conn1)
 	client.Auth = false
+
 	for {
+		conn1.SetReadDeadline(time.Now().Add(time.Minute * 5))
 		msg, err := ReadMsg(conn1)
 		if err != nil {
 			log.Printf("Disconnect:%v\n", client.Id)
@@ -91,6 +99,8 @@ func serveConn(conn1 net.Conn) {
 			err := client.Login(conn1, smsg)
 			if err != nil {
 				log.Printf("on CmdLogin:%v\n", err)
+			} else {
+				defer clients.Delete(client.Id)
 			}
 		case CmdGetNames:
 			//[id1,id2,...]
@@ -314,7 +324,7 @@ func (c *ClientType) Redirect(conn1 io.Writer, msg *MsgType) error {
 		c.SysResp(conn1, CmdSysReturn, err.Error())
 		return err
 	}
-	_, err = io.Copy(v.(io.Writer), bytes.NewBuffer(req))
+	_, err = io.Copy(v.(*ClientData).Conn, bytes.NewBuffer(req))
 	if err != nil {
 		log.Printf("io.Copy:%v\n", err)
 		c.SysResp(conn1, CmdSysReturn, err.Error())
@@ -332,6 +342,14 @@ func (c *ClientType) ServeReady(conn1 io.Writer) error {
 }
 
 func (c *ClientType) Pong(conn1 io.Writer) error {
+	v, ok := clients.Load(c.Id)
+	if ok == false {
+		link1 := v.(*ClientData).Conn
+		link1.Close()
+		clients.Delete(c.Id)
+		return nil
+	}
+	v.(*ClientData).Counter++
 	msg, _ := MsgEncode(CmdPong, 0, c.Id, []byte("\n"))
 	_, err := io.Copy(conn1, bytes.NewBuffer(msg))
 	return err
@@ -391,7 +409,7 @@ func (c *ClientType) Login(conn1 io.WriteCloser, msg *MsgType) error {
 	}
 	c.Id = u.Id
 	c.Auth = true
-	clients.Store(c.Id, conn1)
+	clients.Store(c.Id, &ClientData{Conn: conn1, Counter: 0})
 	u.Pwdmd5 = ""
 	reqb, _ := json.Marshal(u)
 	c.SysResp(conn1, CmdLogResult, string(reqb))
@@ -465,7 +483,7 @@ func (c *ClientType) DeleteUser(conn1 io.Writer, msg *MsgType) error {
 	c.SysResp(conn1, CmdSysReturn, "DELETE 1\n")
 	v1, ok := clients.Load(c.Id)
 	if ok {
-		link1 := v1.(io.WriteCloser)
+		link1 := v1.(*ClientData).Conn
 		link1.Close()
 		clients.Delete(c.Id)
 	}
