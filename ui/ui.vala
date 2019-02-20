@@ -551,6 +551,7 @@ list{
     }
     public void add_text(string text,bool center=false ,bool markup=false){
         var lb = new Gtk.Label("");
+        lb.set_selectable(true);
         if(markup){
 			lb.set_markup(text);
 			var sc1 = lb.get_style_context();
