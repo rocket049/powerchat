@@ -83,7 +83,11 @@ list{
 		this.button1.load_from_data("""button{color:#FF0000;}
 """);
 		this.link_css1 = new Gtk.CssProvider();
-		this.link_css1.load_from_data("label>link{color:#0000FF;}");
+		try{
+			this.link_css1.load_from_data("label>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
+		} catch (Error e) {
+            print ("CSS Error: %s\n", e.message);
+        }
 
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
 		scrollWin1.width_request = 240;
@@ -552,10 +556,10 @@ list{
     public void add_text(string text,bool center=false ,bool markup=false){
         var lb = new Gtk.Label("");
         lb.set_selectable(true);
+        var sc1 = lb.get_style_context();
+		sc1.add_provider(this.link_css1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
         if(markup){
-			lb.set_markup(text);
-			var sc1 = lb.get_style_context();
-			sc1.add_provider(this.link_css1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+			lb.set_markup(text);	
 		} else
 			lb.set_label(text);
 		lb.wrap = true;
