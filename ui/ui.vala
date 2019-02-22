@@ -9,7 +9,7 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
-static int RELEASE=14;
+static int RELEASE=15;
 static int LATESTVER=0;
 
 public struct UserData {
@@ -820,7 +820,9 @@ public class AppWin:Gtk.ApplicationWindow{
                 this.set_keep_above(true);
 			}
 		});
-		
+		this.set_focus_child.connect((w)=>{
+			this.set_keep_above(false);
+		});
 		this.show.connect(()=>{
 			this.tray1.set_visible(true);
 			if(grid1.mark_num==0){

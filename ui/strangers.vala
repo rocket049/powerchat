@@ -56,7 +56,7 @@ public class StrangersDialg:GLib.Object{
 				if(u.id==id){
 					//stdout.printf("add: %s %s\n",u.name,u.desc);
 					grid1.add_friend(u);
-                    rpc1.tell(id);
+                    //rpc1.tell(id);
 				}
 			}
 		});
