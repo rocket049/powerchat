@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"mime"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
 	"sync"
