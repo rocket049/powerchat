@@ -191,9 +191,6 @@ func serveConn(conn1 net.Conn) {
 			}
 		}
 	}
-	if client.Id > 0 {
-		clients.Delete(client.Id)
-	}
 }
 
 type ClientType struct {
@@ -341,12 +338,10 @@ func (c *ClientType) ServeReady(conn1 io.Writer) error {
 	return err
 }
 
-func (c *ClientType) Pong(conn1 io.Writer) error {
+func (c *ClientType) Pong(conn1 io.WriteCloser) error {
 	v, ok := clients.Load(c.Id)
 	if ok == false {
-		link1 := v.(*ClientData).Conn
-		link1.Close()
-		clients.Delete(c.Id)
+		conn1.Close()
 		return nil
 	}
 	v.(*ClientData).Counter++
@@ -485,7 +480,6 @@ func (c *ClientType) DeleteUser(conn1 io.Writer, msg *MsgType) error {
 	if ok {
 		link1 := v1.(*ClientData).Conn
 		link1.Close()
-		clients.Delete(c.Id)
 	}
 	return nil
 }

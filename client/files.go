@@ -26,10 +26,7 @@ var (
 )
 
 func getFileDir() string {
-	u1, _ := user.Current()
-	res := filepath.Join(u1.HomeDir, ".powerchat", "RecvFiles")
-	os.MkdirAll(res, os.ModePerm)
-	return res
+	return getRelatePath("RecvFiles")
 }
 
 type fileHeaderType struct {
