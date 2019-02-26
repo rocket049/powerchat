@@ -9,7 +9,7 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
-static int RELEASE=18;
+static int RELEASE=19;
 static int LATESTVER=0;
 
 public struct UserData {
@@ -840,7 +840,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
 		this.box1 = new Gtk.VBox(false,0);
 		this.add(this.box1);
-		setup_menubar();
+		this.setup_menubar();
 	}
 	public void update_tooltip(){
 		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+@"$(grid1.uname)@$(grid1.host)"+"\n"+_("(Click to Hide/Show)"));
@@ -856,26 +856,9 @@ public class AppWin:Gtk.ApplicationWindow{
 	}
 	public void setup_menubar(){
         var menu1 = new GLib.Menu();
-        var item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
-        menu1.append_item(item1);
-        
-        item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
-        menu1.append_item(item1);
-        
-        item1 = new GLib.MenuItem(_("About"),"app.about");
-        menu1.append_item(item1);
-        
-        item1 = new GLib.MenuItem(_("Pay"),"app.pay");
-        menu1.append_item(item1);
-        
-        item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
-        menu1.append_item(item1);
-        
         var menubar =new GLib.Menu();
-        menubar.append_submenu(_("Help"),menu1);
         
-        menu1 = new GLib.Menu();
-        item1 = new GLib.MenuItem(_("PreviewWeb"),"app.preview-web");
+        var item1 = new GLib.MenuItem(_("PreviewWeb"),"app.preview-web");
         menu1.append_item(item1);
         
         item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
@@ -894,6 +877,25 @@ public class AppWin:Gtk.ApplicationWindow{
         menu1.append_item(item1);
         
         menubar.append_submenu(_("Operate"),menu1);
+        
+        menu1 = new GLib.Menu();
+        
+        item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("About"),"app.about");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("Pay"),"app.pay");
+        menu1.append_item(item1);
+        
+        item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
+        menu1.append_item(item1);
+        
+        menubar.append_submenu(_("Help"),menu1);
         
         application1.set_menubar(menubar as GLib.MenuModel);
         
@@ -930,8 +932,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act3 = new SimpleAction ("homepage", null);
 		act3.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
-			//rpc1.open_path("https://gitee.com/rocket049/powerchat");
+			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			rpc1.open_path("https://gitee.com/rocket049/powerchat");
 			application1.release ();
 		});
         act3.set_enabled(true);
@@ -940,8 +942,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act4 = new SimpleAction ("pay", null);
 		act4.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
-			//rpc1.open_path("https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779");
+			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779",Gdk.CURRENT_TIME);
+			rpc1.open_path("https://gitee.com/rocket049/powerchat/wikis/powerchat?sort_id=1325779");
 			application1.release ();
 		});
         act4.set_enabled(true);
@@ -950,8 +952,8 @@ public class AppWin:Gtk.ApplicationWindow{
 		SimpleAction act5 = new SimpleAction ("preview-web", null);
 		act5.activate.connect (() => {
 			application1.hold ();
-			Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
-			//rpc1.open_path(@"http://localhost:$(proxy_port)/");
+			//Gtk.show_uri(null,@"http://localhost:$(proxy_port)/",Gdk.CURRENT_TIME);
+			rpc1.open_path(@"http://localhost:$(proxy_port)/");
 			application1.release ();
 		});
         act5.set_enabled(true);
@@ -1106,35 +1108,13 @@ public class LoginDialog :GLib.Object{
 		this.dlg1.add_button(_("Register"),4);
 		this.dlg1.add_button(_("Cancel"),3);
         this.load_name();
-        
+        this.passwd.activate.connect(()=>{
+			this.login();
+		});
 		this.dlg1.response.connect((rid)=>{
 			if (rid==2){
 				//stdout.printf("next %d\n%s\n%s\n",rid,this.name.text,this.passwd.text);
-				UserData u;
-				var res = rpc1.login(this.name.text,this.passwd.text,out u);
-				if (res>0){
-					stdout.printf("login ok\n");
-					grid1.uid = res;
-					grid1.uname = u.name;
-					grid1.usex = u.sex;
-					grid1.uage = u.age;
-					grid1.udesc = u.desc;
-					grid1.user_btn.label = _("About: ")+u.name;
-				}else{
-					this.dlg1.title = _("Name/Password Error!");
-					stdout.printf("login fail\n");
-					return;
-				}
-                GLib.Idle.add(()=>{
-                    if(rpc1.get_friends_async()==false){
-                        print("RPC error");
-                        Gtk.main_quit();
-                    }
-                    return false;
-                });
-                save_name(this.name.text);
-				app.show_all();
-				this.dlg1.hide();
+				this.login();
 			}else if(rid==4){
 				this.dlg1.hide();
 				adduser1 = new AddUserDialog();
@@ -1143,6 +1123,33 @@ public class LoginDialog :GLib.Object{
 				Gtk.main_quit();
 			}
 		});
+	}
+	public void login(){
+		UserData u;
+		var res = rpc1.login(this.name.text,this.passwd.text,out u);
+		if (res>0){
+			stdout.printf("login ok\n");
+			grid1.uid = res;
+			grid1.uname = u.name;
+			grid1.usex = u.sex;
+			grid1.uage = u.age;
+			grid1.udesc = u.desc;
+			grid1.user_btn.label = _("About: ")+u.name;
+		}else{
+			this.dlg1.title = _("Name/Password Error!");
+			stdout.printf("login fail\n");
+			return;
+		}
+		GLib.Idle.add(()=>{
+			if(rpc1.get_friends_async()==false){
+				print("RPC error");
+				Gtk.main_quit();
+			}
+			return false;
+		});
+		save_name(this.name.text);
+		app.show_all();
+		this.dlg1.hide();
 	}
 	public int run(){
 		return this.dlg1.run();
