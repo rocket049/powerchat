@@ -75,6 +75,13 @@ func deleteUser(id int64) error {
 
 //insertUser insert and return id
 func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int64, error) {
+	name1 := strings.TrimSpace(name)
+	if len(name) != len(name1) {
+		return 0, errors.New("Name format error")
+	}
+	if len(pwdmd5) == 0 {
+		return 0, errors.New("Password length error")
+	}
 	sql1 := "insert into users(name,sex,birthday,desc,pwdmd5) values(?,?,date(?),?,?);"
 	dbMutex.Lock()
 	_, err := db.Exec(sql1, name, sex, birthday, desc, pwdmd5)
