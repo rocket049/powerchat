@@ -71,6 +71,15 @@ type NUParam struct {
 }
 
 func (c *PClient) NewUser(p NUParam, res *int) error {
+	name1 := strings.TrimSpace(p.Name)
+	if len(p.Name) != len(name1) {
+		*res = -1
+		return errors.New("Name format error")
+	}
+	if len(p.Pwd) == 0 {
+		*res = -1
+		return errors.New("Password length error")
+	}
 	var user1 = &UserInfo{0, p.Name, p.Sex,
 		fmt.Sprintf("%d-01-01", p.Birth), p.Desc, string(newuserMd5(p.Name, p.Pwd))}
 	b, err := json.Marshal(user1)
