@@ -199,23 +199,7 @@ list{
 		this.mygrid.show.connect(()=>{
 			//var mutex1 = new GLib.Mutex();
 			stdout.printf("grid show\n");
-			var thread = new GLib.Thread<bool>("tell",()=>{
-				var ids = this.frds1.keys;
-				foreach( string k1 in ids){
-					//mutex1.lock();
-					//print("%s\n",k1);
-					if(k1 == this.uid.to_string())
-						continue;
-					GLib.Idle.add(()=>{
-						if( rpc1.tell(k1.to_int64())==false ){
-							Gtk.main_quit();
-						}
-						//mutex1.unlock();
-						return false;
-					});
-				}
-				return true;
-			});
+			
 			strangers1 = new StrangersDialg();
 			uint16 port2;
 			if(rpc1.get_proxy(out port2)){
@@ -227,6 +211,20 @@ list{
 			rpc1.get_host(out this.host);
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 			app.update_tooltip();
+			
+			//tell online
+			var ids = this.frds1.keys;
+			foreach( string k1 in ids){
+				if(k1 == this.uid.to_string())
+					continue;
+				GLib.Idle.add(()=>{
+					if( rpc1.tell(k1.to_int64())==false ){
+						Gtk.main_quit();
+					}
+					//mutex1.unlock();
+					return false;
+				});
+			}
 		});
 
 		b1.clicked.connect(()=>{
@@ -1085,7 +1083,6 @@ public class LoginDialog :GLib.Object{
 	public Gtk.Entry name;
 	public Gtk.Entry passwd;
 	public Gtk.Dialog dlg1;
-	//public Thread<int> thread;
 	public LoginDialog(){
 		this.dlg1 = new Gtk.Dialog.with_buttons(_("login"),app,Gtk.DialogFlags.MODAL);
 		var grid = new Gtk.Grid();
