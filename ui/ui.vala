@@ -1120,10 +1120,13 @@ public class LoginDialog :GLib.Object{
 					stdout.printf("login fail\n");
 					return;
 				}
-				if(rpc1.get_friends_async()==false){
-					print("RPC error");
-					Gtk.main_quit();
-				}
+                GLib.Idle.add(()=>{
+                    if(rpc1.get_friends_async()==false){
+                        print("RPC error");
+                        Gtk.main_quit();
+                    }
+                    return false;
+                });
                 save_name(this.name.text);
 				app.show_all();
 				this.dlg1.hide();
