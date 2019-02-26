@@ -238,6 +238,25 @@ public class RpcClient:GLib.Object{
         }
 	}
 	
+	public bool tell_all(int64[] to ){
+		var data = new Variant[to.length];
+		for(int i=0;i<to.length;i++){
+			data[i] = new Variant.int64(to[i]);
+		}
+		var params = new Variant.tuple(data);
+        //Variant res;
+        application1.hold ();
+        try{
+            c.call_async.begin("PClient.TellAll",params,null,(s,r)=>{c.call_async.end(r,null);});
+            application1.release ();
+            return true;
+        }catch (Error e) {
+            stdout.printf ("tell Error: %s\n", e.message);
+            application1.release ();
+            return false;
+        }
+	}
+	
 	public bool set_http_id(int64 uid){
 		var params = new GLib.Variant("(i)",uid);
 		//GLib.Variant res;

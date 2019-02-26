@@ -399,6 +399,15 @@ func (c *PClient) Tell(uid []int64, res *int) error {
 }
 
 //rpc service
+func (c *PClient) TellAll(uid []int64, res *int) error {
+	for _, id := range uid {
+		msg, _ := MsgEncode(CmdChat, 0, id, []byte("LOGI"))
+		go c.conn.Write(msg)
+	}
+	return nil
+}
+
+//rpc service
 func (c *PClient) Ping(param []byte, res *int) error {
 	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
 	c.conn.Write(msg)

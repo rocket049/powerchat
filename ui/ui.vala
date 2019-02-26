@@ -9,7 +9,7 @@ static MyGrid grid1;
 static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
-static int RELEASE=16;
+static int RELEASE=17;
 static int LATESTVER=0;
 
 public struct UserData {
@@ -213,17 +213,22 @@ list{
 			app.update_tooltip();
 			
 			//tell online
-			var ids = this.frds1.keys;
+			//var ids = this.frds1.keys;
+			//ids.remove(this.uid.to_string());
+			Gee.HashSet<string> ids = new Gee.HashSet<string>();
+			foreach( string k1 in this.frds1.keys){
+				var suid = this.uid.to_string();
+				if( k1 != suid )
+					ids.add(k1);
+			}
+			var idsi = new int64[ids.size];
+			int i=0;
 			foreach( string k1 in ids){
-				if(k1 == this.uid.to_string())
-					continue;
-				GLib.Idle.add(()=>{
-					if( rpc1.tell(k1.to_int64())==false ){
-						Gtk.main_quit();
-					}
-					//mutex1.unlock();
-					return false;
-				});
+				idsi[i] = k1.to_int64();
+				i++;
+			}
+			if( rpc1.tell_all( idsi )==false ){
+					Gtk.main_quit();
 			}
 		});
 
