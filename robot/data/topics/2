@@ -1,0 +1,10 @@
+"人人公众号"的主页和源代码
+
+"人人公众号"的是开源软件，用 go 语言和 vala 语言开发。
+它的主页有：
+https://gitee.com/rocket049/powerchat
+https://github.com/rocket049/powerchat
+
+编译好的二进制程序下载地址：
+https://gitee.com/rocket049/powerchat/releases
+https://github.com/rocket049/powerchat/releases
