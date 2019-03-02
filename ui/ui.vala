@@ -217,25 +217,6 @@ list{
 			rpc1.get_host(out this.host);
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 			app.update_tooltip();
-			
-			//tell online
-			//var ids = this.frds1.keys;
-			//ids.remove(this.uid.to_string());
-			Gee.HashSet<string> ids = new Gee.HashSet<string>();
-			var suid = this.uid.to_string();
-			foreach( string k1 in this.frds1.keys){
-				if( k1 != suid )
-					ids.add(k1);
-			}
-			var idsi = new int64[ids.size];
-			int i=0;
-			foreach( string k1 in ids){
-				idsi[i] = k1.to_int64();
-				i++;
-			}
-			if( rpc1.tell_all( idsi )==false ){
-					Gtk.main_quit();
-			}
 		});
 
 		b1.clicked.connect(()=>{
@@ -428,13 +409,15 @@ list{
 		//this.conn.close();
 	}
 	string pressed = "";
-	public void add_friend(UserData user1){
+	public void add_friend(UserData user1,bool tell=true){
 		if(this.frds1.has_key(user1.id.to_string()))
 			return;
 		else
 			this.frds1[user1.id.to_string()] = user1;
-		if( false==rpc1.tell(user1.id) ){
-			Gtk.main_quit();
+		if(tell){
+			if( false==rpc1.tell(user1.id) ){
+				Gtk.main_quit();
+			}
 		}
 		string iconp;
 		if (user1.sex==1)
@@ -1205,7 +1188,7 @@ public void save_name(string name1){
 public string get_cfg_dir(string name){
 	var home1 = GLib.Environment.get_home_dir();
 	var res = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,home1,".powerchat", name);
-	GLib.DirUtils.create_with_parents(res,0644);
+	GLib.DirUtils.create_with_parents(res,0755);
 	return res;
 }
 public static string prog_path;

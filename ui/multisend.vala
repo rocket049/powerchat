@@ -131,8 +131,6 @@ public class MultiSendUi: GLib.Object{
 					cb1.set_active(false);
 				}
 			});
-		}else{
-			print("cancel\n");
 		}
 
 		dlg1.destroy();
@@ -177,6 +175,7 @@ public class MultiSendUi: GLib.Object{
 				return;
 			}
 			rpc1.multi_send(idsi,entry1.text);
+			entry1.text = "";
 		});
 	}
 	private void set_css(){
@@ -194,6 +193,7 @@ list{
 	}
 	public void show(){
 		frame1.show_all();
+		load_groups();
 	}
 	private void set_lists(){
 		var suid = grid1.uid.to_string();
@@ -218,7 +218,7 @@ list{
 		});
 	}
 	private void on_select_destroy(){
-		print("on destroy\n");
+		//print("on destroy\n");
 		if(group_map.size==0){
 			return;
 		}
@@ -241,7 +241,61 @@ list{
 		size_t len1;
 		//print("json\n");
 		string data1 = Json.gvariant_serialize_data (res, out len1);
-		stdout.printf (data1);
-		print ("\n");
+		//stdout.printf (data1);
+		//print ("\n");
+		save_groups(data1);
 	}
+	private void save_groups(string data){
+		var filename = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,get_cfg_dir(grid1.uid.to_string()),"groups.json");
+		GLib.File fp = GLib.File.new_for_path(filename);
+		GLib.FileOutputStream fs;
+		try{
+			fs = fp.create(FileCreateFlags.PRIVATE);
+		}catch (Error e1) {
+			try{
+				fs = fp.replace(null,false,FileCreateFlags.PRIVATE);
+			}catch (Error e2){
+				print ("write name Error: %s\n", e2.message);
+				return;
+			}
+		}
+		DataOutputStream dos = new DataOutputStream (fs as OutputStream);
+		dos.put_string( data );
+	}
+	private void load_groups(){
+        var filename = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,get_cfg_dir(grid1.uid.to_string()),"groups.json");
+		GLib.File fp = GLib.File.new_for_path(filename);
+        try{
+            var fs = fp.read();
+            DataInputStream dis = new DataInputStream (fs as InputStream);
+            string data = dis.read_line();
+            //stdout.printf("%s\n",data);
+            if (data != null ){
+                Variant variant1 = Json.gvariant_deserialize_data (data, -1, null);
+                for(size_t i=0;i<variant1.n_children ();i++){
+					var g1 = variant1.get_child_value(i).get_child_value(0);
+					//stdout.printf(@"size:$(g1.n_children()),type:$(g1.get_type_string())\n");
+					var name = g1.lookup_value("Name",null).get_string();
+					//print(name+"\n");
+					var values = g1.lookup_value("Ids",null);
+					var ids = new int64[values.n_children()];
+					//stdout.printf(@"size:$(values.n_children()),type:$(values.get_type_string())\n");
+					for(int n=0;n<ids.length;n++){
+						var v1 = values.get_child_value(n);
+						//stdout.printf(@"size:$(v1.n_children()),type:$(v1.get_type_string())\n");
+						ids[n] = v1.get_child_value(0).get_int64();
+					}
+					group_map[name] = {ids};
+					
+					//show
+					var label1 = new Gtk.Label(name);
+					groups.add(label1);
+					label1.show();
+					(label1.parent as Gtk.ListBoxRow).name = name;
+				}
+            }
+        }catch (Error e) {
+            print ("load name Error: %s\n", e.message);
+        }
+    }
 }

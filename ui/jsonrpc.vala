@@ -181,6 +181,7 @@ public class RpcClient:GLib.Object{
 				c.call_async.end(r,out res);
 				Variant val;
 				var size1 = res.n_children();
+				var idsi = new int64[size1];
 				for(size_t i=0;i<size1;i++){
 					val = res.get_child_value(i).get_child_value(0);
 					var id = val.lookup_value("Id",null).get_int64();
@@ -193,9 +194,13 @@ public class RpcClient:GLib.Object{
 					var timestamp_offline = obj_offline.lookup_value("Timestamp",null).get_string();
 					//stdout.printf("%s %s\n",name,desc);
 					UserData u1 = {id,(int16)sex,name,desc,(int16)age,msg_offline,timestamp_offline};
+					idsi[i] = id;
 					application1.hold ();
-					grid1.add_friend(u1);
+					grid1.add_friend(u1,false);
 					application1.release ();
+				}
+				if( tell_all( idsi )==false ){
+					Gtk.main_quit();
 				}
 			});
             application1.release ();
