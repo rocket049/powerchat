@@ -1,6 +1,8 @@
 using Gtk;
 using Gee;
-
+struct IDArray{
+	int64[] ids;
+}
 public class MultiSendUi: GLib.Object{
 	Gtk.Dialog frame1;
 	Gtk.ListBox friends;
@@ -9,7 +11,7 @@ public class MultiSendUi: GLib.Object{
 	Gtk.Button send1;  //send message
 	Gtk.Button save1;  //save new group
 	Gee.HashSet<int64?> ids;   //store id selected
-	Gee.HashMap<string,int64[]?> group_map;
+	Gee.HashMap<string,IDArray?> group_map;
 	
 	public MultiSendUi(){
 		frame1 = new Gtk.Dialog();
@@ -27,7 +29,7 @@ public class MultiSendUi: GLib.Object{
 		ids = new Gee.HashSet<int64?>(null,(a,b)=>{
 			return (a==b);
 		});
-		group_map = new Gee.HashMap<string,int64[]?>();
+		group_map = new Gee.HashMap<string,IDArray?>();
 		
 		var grid1 = new Gtk.Grid();
 		var box1 = frame1.get_content_area ();
@@ -90,7 +92,7 @@ public class MultiSendUi: GLib.Object{
 					idsi[i] = id1;
 					i++;
 				}
-				group_map[name1.text] = idsi;
+				group_map[name1.text] = {idsi};
 			});
 		});
 	}
