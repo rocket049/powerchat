@@ -1,5 +1,7 @@
 using Gtk;
 using Gee;
+using Json;
+
 struct IDArray{
 	int64[] ids;
 }
@@ -70,6 +72,12 @@ public class MultiSendUi: GLib.Object{
 		set_send_callback();
 		set_save_callback();
 		set_group_callback();
+		
+		frame1.destroy.connect(()=>{
+			lock(group_map){
+				on_select_destroy();
+			}
+		});
 	}
 	private void set_group_callback(){
 		groups.row_selected.connect((r)=>{
@@ -89,6 +97,45 @@ public class MultiSendUi: GLib.Object{
 	}
 	private void ask_group(string msg1,int64[] ids1){
 		//show msg1,ask Yes or No
+		var set1 = new Gee.HashSet<string>(null,(a,b)=>{return (a==b);});
+		for(int i=0;i<ids1.length;i++){
+			set1.add(ids1[i].to_string());
+		}
+		var dlg1 = new Gtk.Dialog();
+		dlg1.set_modal(true);
+		dlg1.title=_("MultiSend");
+		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
+		scrollWin1.set_size_request(240,320);
+		scrollWin1.add(new Gtk.Label(msg1));
+		dlg1.get_content_area().pack_start(scrollWin1);
+		scrollWin1.show_all();
+		dlg1.add_button(_("Select"),1);
+		dlg1.add_button(_("UnSelect"),2);
+		dlg1.add_button(_("Cancel"),-1);
+		int ret = dlg1.run();
+		if(ret==1){
+			//print("select\n");
+			friends.foreach((w)=>{
+				var r = w as Gtk.ListBoxRow;
+				var cb1 = r.get_child() as Gtk.CheckButton;
+				if(set1.contains(cb1.name)){
+					cb1.set_active(true);
+				}
+			});
+		}else if(ret==2){
+			//print("unselect\n");
+			friends.foreach((w)=>{
+				var r = w as Gtk.ListBoxRow;
+				var cb1 = r.get_child() as Gtk.CheckButton;
+				if(set1.contains(cb1.name)){
+					cb1.set_active(false);
+				}
+			});
+		}else{
+			print("cancel\n");
+		}
+
+		dlg1.destroy();
 	}
 	private void set_save_callback(){
 		save1.clicked.connect(()=>{
@@ -97,10 +144,11 @@ public class MultiSendUi: GLib.Object{
 			name1.text = @"$(ids.size) persons group";
 			name1.show();
 			name1.activate.connect(()=>{
-				if(group_map.has_key(name1.text)){
+				var gname = name1.text;
+				if(group_map.has_key(gname)){
 					return;
 				}
-				var label1 = new Gtk.Label(name1.text);
+				var label1 = new Gtk.Label(gname);
 				groups.remove(name1);
 				name1.destroy();
 				groups.add(label1);
@@ -112,8 +160,8 @@ public class MultiSendUi: GLib.Object{
 					idsi[i] = id1;
 					i++;
 				}
-				group_map[name1.text] = {idsi};
-				(label1.parent as Gtk.ListBoxRow).name = name1.text;
+				group_map[gname] = {idsi};
+				(label1.parent as Gtk.ListBoxRow).name = gname;
 			});
 		});
 	}
@@ -168,5 +216,32 @@ list{
 				ids.remove(u1.id);
 			}
 		});
+	}
+	private void on_select_destroy(){
+		print("on destroy\n");
+		if(group_map.size==0){
+			return;
+		}
+		var arrayv = new Variant[group_map.size];
+		int n=0;
+		foreach(string k1 in group_map.keys){
+			var v = group_map[k1].ids;
+			var data = new Variant[v.length];
+			for(int i=0;i<v.length;i++){
+				data[i] = new Variant.int64(v[i]);
+			}
+			var ids = new Variant.tuple(data);
+			var name = new Variant.string(k1);
+			var objv = new Variant.parsed( "{'Name':%v,'Ids':%v}",name,ids );
+			//print(@"$(k1)\n");
+			arrayv[n] = objv;
+			n++;
+		}
+		var res = new Variant.tuple(arrayv);
+		size_t len1;
+		//print("json\n");
+		string data1 = Json.gvariant_serialize_data (res, out len1);
+		stdout.printf (data1);
+		print ("\n");
 	}
 }

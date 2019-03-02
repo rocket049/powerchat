@@ -1202,7 +1202,12 @@ public void save_name(string name1){
 	dos.put_string( name1 );
 	print("write name. \n");
 }
-
+public string get_cfg_dir(string name){
+	var home1 = GLib.Environment.get_home_dir();
+	var res = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,home1,".powerchat", name);
+	GLib.DirUtils.create_with_parents(res,0644);
+	return res;
+}
 public static string prog_path;
 public void set_my_locale(string path1){
 	var dir1 = GLib.Path.get_dirname(path1);
