@@ -14,6 +14,7 @@ public class MultiSendUi: GLib.Object{
 	Gtk.Button save1;  //save new group
 	Gee.HashSet<int64?> ids;   //store id selected
 	Gee.HashMap<string,IDArray?> group_map;
+	GroupPopup popup1;
 	
 	public MultiSendUi(){
 		frame1 = new Gtk.Dialog();
@@ -32,6 +33,7 @@ public class MultiSendUi: GLib.Object{
 			return (a==b);
 		});
 		group_map = new Gee.HashMap<string,IDArray?>();
+		popup1=new GroupPopup();
 		
 		var grid1 = new Gtk.Grid();
 		var box1 = frame1.get_content_area ();
@@ -72,6 +74,7 @@ public class MultiSendUi: GLib.Object{
 		set_send_callback();
 		set_save_callback();
 		set_group_callback();
+		set_popup();
 		
 		frame1.destroy.connect(()=>{
 			lock(group_map){
@@ -103,6 +106,7 @@ public class MultiSendUi: GLib.Object{
 		}
 		var dlg1 = new Gtk.Dialog();
 		dlg1.set_modal(true);
+		dlg1.set_keep_above(true);
 		dlg1.title=_("MultiSend");
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
 		scrollWin1.set_size_request(240,320);
@@ -137,10 +141,14 @@ public class MultiSendUi: GLib.Object{
 	}
 	private void set_save_callback(){
 		save1.clicked.connect(()=>{
+			if(ids.size==0){
+				return;
+			}
 			var name1 = new Gtk.Entry();
 			groups.add(name1);
 			name1.text = @"$(ids.size) persons group";
 			name1.show();
+			name1.grab_focus_without_selecting ();
 			name1.activate.connect(()=>{
 				var gname = name1.text;
 				if(group_map.has_key(gname)){
@@ -220,6 +228,7 @@ list{
 	private void on_select_destroy(){
 		//print("on destroy\n");
 		if(group_map.size==0){
+			save_groups("\n");
 			return;
 		}
 		var arrayv = new Variant[group_map.size];
@@ -298,4 +307,44 @@ list{
             print ("load name Error: %s\n", e.message);
         }
     }
+    public void remove_group_by_name(string name){
+		group_map.unset(name);
+		groups.foreach((w)=>{
+			var r = w as Gtk.ListBoxRow;
+			if(r.name == name){
+				groups.remove(r);
+				r.destroy();
+				groups.show_all();
+			}
+		});
+	}
+	private void set_popup(){
+		groups.button_release_event.connect((e)=>{
+			if(e.button!=3)
+				return false;
+
+			//stdout.printf("button:%u %f\n",e.button,e.y);
+			Gtk.ListBoxRow r = groups.get_row_at_y((int)e.y);
+			groups.select_row(r);
+			popup1.set_name( r.name );
+			popup1.popup_at_pointer(e);
+			return true;
+		});
+	}
+}
+
+public class GroupPopup : Gtk.Menu{
+	private string g_name;
+	public void set_name(string name){
+		g_name = name;
+	}
+	public GroupPopup(){
+		var item2 = new Gtk.MenuItem.with_label (_("Delete"));
+		item2.activate.connect(()=>{
+			//stdout.printf("menu: %s\n",g_name);
+			msend_ui.remove_group_by_name(g_name);
+		});
+		this.append(item2);
+		this.show_all();
+	}
 }

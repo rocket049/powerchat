@@ -356,3 +356,30 @@ msgstr "用户名： "
 
 msgid "OpenDownloadDir"
 msgstr "我的下载目录"
+
+#: multisend.vala:21 multisend.vala:106
+msgid "MultiSend"
+msgstr "信息多发"
+
+#: multisend.vala:40
+msgid "Groups"
+msgstr "组群"
+
+#: multisend.vala:64
+msgid "Text:"
+msgstr "文字:"
+
+#: multisend.vala:88
+msgid "Group Members:\n"
+msgstr "组成员：\n"
+
+#: multisend.vala:112
+msgid "Select"
+msgstr "选择"
+
+#: multisend.vala:113
+msgid "UnSelect"
+msgstr "不选"
+
+msgid "Test Online"
+msgstr "是否在线"
