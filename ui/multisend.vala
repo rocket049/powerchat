@@ -77,10 +77,18 @@ public class MultiSendUi: GLib.Object{
 				return;
 			}
 			var array1 = group_map[r.name];
+			var msg = _("Group Members:\n");
 			for(int i=0;i<array1.ids.length;i++){
-				print(@"$(array1.ids[i])\n");
+				var id1 = array1.ids[i].to_string();
+				var name1 = grid1.frds1[id1].name;
+				msg = msg + @"$(name1)\n";
 			}
+			//call show dialog
+			ask_group(msg,array1.ids);
 		});
+	}
+	private void ask_group(string msg1,int64[] ids1){
+		//show msg1,ask Yes or No
 	}
 	private void set_save_callback(){
 		save1.clicked.connect(()=>{
