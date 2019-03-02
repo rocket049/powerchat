@@ -69,6 +69,18 @@ public class MultiSendUi: GLib.Object{
 		set_lists();
 		set_send_callback();
 		set_save_callback();
+		set_group_callback();
+	}
+	private void set_group_callback(){
+		groups.row_selected.connect((r)=>{
+			if(group_map.has_key(r.name)==false){
+				return;
+			}
+			var array1 = group_map[r.name];
+			for(int i=0;i<array1.ids.length;i++){
+				print(@"$(array1.ids[i])\n");
+			}
+		});
 	}
 	private void set_save_callback(){
 		save1.clicked.connect(()=>{
@@ -93,6 +105,7 @@ public class MultiSendUi: GLib.Object{
 					i++;
 				}
 				group_map[name1.text] = {idsi};
+				(label1.parent as Gtk.ListBoxRow).name = name1.text;
 			});
 		});
 	}
