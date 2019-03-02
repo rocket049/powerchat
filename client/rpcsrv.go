@@ -409,10 +409,17 @@ func (c *PClient) Tell(uid []int64, res *int) error {
 
 //rpc service
 func (c *PClient) TellAll(uid []int64, res *int) error {
-	for _, id := range uid {
-		msg, _ := MsgEncode(CmdChat, 0, id, []byte("LOGI"))
-		go c.conn.Write(msg)
+	mMsg := &MultiSendMsg{Ids: uid, Msg: "LOGI"}
+	return c.MultiSend(mMsg, res)
+}
+
+func (c *PClient) MultiSend(param *MultiSendMsg, res *int) error {
+	bmsg, err := json.Marshal(param)
+	if err != nil {
+		return err
 	}
+	msg, _ := MsgEncode(CmdMultiSend, 0, 0, bmsg)
+	c.conn.Write(msg)
 	return nil
 }
 

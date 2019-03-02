@@ -184,6 +184,8 @@ func serveConn(conn1 net.Conn) {
 		case CmdUserStatus:
 			//return status
 			client.UserStatus(conn1, smsg)
+		case CmdMultiSend:
+			client.MultiSend(conn1, smsg)
 		default:
 			err := client.Redirect(conn1, smsg)
 			if err != nil {
@@ -326,6 +328,39 @@ func (c *ClientType) Redirect(conn1 io.Writer, msg *MsgType) error {
 		log.Printf("io.Copy:%v\n", err)
 		c.SysResp(conn1, CmdSysReturn, err.Error())
 		return err
+	}
+	return nil
+}
+
+func (c *ClientType) MultiSend(conn1 io.Writer, msg *MsgType) error {
+	if c.Auth == false {
+		c.SysResp(conn1, CmdSysReturn, "Permission Denied")
+		return errors.New("not auth")
+	}
+	mMsg := new(MultiSendMsg)
+	err := json.Unmarshal(msg.Msg, mMsg)
+	if err != nil {
+		c.SysResp(conn1, CmdSysReturn, "Format Error")
+		return err
+	}
+	bmsg := []byte(mMsg.Msg)
+	for _, id1 := range mMsg.Ids {
+		v, ok := clients.Load(id1)
+		if ok == false {
+			c.SysResp(conn1, CmdSysReturn, fmt.Sprintf("Offline %d", id1))
+			offlineMsg(c.Id, id1, mMsg.Msg)
+			continue
+		}
+		req, err := MsgEncode(CmdChat, c.Id, id1, bmsg)
+		if err != nil {
+			c.SysResp(conn1, CmdSysReturn, err.Error())
+			continue
+		}
+		_, err = io.Copy(v.(*ClientData).Conn, bytes.NewBuffer(req))
+		if err != nil {
+			c.SysResp(conn1, CmdSysReturn, err.Error())
+			continue
+		}
 	}
 	return nil
 }

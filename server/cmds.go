@@ -47,7 +47,13 @@ const (
 	CmdUpdateDesc                           //更新自述文字
 	CmdDeleteMe                             //删除当前登录用户
 	CmdUserStatus                           //查询、返回用户状态
+	CmdMultiSend                            //文字信息群发
 )
+
+type MultiSendMsg struct {
+	Ids []int64
+	Msg string
+}
 
 const HeadSize uint16 = 19
 const MsgLimit int = 65000 - 19
