@@ -29,9 +29,7 @@ public class MultiSendUi: GLib.Object{
 		save1.set_size_request(24,12);
 		save1.expand=false;
 		
-		ids = new Gee.HashSet<int64?>(null,(a,b)=>{
-			return (a==b);
-		});
+		ids = new Gee.HashSet<int64?>(null,(a,b)=>{ return (a==b); });
 		group_map = new Gee.HashMap<string,IDArray?>();
 		popup1=new GroupPopup();
 		
@@ -178,6 +176,7 @@ public class MultiSendUi: GLib.Object{
 			foreach( int64 id1 in ids){
 				idsi[i] = id1;
 				i++;
+                //print(@"$(id1)\n");
 			}
 			if (entry1.text.length==0){
 				return;
@@ -217,11 +216,16 @@ list{
 		button1.name = u1.id.to_string();
 		friends.add(button1);
 		button1.show();
+        (button1.parent as Gtk.ListBoxRow).selectable = false;
 		button1.toggled.connect(()=>{
 			if (button1.active){
-				ids.add(u1.id);
+                if(ids.contains(u1.id)==false){
+                    ids.add(u1.id);
+                }
 			}else{
-				ids.remove(u1.id);
+                if( ids.contains(u1.id) ){
+                    ids.remove(u1.id);
+                }
 			}
 		});
 	}
