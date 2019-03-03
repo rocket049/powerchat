@@ -10,7 +10,7 @@ static LoginDialog login1;
 static RpcClient rpc1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
-static int RELEASE=20;
+static int RELEASE=21;
 static int LATESTVER=0;
 
 public struct UserData {
