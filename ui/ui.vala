@@ -331,6 +331,10 @@ list{
 			return false;
 		});
 	}
+    public void show_sended_msg_to(int64 to,string msg){
+        this.add_left_name_icon_to(to,this.uname,this.usex);
+        this.add_text_to(to,msg);
+    }
 	public void update_pwd(){
 		var dlg_pwd = new Gtk.Dialog.with_buttons(_("Update Password"),app,Gtk.DialogFlags.MODAL);
 		var grid = new Gtk.Grid();
@@ -533,6 +537,64 @@ list{
         grid1.set_column_spacing(5);
 		this.msgs.add(grid1);
 		grid1.show_all();
+    }
+    public void add_left_name_icon_to(int64 to , string name,int16 sex){
+        var box1 = boxes[to.to_string()];
+        if(box1==null){
+            return;
+        }
+		string iconp;
+		if (sex==1)
+			iconp = this.man_icon;
+		else
+			iconp = this.woman_icon;
+        var grid = new Gtk.Grid();
+        var pix1 = new Gdk.Pixbuf.from_file(iconp);
+        var img1 = new Gtk.Image();
+        img1.set_from_pixbuf(pix1);
+        grid.attach(img1,0,0);
+		var l1 = new Gtk.Label(name);
+		l1.xalign = (float)0;
+        grid.attach(l1,1,0);
+        grid.set_column_spacing(5);
+
+        box1.add(grid);
+
+		grid.show_all();
+    }
+    public void add_text_to(int64 to,string text,bool center=false ,bool markup=false){
+        var box1 = boxes[to.to_string()];
+        if(box1==null){
+            return;
+        }
+        var lb = new Gtk.Label("");
+        lb.set_selectable(true);
+        var sc1 = lb.get_style_context();
+		sc1.add_provider(this.link_css1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+        if(markup){
+			lb.set_markup(text);	
+		} else
+			lb.set_label(text);
+		lb.wrap = true;
+        lb.wrap_mode = Pango.WrapMode.CHAR;
+        if(!center){
+            lb.xalign = (float)0;
+        }
+        lb.width_request = 360;
+        lb.max_width_chars = 15;
+        var grid=new Gtk.Grid();
+        var lb1 = new Gtk.Label("");
+        lb1.width_request = 5;
+        grid.attach(lb1,0,0);
+        grid.attach(lb,1,0);
+        var lb2 = new Gtk.Label("");
+        lb2.width_request = 5;
+        grid.attach(lb2,2,0);
+        grid.halign = Gtk.Align.CENTER;
+        
+		box1.add(grid);
+        
+		grid.show_all();
     }
     public void add_image(string pathname){
         var p1 = new Gdk.Pixbuf.from_file(pathname);

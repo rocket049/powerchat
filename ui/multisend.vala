@@ -175,6 +175,7 @@ public class MultiSendUi: GLib.Object{
 			int i=0;
 			foreach( int64 id1 in ids){
 				idsi[i] = id1;
+                grid1.show_sended_msg_to(id1,entry1.text);
 				i++;
                 //print(@"$(id1)\n");
 			}
