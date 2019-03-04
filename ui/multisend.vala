@@ -7,6 +7,7 @@ struct IDArray{
 }
 public class MultiSendUi: GLib.Object{
 	Gtk.Dialog frame1;
+	Gtk.Grid grid_main;
 	Gtk.ListBox friends;
 	Gtk.ListBox groups;
 	Gtk.Entry entry1;  //edit message
@@ -20,7 +21,7 @@ public class MultiSendUi: GLib.Object{
 		frame1 = new Gtk.Dialog();
 		frame1.set_modal(true);
 		frame1.title=_("MultiSend");
-		frame1.set_size_request(480,640);
+		//frame1.set_size_request(480,640);
 		friends = new Gtk.ListBox();
 		groups = new Gtk.ListBox();
 		entry1 = new Gtk.Entry();
@@ -42,7 +43,7 @@ public class MultiSendUi: GLib.Object{
 		grid1.attach(label2,3,0);
 		
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
-		scrollWin1.width_request = 200;
+		scrollWin1.set_size_request(200,300);
 		scrollWin1.expand = true;
 		scrollWin1.add(friends);
 		grid1.attach(scrollWin1,1,1,1,3);
@@ -56,7 +57,7 @@ public class MultiSendUi: GLib.Object{
 		grid1.attach(lb2,2,3);
 		
 		scrollWin1 = new Gtk.ScrolledWindow(null,null);
-		scrollWin1.width_request = 200;
+		scrollWin1.set_size_request(200,400);
 		scrollWin1.expand = true;
 		scrollWin1.add(groups);
 		grid1.attach(scrollWin1,3,1,1,3);
@@ -66,6 +67,7 @@ public class MultiSendUi: GLib.Object{
 		grid1.attach(send1,4,4);
 		
 		grid1.show_all();
+		grid_main = grid1;
 		
 		set_css();
 		set_lists();
@@ -196,8 +198,19 @@ public class MultiSendUi: GLib.Object{
 list{
 	background-color:#FFFFFF;
 	color:#000000;
+	border-width:1px;
+	border-style:solid;
+	border-color:#0000FF;
 }
 """);
+//		var css_grid = new Gtk.CssProvider();
+//		var sc_grid = grid_main.get_style_context();
+//		sc_grid.add_provider(css_grid,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+//		//background-color:#BABABA;
+//		css_grid.load_from_data("""grid{
+//	background-color:#BABABA;
+//}
+//""");
 	}
 	public void show(){
 		frame1.show_all();
