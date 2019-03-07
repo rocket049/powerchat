@@ -153,7 +153,7 @@ func readConn(conn1 net.Conn) {
 		case CmdUserStatus:
 			cmdChan <- *msg
 		default:
-			log.Printf("Cmd:%d From:%d To:%d Msg:%s\n", msg.Cmd, msg.From, msg.To, string(msg.Msg))
+			//log.Printf("Cmd:%d From:%d To:%d Msg:%s\n", msg.Cmd, msg.From, msg.To, string(msg.Msg))
 		}
 	}
 }

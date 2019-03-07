@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"io"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -35,7 +34,7 @@ func startFileServ(conn1 io.Writer) {
 	for {
 		h1, ok := <-fileChan
 		if ok == false {
-			log.Println("close file Header Chan")
+			//log.Println("close file Header Chan")
 			return
 		}
 		if h1.Cmd != CmdFileHeader {

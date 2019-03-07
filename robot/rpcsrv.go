@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"path/filepath"
 	"regexp"
@@ -81,7 +80,7 @@ func (c *PClient) Login(p LogParam) {
 		panic("login fail 3")
 	}
 
-	log.Println("logined")
+	//log.Println("logined")
 }
 
 type ChatMessage struct {
@@ -125,7 +124,7 @@ type MsgReturn struct {
 //rpc notify the client
 func (c *PClient) notifyMsg(msg *MsgType) error {
 	//to deal msg
-	log.Println("cmd:", msg.Cmd)
+	//log.Println("cmd:", msg.Cmd)
 	if msg.Cmd == CmdChat {
 		c.replyChat(msg)
 		//log.Println("chat:", msg.From, string(msg.Msg))
@@ -134,6 +133,9 @@ func (c *PClient) notifyMsg(msg *MsgType) error {
 }
 
 func (c *PClient) replyChat(msg *MsgType) {
+	if len(msg.Msg) < 4 {
+		return
+	}
 	pre := string(msg.Msg[:4])
 	switch pre {
 	case "LOGI":
@@ -154,7 +156,7 @@ func (c *PClient) replyChat(msg *MsgType) {
 func (c *PClient) showTopic(msg *MsgType) bool {
 	ok, err := regexp.Match("^\\d+$", msg.Msg[4:])
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return false
 	}
 	if ok {
@@ -172,7 +174,7 @@ func (c *PClient) showTopic(msg *MsgType) bool {
 func (c *PClient) showIndex(msg *MsgType) bool {
 	ok, err := regexp.Match("^p\\d+$", msg.Msg[4:])
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return false
 	}
 	if ok {

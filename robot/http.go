@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"sync"
 	"time"
@@ -39,7 +38,7 @@ func httpProxy2(conn1 io.ReadWriter) {
 func proxyChan(ch1 chan MsgType, conn1 io.ReadWriter, from int64, cid uint32) {
 	httpConn, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", proxyPort))
 	if err != nil {
-		log.Printf("localhost:%d :%v\n", proxyPort, err)
+		//log.Printf("localhost:%d :%v\n", proxyPort, err)
 		return
 	}
 	defer httpConn.Close()
@@ -55,7 +54,7 @@ func proxyChan(ch1 chan MsgType, conn1 io.ReadWriter, from int64, cid uint32) {
 				return
 			}
 			if rbody.Cmd == CmdHttpReqClose {
-				log.Println("recv CmdHttpReqClose")
+				//log.Println("recv CmdHttpReqClose")
 				return
 			}
 			if rbody.Cmd == CmdHttpRequest {
@@ -81,7 +80,7 @@ func proxyResopnse(conn1 io.ReadWriter, httpConn io.ReadWriter, from int64, time
 	for {
 		n, err := httpConn.Read(buf)
 		if err != nil {
-			log.Printf("ProxyResp:%v\n", err)
+			//log.Printf("ProxyResp:%v\n", err)
 			cr, _ := MsgEncode(CmdHttpRespClose, id, from, header)
 			conn1.Write(cr)
 			timeout_ch <- 0
@@ -128,7 +127,7 @@ func httpResponse2(conn1 io.ReadWriter, locConn net.Conn, to int64) {
 	for {
 		n, err := locConn.Read(buf)
 		if err != nil {
-			log.Printf("Browser:%v\n", err)
+			//log.Printf("Browser:%v\n", err)
 			r, _ := MsgEncode(CmdHttpReqClose, 0, to, header)
 			conn1.Write(r)
 			return

@@ -5,16 +5,20 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/rocket049/go-jsonrpc2glib"
 )
 
 var (
@@ -22,16 +26,13 @@ var (
 	id         int64
 	httpId     int64
 	proxyPort  int
-	cSrv       *pChatClient
+	rpcSrv     *PClient
 	serverAddr string
 	servePort  int = 7890
-	pgPath     string
 )
 
 func init() {
-	cSrv = new(pChatClient)
-	main_init()
-	log.Println("go init.")
+	rpcSrv = new(PClient)
 }
 
 func client(ctl1 chan int) {
@@ -47,7 +48,7 @@ func client(ctl1 chan int) {
 	}
 	defer conn1.Close()
 	go httpProxy2(conn1)
-	//replace httpServe and cSrv.startcSrv4Glib
+	//replace httpServe and rpcSrv.startRpcSrv4Glib
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
 	//go httpServe(conn1)
@@ -72,7 +73,7 @@ type UserInfo struct {
 
 func OnReady(msg *MsgType) {
 	token = msg.Msg
-	cSrv.token = msg.Msg
+	rpcSrv.token = msg.Msg
 }
 
 //for httpProxy
@@ -296,7 +297,7 @@ LOOP1:
 	}
 }
 
-//goroutine replace httpServe and startcSrv4Glib
+//goroutine replace httpServe and startRpcSrv4Glib
 func localServe(conn1 net.Conn, res1 chan bool) {
 	var l net.Listener
 	var err error
@@ -313,10 +314,11 @@ func localServe(conn1 net.Conn, res1 chan bool) {
 		panic(err)
 	}
 	defer l.Close()
-	cSrv.setConn(conn1)
 	u1, _ := user.Current()
 	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	res1 <- true
+	jsonrpc2glib.DebugMode(false)
+	serveID := 0
 	go httpRespRouter()
 	for {
 		conn, err := l.Accept()
@@ -324,7 +326,16 @@ func localServe(conn1 net.Conn, res1 chan bool) {
 			log.Println("2.accept", err)
 			return
 		}
-		go httpResponse2(conn1, conn, httpId)
+
+		switch serveID {
+		case 0:
+			rpcSrv.setConn(conn1, conn)
+			go rpcSrv.startServe()
+			serveID += 1
+		case 1:
+			//go httpResponse(conn1, conn)
+			go httpResponse2(conn1, conn, httpId)
+		}
 
 	}
 }
@@ -350,7 +361,7 @@ func readConn(conn1 net.Conn) {
 		case CmdReady:
 			OnReady(msg)
 		case CmdChat:
-			notifyMsg(msg)
+			rpcSrv.notifyMsg(msg)
 		case CmdHttpRequest:
 			pushHttpChan(msg)
 		case CmdHttpReqContinued:
@@ -391,7 +402,7 @@ func readConn(conn1 net.Conn) {
 		case CmdReturnPersons:
 			cmdChan <- *msg
 		case CmdSysReturn:
-			notifyMsg(msg)
+			rpcSrv.notifyMsg(msg)
 		case CmdReturnStrangers:
 			cmdChan <- *msg
 		case CmdReturnQueryID:
@@ -403,15 +414,16 @@ func readConn(conn1 net.Conn) {
 		}
 	}
 }
-func main_init() {
-	servePort = 7890
+func main() {
+	var port1 = flag.Int("port", 7890, "local serve port")
+	flag.Parse()
+	servePort = *port1
 	proxyPort = servePort + 2000
 	filepath1, err := os.Executable()
 	if err != nil {
 		log.Fatal(err)
 	}
 	path1 := filepath.Dir(filepath1)
-	pgPath = path1
 	var cfg1 = make(map[string]string)
 	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "config.json"))
 	if err != nil {
@@ -431,6 +443,51 @@ func main_init() {
 	go client(ctl1)
 	<-ctl1
 	close(ctl1)
+	//start ui
+	ui1 := filepath.Join(path1, "ui")
+	ui2 := filepath.Join(path1, "..", "ui", "ui")
+	ui3 := filepath.Join(path1, "ui.exe")
+	ui4 := filepath.Join(path1, "..", "ui", "ui.exe")
+	var cui *exec.Cmd
+	switch osID {
+	case 0:
+		if _, err = os.Stat(ui1); err == nil {
+			cui = exec.Command(ui1, fmt.Sprintf("%d", servePort))
+		} else if _, err = os.Stat(ui2); err == nil {
+			cui = exec.Command(ui2, fmt.Sprintf("%d", servePort))
+		} else {
+			log.Fatal("Can't find ui.\n")
+		}
+	case 1:
+		if _, err = os.Stat(ui3); err == nil {
+			cui = exec.Command(ui3, fmt.Sprintf("%d", servePort))
+		} else if _, err = os.Stat(ui4); err == nil {
+			cui = exec.Command(ui4, fmt.Sprintf("%d", servePort))
+		} else {
+			log.Fatal("Can't find ui.\n")
+		}
+	}
+
+	out1, err := cui.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	defer out1.Close()
+	err = cui.Start()
+	if err != nil {
+		panic(err)
+	}
+	rdOut := bufio.NewReader(out1)
+	for {
+		ln1, _, err := rdOut.ReadLine()
+		if err != nil {
+			log.Println(err)
+			break
+		}
+		fmt.Printf("UI: ")
+		os.Stdout.Write(ln1)
+		fmt.Printf("\n")
+	}
 }
 
 func getRelatePath(name1 string) string {

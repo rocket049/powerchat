@@ -71,7 +71,7 @@ func notifyFile(pathname string, from int64) {
 	msgbuf.Write(b1)
 	msg := MsgType{Cmd: CmdFileHeader, From: from, To: 0, Msg: msgbuf.Bytes()}
 	//msgChan <- msg
-	rpcSrv.notifyMsg(&msg)
+	notifyMsg(&msg)
 }
 
 //goroutine

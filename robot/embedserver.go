@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -25,7 +24,7 @@ func newMyHandler(pathRoot string) *myHandler {
 }
 
 func startMyHttpServe(pathRoot, addr string) {
-	log.Println("www root:", pathRoot)
+	//log.Println("www root:", pathRoot)
 	handler := newMyHandler(pathRoot)
 	http.ListenAndServe(addr, handler)
 }
@@ -135,7 +134,7 @@ func (s *myHandler) lsPath(resp http.ResponseWriter, req *http.Request) {
 	tpl1 := template.New("")
 	_, err = tpl1.Parse(tmpl)
 	if err != nil {
-		log.Println("tempate parse error:", err)
+		//log.Println("tempate parse error:", err)
 		resp.WriteHeader(404)
 		return
 	}
