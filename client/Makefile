@@ -1,8 +1,10 @@
 SRC=ui.vala jsonrpc.vala adduser.vala search.vala strangers.vala popup.vala multisend.vala client.vapi
 VALACFLAGS=-X -D'GETTEXT_PACKAGE="powerchat"' -X -Wl,--rpath=. -X -L. -X -lclient --pkg gtk+-3.0 --pkg jsonrpc-glib-1.0 --pkg gee-0.8 --pkg json-glib-1.0
-powerchat:$(SRC) libclient.h libclient.a
+
+powerchat:$(SRC) libclient.a libclient.h
 	valac -o powerchat $(VALACFLAGS) -X -lasound $(SRC)
-powerchat.exe:$(SRC) libclient.h libclient.dll
+powerchat.exe:$(SRC) libclient.dll libclient.h
+	if [ -f libclient.a ] ; then rm libclient.a; fi
 	valac -o powerchat.exe -X -mwindows $(VALACFLAGS) $(SRC)
 libclient.a:./libclient/*.go
 	go build -o libclient.a -buildmode=c-archive ./libclient
