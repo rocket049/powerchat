@@ -146,8 +146,10 @@ public class ChatClient:GLib.Object{
 		}
 		var thread = new Thread<int>("search_person", ()=>{
 			Client_QueryID(uid,msg,(void*)stranger_add);
-			
 			return 0;});
+	}
+	public string get_pg_path(){
+		return Client_GetPgPath();
 	}
 }
 
