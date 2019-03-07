@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=22;
+static int RELEASE=23;
 static int LATESTVER=0;
 
 public struct UserMsg{
@@ -809,7 +809,7 @@ public void msg_notify(string uname){
 }
 public void version_notify(){
 	var pname = GLib.Environment.get_prgname();
-	if( pname=="ui" ){
+	if( pname=="powerchat" ){
         var app = application1;
 	    app.hold();
 		var notify1 = new Notification(_("New Version Released!"));
@@ -1062,6 +1062,7 @@ public class AppWin:Gtk.ApplicationWindow{
 			int r = dlg.run();
 			if(r==1){
 				client.update_desc(desc1.text);
+				grid1.udesc = desc1.text;
 			}
 			dlg.destroy();
 			application1.release ();
@@ -1231,8 +1232,9 @@ public string get_cfg_dir(string name){
 }
 public static string prog_path;
 public void set_my_locale(string path1){
-	var dir1 = GLib.Path.get_dirname(path1);
+	var dir1 = GLib.Path.get_dirname(GLib.Environment.find_program_in_path("powerchat"));
 	prog_path = dir1;
+	//stdout.printf("%s\n",GLib.Environment.find_program_in_path("powerchat"));
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","locale");
 	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
 	GLib.Intl.textdomain("powerchat");

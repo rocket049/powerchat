@@ -1,7 +1,4 @@
-ui
-ui.exe
-libclient.so
+libclient*
 powerchat
 powerchat.exe
-libclient.dll
 

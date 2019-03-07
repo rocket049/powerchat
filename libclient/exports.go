@@ -312,7 +312,7 @@ func Client_UserStatus(uid C.gint64) C.int {
 }
 
 //export Client_QueryID
-func Client_QueryID(uid C.gint64) *C.struct_UserData {
+func Client_QueryID(uid C.gint64, msg *C.char, callback unsafe.Pointer) {
 	req, _ := MsgEncode(CmdQueryID, cSrv.id, int64(uid), []byte("\n"))
 	cSrv.conn.Write(req)
 	var resp MsgType
@@ -320,7 +320,7 @@ func Client_QueryID(uid C.gint64) *C.struct_UserData {
 	for {
 		resp, ok = <-cmdChan
 		if ok == false {
-			return nil
+			return
 		}
 		if resp.Cmd == CmdReturnQueryID {
 			break
@@ -332,10 +332,11 @@ func Client_QueryID(uid C.gint64) *C.struct_UserData {
 	var v UserBaseInfo
 	err := json.Unmarshal(resp.Msg, &v)
 	if err != nil {
-		return nil
+		return
 	}
-	return &C.struct_UserData{Id: C.gint64(v.Id), Name: C.CString(v.Name), Sex: C.int(v.Sex),
-		Age: C.int(time.Now().Year() - v.Birthday.Year()), Desc: C.CString(v.Desc)}
+	C.callAppendUser(callback, C.gint64(v.Id), C.CString(v.Name), C.int(v.Sex),
+		C.int(time.Now().Year()-v.Birthday.Year()), C.CString(v.Desc),
+		msg, C.CString(time.Now().Format("2006-01-02 15:04:05")))
 }
 
 //export Client_MoveStrangerToFriend

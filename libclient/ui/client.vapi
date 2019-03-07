@@ -12,7 +12,7 @@ public static void Client_GetFriends(void* p0);
 
 public static int Client_UserStatus(int64 p0);
 
-public static UserData? Client_QueryID(int64 p0);
+public static void Client_QueryID(int64 p0,string msg,void* callfn);
 
 public static void Client_MoveStrangerToFriend(int64 p0);
 

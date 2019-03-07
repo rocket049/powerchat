@@ -19,16 +19,24 @@ public struct UserData {
 }
 
 public void search_add(int64 id,string name,int sex,int age,string desc,string msg, string msg_time){
-	search1.seach_callback({id,sex,name,desc,age,msg,msg_time});
+	Idle.add(()=>{
+		search1.seach_callback({id,sex,name,desc,age,msg,msg_time});
+		return false;});
 }
 public void stranger_add(int64 id,string name,int sex,int age,string desc,string msg, string msg_time){
-	strangers1.add_row({id,sex,name,desc,age,msg,msg_time});
+	Idle.add(()=>{
+		strangers1.prepend_row({id,sex,name,desc,age,msg,msg_time});
+		return false;});
 }
 public void friend_add(int64 id,string name,int sex,int age,string desc,string msg, string msg_time){
-	grid1.add_friend({id,sex,name,desc,age,msg,msg_time});
+	Idle.add(()=>{
+		grid1.add_friend({id,sex,name,desc,age,msg,msg_time});
+		return false;});
 }
 public void client_notify(int8 typ,int64 from,int64 to,string msg){
-	grid1.rpc_callback(typ,from,msg);
+	Idle.add(()=>{
+		grid1.rpc_callback(typ,from,msg);
+		return false;});
 }
 
 public class ChatClient:GLib.Object{
@@ -55,18 +63,24 @@ public class ChatClient:GLib.Object{
 	}
 	//f(long long id,string name,int sex,int age,string desc,string msg, string msg_time)
 	public void search_person_async(string key){
-		Client_SearchPersons(key,(void*)search_add);
+		var thread = new Thread<int>("search_person", ()=>{
+			Client_SearchPersons(key,(void*)search_add);
+			return 0;});
 	}
 	public void move_stranger_to_friend(int64 fid){
 		Client_MoveStrangerToFriend(fid);
 	}
 	
 	public void get_stranger_msgs_async(){
-		Client_GetStrangerMsgs((void*)stranger_add);
+		var thread = new Thread<int>("get_strangers", ()=>{
+			Client_GetStrangerMsgs((void*)stranger_add);
+			return 0;});
 	}
 
     public void get_friends_async(){
-		Client_GetFriends((void*)friend_add);
+		var thread = new Thread<int>("get_friends", ()=>{
+			Client_GetFriends((void*)friend_add);
+			return 0;});
     }
     public void ChatTo(int64 to , string msg){
 		Client_ChatTo(to,msg);
@@ -130,12 +144,10 @@ public class ChatClient:GLib.Object{
 		if(uid==0){
 			return;
 		}
-		var u = Client_QueryID(uid);
-		var tm1 = new GLib.DateTime.now_local();
-		UserMsg u1 = {u.Id,u.Sex,u.Name,u.Desc,u.Age,msg,tm1.format("%Y-%m-%d %H:%M:%S")};
-		//show u1
-		strangers1.prepend_row(u1);
-		msg_notify(_("Strangers"));
+		var thread = new Thread<int>("search_person", ()=>{
+			Client_QueryID(uid,msg,(void*)stranger_add);
+			
+			return 0;});
 	}
 }
 

@@ -120,7 +120,7 @@ msgstr "确认密码："
 
 #: ui.vala:365
 msgid "Update"
-msgstr "跟新"
+msgstr "更新"
 
 #: ui.vala:373
 msgid "Confirm Fail!"
