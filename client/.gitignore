@@ -1,4 +1,4 @@
-client
-client.exe
-/RecvFiles
-vendor/
+powerchat
+powerchat.exe
+libclient.*
+
