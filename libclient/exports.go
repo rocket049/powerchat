@@ -637,13 +637,14 @@ func Client_DeleteMe(name, pwd *C.char) C.int {
 	}
 }
 
-var ret_path string
+var ret_path *C.char
 
 //export Client_GetPgPath
 func Client_GetPgPath() *C.char {
 	filepath1, _ := os.Executable()
-	ret_path = fmt.Sprintf("%s", filepath.Dir(filepath1))
-	return C.CString(ret_path)
+	ret_path = C.CString(fmt.Sprintf("%s", filepath.Dir(filepath1)))
+	return ret_path
 }
 
+//main
 func main() {}

@@ -1231,10 +1231,14 @@ public void set_my_locale(string path1){
 	string dir1;
 	try{
 		dir1 = GLib.Path.get_dirname(GLib.Environment.find_program_in_path("powerchat"));
-	}catch( FileError e){
+		if(dir1==null)
+			dir1 = GLib.Path.get_dirname(path1);
+		//stdout.printf("find:%s\n",dir1);
+	}catch( GLib.Error e){
 		dir1 = GLib.Path.get_dirname(path1);
+		//stdout.printf("arg:%s\n",dir1);
 	}
-	//stdout.printf("Path:%s\n",dir1);
+	//stdout.printf("Path:%s\n",Client_GetPgPath());
 	prog_path = dir1;
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","locale");
 	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
