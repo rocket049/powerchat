@@ -60,6 +60,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -633,6 +635,15 @@ func Client_DeleteMe(name, pwd *C.char) C.int {
 	} else {
 		return 0
 	}
+}
+
+var ret_path string
+
+//export Client_GetPgPath
+func Client_GetPgPath() *C.char {
+	filepath1, _ := os.Executable()
+	ret_path = fmt.Sprintf("%s", filepath.Dir(filepath1))
+	return C.CString(ret_path)
 }
 
 func main() {}

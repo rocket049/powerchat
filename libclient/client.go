@@ -25,11 +25,13 @@ var (
 	cSrv       *pChatClient
 	serverAddr string
 	servePort  int = 7890
+	pgPath     string
 )
 
 func init() {
 	cSrv = new(pChatClient)
 	main_init()
+	log.Println("go init.")
 }
 
 func client(ctl1 chan int) {
@@ -409,6 +411,7 @@ func main_init() {
 		log.Fatal(err)
 	}
 	path1 := filepath.Dir(filepath1)
+	pgPath = path1
 	var cfg1 = make(map[string]string)
 	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "config.json"))
 	if err != nil {

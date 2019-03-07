@@ -808,8 +808,8 @@ public void msg_notify(string uname){
 	}
 }
 public void version_notify(){
-	var pname = GLib.Environment.get_prgname();
-	if( pname=="powerchat" ){
+	var x = GLib.Environ.get_variable(GLib.Environ.@get(),"DISPLAY");
+	if( x != null ){
         var app = application1;
 	    app.hold();
 		var notify1 = new Notification(_("New Version Released!"));
@@ -827,10 +827,6 @@ public class AppWin:Gtk.ApplicationWindow{
 	public int counter=0;
 	public AppWin(){
 		// Sets the title of the Window:
-		var dt1 = new DateTime.now_local();
-		
-		application1 = new Gtk.Application(@"app.powerchat.id$(dt1.to_unix())",GLib.ApplicationFlags.FLAGS_NONE);
-		application1.register();
 		application1.add_window(this as Gtk.Window);
 		this.title = _("Everyone Publish!");
 
@@ -1232,9 +1228,14 @@ public string get_cfg_dir(string name){
 }
 public static string prog_path;
 public void set_my_locale(string path1){
-	var dir1 = GLib.Path.get_dirname(GLib.Environment.find_program_in_path("powerchat"));
+	string dir1;
+	try{
+		dir1 = GLib.Path.get_dirname(GLib.Environment.find_program_in_path("powerchat"));
+	}catch( FileError e){
+		dir1 = GLib.Path.get_dirname(path1);
+	}
+	//stdout.printf("Path:%s\n",dir1);
 	prog_path = dir1;
-	//stdout.printf("%s\n",GLib.Environment.find_program_in_path("powerchat"));
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","locale");
 	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
 	GLib.Intl.textdomain("powerchat");
@@ -1244,18 +1245,16 @@ public void set_my_locale(string path1){
 static uint16 server_port=7890;
 static uint16 proxy_port;
 public static int main(string[] args){
+	Gtk.init(ref args);
 	set_my_locale(args[0]);
 	if (!Thread.supported()) {
 		stderr.printf("Cannot run without threads.\n");
 		return 1;
 	}
-	if(args.length==2){
-		server_port = (uint16)args[1].to_int64();
-	}
-	//proxy_port = server_port + 2000;
 	client = new ChatClient();
 
-	Gtk.init(ref args);
+	application1 = new Gtk.Application(null,GLib.ApplicationFlags.FLAGS_NONE);
+	application1.register();
 	grid1 = new MyGrid();
 	app = new AppWin();
 	app.append(grid1.mygrid);
