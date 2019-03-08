@@ -54,4 +54,4 @@ public static void Client_UpdateDesc(string p0);
 
 public static int Client_DeleteMe(string p0, string p1);
 
-public static string Client_GetPgPath();
+public static unowned string Client_GetPgPath();
