@@ -796,29 +796,30 @@ list{
 }
 Gtk.Application application1;
 public void msg_notify(string uname){
-	//var pname = GLib.Environment.get_prgname();
-    var x = GLib.Environ.get_variable(GLib.Environ.@get(),"DISPLAY");
-	if( x != null ){
-        var app = application1;
-	    app.hold();
-		var notify1 = new Notification(_("New message"));
-		notify1.set_body(_("From: ")+uname);
-		notify1.set_default_action("app.show-win");
-		app.send_notification(null,notify1);
-        app.release();
-	}
+#if WINDOWS
+	return;
+#else
+	var app = application1;
+	app.hold();
+	var notify1 = new Notification(_("New message"));
+	notify1.set_body(_("From: ")+uname);
+	notify1.set_default_action("app.show-win");
+	app.send_notification(null,notify1);
+	app.release();
+#endif
 }
 public void version_notify(){
-	var x = GLib.Environ.get_variable(GLib.Environ.@get(),"DISPLAY");
-	if( x != null ){
-        var app = application1;
-	    app.hold();
-		var notify1 = new Notification(_("New Version Released!"));
-		notify1.set_body(_("Click here or click menu item 'Help->Upgrade' to get new version."));
-		notify1.set_default_action("app.down-page");
-		app.send_notification(null,notify1);
-        app.release();
-	}
+#if WINDOWS
+	return;
+#else
+	var app = application1;
+	app.hold();
+	var notify1 = new Notification(_("New Version Released!"));
+	notify1.set_body(_("Click here or click menu item 'Help->Upgrade' to get new version."));
+	notify1.set_default_action("app.down-page");
+	app.send_notification(null,notify1);
+	app.release();
+#endif
 }
 public class AppWin:Gtk.ApplicationWindow{
 	Gtk.StatusIcon tray1;
@@ -1229,18 +1230,11 @@ public string get_cfg_dir(string name){
 }
 public static string prog_path;
 public void set_my_locale(string path1){
-	string dir1;
-	try{
-		dir1 = GLib.Path.get_dirname(GLib.Environment.find_program_in_path("powerchat"));
-		if(dir1==null)
-			dir1 = GLib.Path.get_dirname(path1);
-		//stdout.printf("find:%s\n",dir1);
-	}catch( GLib.Error e){
-		dir1 = GLib.Path.get_dirname(path1);
-		//stdout.printf("arg:%s\n",dir1);
-	}
-	//stdout.printf("Path:%s\n",Client_GetPgPath());
-	prog_path = client.get_pg_path();
+#if WINDOWS
+	prog_path = GLib.Path.get_dirname(path1);
+#else
+	prog_path = GLib.Path.get_dirname( GLib.FileUtils.read_link("/proc/self/exe") );
+#endif
 	var textpath = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","locale");
 	GLib.Intl.setlocale(GLib.LocaleCategory.ALL,"");
 	GLib.Intl.textdomain("powerchat");

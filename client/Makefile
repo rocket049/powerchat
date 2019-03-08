@@ -5,7 +5,7 @@ powerchat:$(SRC) libclient.a
 	valac -o powerchat $(VALACFLAGS) -X -lasound $(SRC)
 powerchat.exe:$(SRC) libclient.dll
 	if [ -f libclient.a ] ; then rm libclient.a; fi
-	valac -o powerchat.exe -X -mwindows $(VALACFLAGS) $(SRC)
+	valac -o powerchat.exe -X -mwindows -D WINDOWS $(VALACFLAGS) $(SRC)
 libclient.a:./libclient/*.go
 	go build -o libclient.a -buildmode=c-archive ./libclient
 libclient.dll:./libclient/*.go
