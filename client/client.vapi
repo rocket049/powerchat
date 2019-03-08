@@ -32,7 +32,7 @@ public static void Client_Ping();
 
 public static void Client_HttpConnect(int64 p0);
 
-public static void Client_ProxyPort(int p0);
+public static int Client_ProxyPort(int p0);
 
 public static void Client_SetNotifyFn(void* p0);
 

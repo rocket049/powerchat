@@ -157,7 +157,7 @@ list{
 		port1.set_text(proxy_port.to_string());
 		port1.tooltip_text = _("Click `Modify` button to edit.\nSet 0 to restore default value.");
 		port1.max_length = 5;
-		port1.width_request = 50;
+		port1.width_chars = 5;
 		port1.editable=false;
 		this.mygrid.attach(port1,5,0,1,1);
 
@@ -234,7 +234,8 @@ list{
 			}else{
 				port1.editable=false;
 				b6.set_label(_("Modify"));
-				client.set_proxy( (int)port1.text.to_int64() );
+				int ret_port = client.set_proxy( (int)(port1.text.to_int64()) );
+				port1.text = ret_port.to_string();
 			}
 		});
         strangers_btn.clicked.connect (() => {
@@ -288,7 +289,7 @@ list{
 				this.mark_num--;
 				if (this.mark_num==0)
 					app.clear_notify();
-				app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
+				app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 				app.show_all();
 			}else{
 				this.msg_win.show_all();
@@ -785,7 +786,7 @@ list{
 			if(this.mark_num==1)
 				app.tray_notify();
 			
-			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+this.host;
+			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 			grid.show_all();
 		}else{
 			grid.show_all();

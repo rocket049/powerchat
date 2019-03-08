@@ -118,8 +118,8 @@ public class ChatClient:GLib.Object{
 	public string get_host(){
 		return Client_GetHost();
 	}
-	public void set_proxy(int port){
-		Client_ProxyPort(port);
+	public int set_proxy(int port){
+		return Client_ProxyPort(port);
 	}
 	public void remove_friend(int64 fid){
 		if(fid==0){

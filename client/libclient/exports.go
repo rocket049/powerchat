@@ -489,7 +489,7 @@ func Client_HttpConnect(uid C.gint64) {
 }
 
 //export Client_ProxyPort
-func Client_ProxyPort(port C.int) {
+func Client_ProxyPort(port C.int) C.int {
 	var port1 int = servePort + 2000
 	if int(port) != 0 {
 		port1 = int(port)
@@ -499,6 +499,7 @@ func Client_ProxyPort(port C.int) {
 	cfg1 := make(map[string]string)
 	cfg1["ProxyPort"] = fmt.Sprintf("%d", port1)
 	saveManual(cSrv.id, cfg1)
+	return C.int(port1)
 }
 
 var notifyFn unsafe.Pointer
