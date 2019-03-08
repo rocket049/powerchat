@@ -1,4 +1,3 @@
-using Jsonrpc;
 using Gtk;
 using Gdk;
 
