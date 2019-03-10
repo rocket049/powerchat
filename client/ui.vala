@@ -27,6 +27,7 @@ public class MyGrid: GLib.Object{
 	Gtk.ListBox friends;
 	Gtk.ListBox msgs = null;
 	Gtk.Entry entry1;
+	Gtk.Label droplabel;
 	public Gtk.Entry port1;
 	int64 to;
 	bool running = true;
@@ -61,36 +62,6 @@ public class MyGrid: GLib.Object{
 		this.frd_boxes = new Gee.HashMap<string,weak Gtk.Grid?>();
 		this.mygrid = new Gtk.Grid();
 		this.mygrid.set_column_spacing(5);
-		this.cssp = new Gtk.CssProvider();
-		var sc = this.mygrid.get_style_context ();
-		sc.add_provider(this.cssp,Gtk.STYLE_PROVIDER_PRIORITY_USER);
-		this.cssp.load_from_data("""grid{
-	padding:5px 5px 5px 5px;
-	background-color:#BABABA;
-}
-list{
-	background-color:#FFFFFF;
-	color:#000000;
-}
-""");
-
-		this.provider1 = new Gtk.CssProvider();
-		this.provider1.load_from_data("""grid{color:#FF0000;}
-""");
-
-		this.mark1 = new Gtk.CssProvider();
-		this.mark1.load_from_data("""grid{background:#F59433;}
-""");
-
-		this.button1 = new Gtk.CssProvider();
-		this.button1.load_from_data("""button{color:#FF0000;}
-""");
-		this.link_css1 = new Gtk.CssProvider();
-		try{
-			this.link_css1.load_from_data("label>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
-		} catch (Error e) {
-            print ("CSS Error: %s\n", e.message);
-        }
 
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
 		scrollWin1.width_request = 240;
@@ -104,8 +75,6 @@ list{
 		r0.set_selectable(false);
 		r0.name = "0";
 		this.friends.border_width = 3;
-		var sc1 = this.friends.get_style_context ();
-		sc1.add_provider(this.cssp,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
 		this.friends.set_sort_func((row1,row2)=>{
 			if(row1.name=="0"){
@@ -136,21 +105,26 @@ list{
 			}
 		});
 		var bottom_grid = new Gtk.Grid();
+		bottom_grid.set_size_request(240,20);
 		mygrid.attach(bottom_grid,0,3,2,1);
-		var b1 = new Gtk.Button.with_label(_("Find Persons"));
-		bottom_grid.attach(b1,0,0);
+		var search_btn = new Gtk.Button.with_label(_("Find Persons"));
+		bottom_grid.attach(search_btn,0,0);
+		search_btn.set_size_request(80,16);
 
 		strangers_btn = new Gtk.Button.with_label(_("Strangers"));
 		bottom_grid.attach(strangers_btn,1,0);
+		strangers_btn.set_size_request(80,16);
 		
 		msend_btn = new Gtk.Button.with_label(_("MultiSend"));
 		bottom_grid.attach(msend_btn,2,0);
+		msend_btn.set_size_request(80,16);
 
 		user_btn = new Gtk.Button.with_label(_("Current User"));
 		this.mygrid.attach(user_btn,2,0,2,1);
 		user_btn.hexpand = true;
 
-		var b4 = new Gtk.Label(_("Proxy Port"));
+		var b4 = new Gtk.Label(_("Proxy Port")+":");
+		b4.xalign = (float)1.0;
 		this.mygrid.attach(b4,4,0,1,1);
 
 		port1 = new Gtk.Entry();
@@ -158,24 +132,24 @@ list{
 		port1.tooltip_text = _("Click `Modify` button to edit.\nSet 0 to restore default value.");
 		port1.max_length = 5;
 		port1.width_chars = 5;
+		port1.set_size_request(40,16);
+		port1.xalign = (float)0.5;
 		port1.editable=false;
 		this.mygrid.attach(port1,5,0,1,1);
 
-		var b6 = new Gtk.Button.with_label(_("Modify"));
-		this.mygrid.attach(b6,6,0,1,1);
+		var port_btn = new Gtk.Button.with_label(_("Modify"));
+		this.mygrid.attach(port_btn,6,0,1,1);
 
 		this.msg_win = new Gtk.ScrolledWindow(null,null);
 		this.msg_win.height_request = 450;
 		this.msg_win.expand = true;
 		this.mygrid.attach(this.msg_win,2,1,5,1);
 
-		var grid1 = new Gtk.Grid();
-		this.mygrid.attach(grid1,2,2,5,2);
 		//文件拖放区
 		Gtk.EventBox dropbox = new Gtk.EventBox();
 		dropbox.set_size_request(240,40);
-		grid1.attach(dropbox,0,0,4,1);
-		var droplabel = new Gtk.Label(_("Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"));
+		mygrid.attach(dropbox,2,2,5,1);
+		droplabel = new Gtk.Label(_("Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"));
 		droplabel.wrap = true;
         droplabel.wrap_mode = Pango.WrapMode.CHAR;
 		droplabel.selectable = true;
@@ -195,13 +169,14 @@ list{
 			}
 			return true;
 		});
-
+		var grid1 = new Gtk.Grid();
+		this.mygrid.attach(grid1,2,3,5,1);
 		this.entry1 = new Gtk.Entry();
-		grid1.attach(this.entry1,0,1,3,1);
+		grid1.attach(this.entry1,0,0);
 		this.entry1.hexpand = true;
 
-		var b7 = new Gtk.Button.with_label(_("Send"));
-		grid1.attach(b7,3,1,1,1);
+		var send_btn = new Gtk.Button.with_label(_("Send"));
+		grid1.attach(send_btn,1,0,1);
 
 		this.mygrid.show.connect(()=>{
 			//var mutex1 = new GLib.Mutex();
@@ -220,20 +195,20 @@ list{
 			app.update_tooltip();
 		});
 
-		b1.clicked.connect(()=>{
+		search_btn.clicked.connect(()=>{
 			search1 = new SearchDialg();
 			search1.show();
 			return;
 		});
 
-		b6.clicked.connect (() => {
+		port_btn.clicked.connect (() => {
 			// 修改代理端口
 			if(port1.editable==false){
 				port1.editable = true;
-				b6.set_label(_("Save"));
+				port_btn.set_label(_("Save"));
 			}else{
 				port1.editable=false;
-				b6.set_label(_("Modify"));
+				port_btn.set_label(_("Modify"));
 				int ret_port = client.set_proxy( (int)(port1.text.to_int64()) );
 				port1.text = ret_port.to_string();
 			}
@@ -264,7 +239,7 @@ list{
 			this.send_msg();
 		} );
 			
-        b7.clicked.connect (() => {
+        send_btn.clicked.connect (() => {
 			// 发送信息
 			this.send_msg();
 		});
@@ -295,6 +270,8 @@ list{
 				this.msg_win.show_all();
 			}
 		});
+		
+		set_css_once();
 	}
 	public void send_uri1(string[] uris){
 		if(uris.length!=1){
@@ -325,6 +302,49 @@ list{
 			adj1.value = adj1.upper;
 			return false;
 		});
+	}
+	private void set_css_once(){
+		this.cssp = new Gtk.CssProvider();
+		var sc = this.mygrid.get_style_context ();
+		sc.add_provider(this.cssp,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		sc = this.droplabel.get_style_context ();
+		sc.add_provider(this.cssp,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		sc = this.friends.get_style_context ();
+		sc.add_provider(this.cssp,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		this.cssp.load_from_data("""grid{
+	padding:5px 5px 5px 5px;
+}
+list{
+	background-color:#FFFFFF;
+	color:#000000;
+	border-width:1px;
+	border-style:solid;
+	border-color:black;
+}
+label{
+	border-width:1px;
+	border-style:solid;
+	border-color:black;
+}
+""");
+
+		this.provider1 = new Gtk.CssProvider();
+		this.provider1.load_from_data("""grid{color:#FF0000;}
+""");
+
+		this.mark1 = new Gtk.CssProvider();
+		this.mark1.load_from_data("""grid{background:#F59433;}
+""");
+
+		this.button1 = new Gtk.CssProvider();
+		this.button1.load_from_data("""button{color:#FF0000;}
+""");
+		this.link_css1 = new Gtk.CssProvider();
+		try{
+			this.link_css1.load_from_data("label>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
+		} catch (Error e) {
+            print ("CSS Error: %s\n", e.message);
+        }
 	}
     public void show_sended_msg_to(int64 to,string msg){
         this.add_left_name_icon_to(to,this.uname,this.usex);

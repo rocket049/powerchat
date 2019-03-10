@@ -200,7 +200,7 @@ list{
 	color:#000000;
 	border-width:1px;
 	border-style:solid;
-	border-color:#0000FF;
+	border-color:black;
 }
 """);
 //		var css_grid = new Gtk.CssProvider();

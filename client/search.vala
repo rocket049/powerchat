@@ -10,7 +10,7 @@ public class SearchDialg:GLib.Object{
 	public GLib.List<UserMsg?> persons;
 	public SearchDialg(){
 		this.dlg1 = new Gtk.Dialog.with_buttons(_("Find Persons"),app,Gtk.DialogFlags.MODAL);
-        this.dlg1.set_size_request(350,400);
+        this.dlg1.set_size_request(400,500);
 		var grid = new Gtk.Grid();
 		grid.attach(new Gtk.Label(_("(part of)Name：")),0,0);
 		this.key1 = new Gtk.Entry();
