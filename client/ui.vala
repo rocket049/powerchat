@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=25;
+static int RELEASE=26;
 static int LATESTVER=0;
 
 public struct UserMsg{
@@ -474,7 +474,7 @@ label{
         img2.tooltip_text = @"$(user1.age)岁\n$(user1.desc)";
 		var h_id = user1.id;
         b2.clicked.connect(()=>{
-			stdout.printf(@"open $(h_id)\n");
+			//stdout.printf(@"open $(h_id)\n");
 			client.set_http_id(h_id);
 			client.open_path(@"http://localhost:$(server_port)");
 		});
