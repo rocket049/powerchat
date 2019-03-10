@@ -52,7 +52,7 @@ public class MyGrid: GLib.Object{
 	public string uname;
 	public string udesc;
 	public int16 uage;
-	
+
 	public string host;
 	Gtk.CssProvider cssp;
 	Gtk.ScrolledWindow msg_win;
@@ -114,7 +114,7 @@ public class MyGrid: GLib.Object{
 		strangers_btn = new Gtk.Button.with_label(_("Strangers"));
 		bottom_grid.attach(strangers_btn,1,0);
 		strangers_btn.set_size_request(80,16);
-		
+
 		msend_btn = new Gtk.Button.with_label(_("MultiSend"));
 		bottom_grid.attach(msend_btn,2,0);
 		msend_btn.set_size_request(80,16);
@@ -181,7 +181,7 @@ public class MyGrid: GLib.Object{
 		this.mygrid.show.connect(()=>{
 			//var mutex1 = new GLib.Mutex();
 			stdout.printf("grid show\n");
-			
+
 			strangers1 = new StrangersDialg();
 			uint16 port2 = (uint16)client.get_proxy();
 			if(port2>0){
@@ -238,7 +238,7 @@ public class MyGrid: GLib.Object{
 		this.entry1.activate.connect( ()=>{
 			this.send_msg();
 		} );
-			
+
         send_btn.clicked.connect (() => {
 			// 发送信息
 			this.send_msg();
@@ -270,7 +270,7 @@ public class MyGrid: GLib.Object{
 				this.msg_win.show_all();
 			}
 		});
-		
+
 		set_css_once();
 	}
 	public void send_uri1(string[] uris){
@@ -354,28 +354,28 @@ label{
 		var dlg_pwd = new Gtk.Dialog.with_buttons(_("Update Password"),app,Gtk.DialogFlags.MODAL);
 		var grid = new Gtk.Grid();
 		grid.attach(new Gtk.Label(_("Input your new password")),0,0,2,1);
-		
+
 		grid.attach(new Gtk.Label(_("Old Password:")),0,1);
 		var pwd1 = new Gtk.Entry();
 		pwd1.set_visibility(false);
 		grid.attach(pwd1,1,1);
-		
+
 		grid.attach(new Gtk.Label(_("New Password:")),0,2);
 		var pwd2 = new Gtk.Entry();
 		pwd2.set_visibility(false);
 		grid.attach(pwd2,1,2);
-		
+
 		grid.attach(new Gtk.Label(_("Confirm Password:")),0,3);
 		var pwd3 = new Gtk.Entry();
 		pwd3.set_visibility(false);
 		grid.attach(pwd3,1,3);
-		
+
 		var content = dlg_pwd.get_content_area () as Gtk.Box;
 		content.pack_start(grid);
-		
+
 		dlg_pwd.add_button(_("Update"),2);
 		dlg_pwd.add_button(_("Cancel"),3);
-		
+
 		dlg_pwd.response.connect((rid)=>{
 			if(rid==3){
 				dlg_pwd.destroy();
@@ -456,7 +456,7 @@ label{
         b2.set_tooltip_text(@"http://localhost:$(server_port)");
         grid2.attach(b2,2,0);
         grid2.set_column_spacing(5);
-        
+
         var b3 = new Gtk.Button.with_label("TCP");
         b3.set_tooltip_text(_("TCP Tunnel, PORT:")+@"$(server_port)");
         grid2.attach(b3,3,0);
@@ -472,12 +472,13 @@ label{
         grid2.show_all();
 
         img2.tooltip_text = @"$(user1.age)岁\n$(user1.desc)";
-
+		var h_id = user1.id;
         b2.clicked.connect(()=>{
-			//stdout.printf(@"open %$(uint64.FORMAT)\n",user1.id);
-			client.set_http_id(user1.id);
+			stdout.printf(@"open $(h_id)\n");
+			client.set_http_id(h_id);
+			client.open_path(@"http://localhost:$(server_port)");
 		});
-		
+
 		b3.clicked.connect(()=>{
 			//stdout.printf(@"open %$(uint64.FORMAT)\n",user1.id);
 			client.set_tcp_id(user1.id);
@@ -579,7 +580,7 @@ label{
         var sc1 = lb.get_style_context();
 		sc1.add_provider(this.link_css1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
         if(markup){
-			lb.set_markup(text);	
+			lb.set_markup(text);
 		} else
 			lb.set_label(text);
 		lb.wrap = true;
@@ -598,9 +599,9 @@ label{
         lb2.width_request = 5;
         grid.attach(lb2,2,0);
         grid.halign = Gtk.Align.CENTER;
-        
+
 		box1.add(grid);
-        
+
 		grid.show_all();
     }
     public void add_image(string pathname){
@@ -624,7 +625,7 @@ label{
         var sc1 = lb.get_style_context();
 		sc1.add_provider(this.link_css1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
         if(markup){
-			lb.set_markup(text);	
+			lb.set_markup(text);
 		} else
 			lb.set_label(text);
 		lb.wrap = true;
@@ -663,10 +664,10 @@ label{
 		grid.attach(bt_dir,2,0);
 		grid.attach(bt_del,3,0);
 		grid.attach(lb2,4,0);
-		
+
 		this.msgs.add( grid );
 		grid.show_all();
-		
+
 		bt_open.clicked.connect(()=>{
 			client.open_path(pathname);
 		});
@@ -805,7 +806,7 @@ label{
 			this.mark_num++;
 			if(this.mark_num==1)
 				app.tray_notify();
-			
+
 			app.title = _("Everyone Publish!")+@"($(this.mark_num))"+" - "+@"$(this.uname)@$(this.host)";
 			grid.show_all();
 		}else{
@@ -888,7 +889,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
 		// Method called on pressing [X]
 		this.set_destroy_with_parent(false);
-		this.delete_event.connect((e)=>{ 
+		this.delete_event.connect((e)=>{
 			counter = 1;
 			return this.hide_on_delete ();
 		});
@@ -911,51 +912,51 @@ public class AppWin:Gtk.ApplicationWindow{
 	public void setup_menubar(){
         var menu1 = new GLib.Menu();
         var menubar =new GLib.Menu();
-        
+
         var item1 = new GLib.MenuItem(_("PreviewWeb"),"app.preview-web");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("OpenBlogDir"),"app.blog-dir");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("OpenDownloadDir"),"app.down-dir");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("ModifyDesc"),"app.modify-desc");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("UpdatePasswd"),"app.update-pwd");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("Quit"),"app.quit");
         menu1.append_item(item1);
-        
+
         menubar.append_submenu(_("Operate"),menu1);
-        
+
         menu1 = new GLib.Menu();
-        
+
         item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("Wiki"),"app.wiki");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("About"),"app.about");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("Pay"),"app.pay");
         menu1.append_item(item1);
-        
+
         item1 = new GLib.MenuItem(_("DeleteMe"),"app.delete-me");
         menu1.append_item(item1);
-        
+
         menubar.append_submenu(_("Help"),menu1);
-        
+
         application1.set_menubar(menubar as GLib.MenuModel);
-        
+
         add_actions();
     }
     private void add_actions () {
@@ -970,7 +971,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act1.set_enabled(true);
 		application1.add_action (act1);
-		
+
 		SimpleAction act2 = new SimpleAction ("about", null);
 		act2.activate.connect (() => {
 			application1.hold ();
@@ -985,7 +986,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act2.set_enabled(true);
 		application1.add_action (act2);
-		
+
 		SimpleAction act3 = new SimpleAction ("homepage", null);
 		act3.activate.connect (() => {
 			application1.hold ();
@@ -995,7 +996,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act3.set_enabled(true);
 		application1.add_action (act3);
-		
+
 		SimpleAction act4 = new SimpleAction ("pay", null);
 		act4.activate.connect (() => {
 			application1.hold ();
@@ -1005,7 +1006,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act4.set_enabled(true);
 		application1.add_action (act4);
-		
+
 		SimpleAction act5 = new SimpleAction ("preview-web", null);
 		act5.activate.connect (() => {
 			application1.hold ();
@@ -1015,7 +1016,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act5.set_enabled(true);
 		application1.add_action (act5);
-		
+
 		SimpleAction act6 = new SimpleAction ("blog-dir", null);
 		act6.activate.connect (() => {
 			application1.hold ();
@@ -1026,7 +1027,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act6.set_enabled(true);
 		application1.add_action (act6);
-		
+
 		SimpleAction act7 = new SimpleAction ("quit", null);
 		act7.activate.connect (() => {
 			application1.hold ();
@@ -1039,7 +1040,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act7.set_enabled(true);
 		application1.add_action (act7);
-		
+
 		SimpleAction act8 = new SimpleAction ("delete-me", null);
 		act8.activate.connect (() => {
 			application1.hold ();
@@ -1064,7 +1065,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act8.set_enabled(true);
 		application1.add_action (act8);
-		
+
 		SimpleAction act9 = new SimpleAction ("modify-desc", null);
 		act9.activate.connect (() => {
 			application1.hold ();
@@ -1090,7 +1091,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act9.set_enabled(true);
 		application1.add_action (act9);
-		
+
 		SimpleAction act10 = new SimpleAction ("down-page", null);
 		act10.activate.connect (() => {
 			application1.hold ();
@@ -1120,7 +1121,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act10.set_enabled(true);
 		application1.add_action (act10);
-        
+
         SimpleAction act11 = new SimpleAction ("update-pwd", null);
 		act11.activate.connect (() => {
 			application1.hold ();
@@ -1129,7 +1130,7 @@ public class AppWin:Gtk.ApplicationWindow{
         });
         act11.set_enabled(true);
 		application1.add_action (act11);
-        
+
         SimpleAction act12 = new SimpleAction ("down-dir", null);
 		act12.activate.connect (() => {
 			application1.hold ();
@@ -1140,7 +1141,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act12.set_enabled(true);
 		application1.add_action (act12);
-		
+
 		SimpleAction act13 = new SimpleAction ("wiki", null);
 		act13.activate.connect (() => {
 			application1.hold ();
@@ -1220,7 +1221,7 @@ public class LoginDialog :GLib.Object{
 	public void hide(){
 		this.dlg1.hide();
 	}
-    
+
     public void load_name(){
         var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
         try{
@@ -1235,7 +1236,7 @@ public class LoginDialog :GLib.Object{
         }catch (Error e) {
             print ("load name Error: %s\n", e.message);
         }
-    } 
+    }
 }
 public void save_name(string name1){
 	var loguser = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,Environment.get_home_dir(),".powerchat","manual","loguser.txt");
@@ -1279,13 +1280,13 @@ static uint16 proxy_port;
 public static int main(string[] args){
 	Gtk.init(ref args);
 	client = new ChatClient();
-	
+
 	if (!Thread.supported()) {
 		stderr.printf("Cannot run without threads.\n");
 		return 1;
 	}
 	set_my_locale(args[0]);
-	
+
 	application1 = new Gtk.Application(null,GLib.ApplicationFlags.FLAGS_NONE);
 	application1.register();
 	grid1 = new MyGrid();

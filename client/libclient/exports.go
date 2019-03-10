@@ -99,6 +99,7 @@ func (c *pChatClient) setID(ident int64) {
 //export Client_SetHttpId
 func Client_SetHttpId(ident C.gint64) {
 	cSrv.httpId = int64(ident)
+	httpId = cSrv.httpId
 }
 
 //export Client_NewUser
@@ -597,6 +598,7 @@ func Client_GetHost(p **C.char) {
 
 //export Client_OpenPath
 func Client_OpenPath(param *C.char) {
+	//log.Println("Open:", C.GoString(param))
 	myOpen(C.GoString(param))
 }
 
