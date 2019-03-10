@@ -5,11 +5,11 @@ package main
 #include "glib.h"
 
 struct NUParam {
-	GString* Name;
+	char* Name;
 	int Sex;
 	int Birth;
-	GString* Desc;
-	GString* Pwd;
+	char* Desc;
+	char* Pwd;
 };
 struct UserData{
 	gint64 Id;
@@ -34,17 +34,13 @@ static void callNotify(void *f,char Cmd,gint64 From,gint64 To,char* Msg){
 static gint64 Get(gint64 *v,int i){
 	return v[i];
 }
-static GString* GStr(char *v){
-	return g_string_new(v);
-}
-static struct UserData *NewUserData(gint64 id,char *name,int sex,int age,char *desc){
-	struct UserData *v = g_new(struct UserData,1);
+
+static void FillUserData(struct UserData *v,gint64 id,char *name,int sex,int age,char *desc){
 	v->Id = id;
 	v->Name = name;
 	v->Sex = sex;
 	v->Age = age;
 	v->Desc = desc;
-	return v;
 }
 */
 import "C"
@@ -107,15 +103,15 @@ func Client_SetHttpId(ident C.gint64) {
 
 //export Client_NewUser
 func Client_NewUser(p *C.struct_NUParam) C.int {
-	name1 := strings.TrimSpace(C.GoString(p.Name.str))
-	if len(C.GoString(p.Name.str)) != len(name1) {
+	name1 := strings.TrimSpace(C.GoString(p.Name))
+	if len(C.GoString(p.Name)) != len(name1) {
 		return -1
 	}
-	if len(C.GoString(p.Pwd.str)) == 0 {
+	if len(C.GoString(p.Pwd)) == 0 {
 		return -1
 	}
 	var user1 = &UserInfo{0, name1, int(p.Sex),
-		fmt.Sprintf("%d-01-01", int(p.Birth)), C.GoString(p.Desc.str), string(newuserMd5(name1, C.GoString(p.Pwd.str)))}
+		fmt.Sprintf("%d-01-01", int(p.Birth)), C.GoString(p.Desc), string(newuserMd5(name1, C.GoString(p.Pwd)))}
 	b, err := json.Marshal(user1)
 	if err != nil {
 		log.Println(err)
@@ -180,26 +176,26 @@ func Client_NewPasswd(name, pwdOld, pwdNew *C.char) C.int {
 var logined_user *C.struct_UserData
 
 //export Client_Login
-func Client_Login(name, pwd *C.char) *C.struct_UserData {
+func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
 	dgam := &LogDgam{Name: C.GoString(name), Pwdmd5: loginMd5(C.GoString(name), C.GoString(pwd), cSrv.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
 	cSrv.conn.Write(msg)
 	resp, ok := <-cmdChan
 	if ok == false {
-		return nil
+		return C.int(0)
 	}
 	if resp.Cmd != CmdLogResult {
-		return nil
+		return C.int(0)
 	}
 	s := string(resp.Msg[0:4])
 	if strings.HasPrefix(s, "FAIL") {
-		return nil
+		return C.int(0)
 	}
 	var u UserBaseInfo
 	err := json.Unmarshal(resp.Msg, &u)
 	if err != nil {
-		return nil
+		return C.int(0)
 	}
 	cSrv.id = u.Id
 	id = u.Id
@@ -219,9 +215,9 @@ func Client_Login(name, pwd *C.char) *C.struct_UserData {
 			log.Println("proxy port:", proxyPort, ",manual:", port)
 		}
 	}
-	logined_user = C.NewUserData(C.gint64(u.Id), C.CString(u.Name), C.int(u.Sex),
+	C.FillUserData(p, C.gint64(u.Id), C.CString(u.Name), C.int(u.Sex),
 		C.int(time.Now().Year()-u.Birthday.Year()), C.CString(u.Desc))
-	return logined_user
+	return C.int(1)
 }
 
 type msgOfflineData struct {
@@ -594,11 +590,9 @@ func Client_Quit() {
 	close(fileChan)
 }
 
-var gstr_host *C.GString
-
 //export Client_GetHost
-func Client_GetHost() *C.char {
-	return C.CString(serverAddr)
+func Client_GetHost(p **C.char) {
+	*p = C.CString(serverAddr)
 }
 
 //export Client_OpenPath
@@ -638,13 +632,10 @@ func Client_DeleteMe(name, pwd *C.char) C.int {
 	}
 }
 
-var ret_path *C.char
-
 //export Client_GetPgPath
-func Client_GetPgPath() *C.char {
+func Client_GetPgPath(p **C.char) {
 	filepath1, _ := os.Executable()
-	ret_path = C.CString(fmt.Sprintf("%s", filepath.Dir(filepath1)))
-	return ret_path
+	*p = C.CString(fmt.Sprintf("%s", filepath.Dir(filepath1)))
 }
 
 //main

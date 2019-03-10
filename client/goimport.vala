@@ -39,14 +39,11 @@ public void client_notify(int8 typ,int64 from,int64 to,string msg){
 }
 
 public class ChatClient:GLib.Object{
-	public UserData u;
     public UserData? login(string name, string pwd){
-		var ret = Client_Login(name,pwd);
-		if(ret !=null){
+		UserData u = {0,"",0,0,""};
+		var ret = Client_Login(name,pwd,ref u);
+		if(ret == 1){
 			Client_SetNotifyFn((void*)client_notify);
-			u=ret;
-			print("LOGIN:");
-			print(u.Name);
 			return u;
 		} else
 			return null;
@@ -115,7 +112,9 @@ public class ChatClient:GLib.Object{
 		return Client_GetProxyPort();
 	}
 	public string get_host(){
-		return Client_GetHost();
+		string p;
+		Client_GetHost(out p);
+		return p.dup();
 	}
 	public int set_proxy(int port){
 		return Client_ProxyPort(port);
@@ -148,7 +147,9 @@ public class ChatClient:GLib.Object{
 			return 0;});
 	}
 	public string get_pg_path(){
-		return Client_GetPgPath();
+		string p;
+		Client_GetPgPath(out p);
+		return p.dup();
 	}
 }
 

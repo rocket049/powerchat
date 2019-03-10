@@ -6,7 +6,7 @@ public static int Client_NewUser(NUParam p0);
 
 public static int Client_NewPasswd(string p0, string p1, string p2);
 
-public static unowned UserData? Client_Login(string p0, string p1);
+public static int Client_Login(string p0, string p1,ref UserData u0);
 
 public static void Client_GetFriends(void* p0);
 
@@ -46,7 +46,7 @@ public static int Client_GetProxyPort();
 
 public static void Client_Quit();
 
-public static string Client_GetHost();
+public static void Client_GetHost(out string p0);
 
 public static void Client_OpenPath(string p0);
 
@@ -54,4 +54,4 @@ public static void Client_UpdateDesc(string p0);
 
 public static int Client_DeleteMe(string p0, string p1);
 
-public static unowned string Client_GetPgPath();
+public static void Client_GetPgPath(out string p0);

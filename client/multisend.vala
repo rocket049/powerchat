@@ -62,9 +62,15 @@ public class MultiSendUi: GLib.Object{
 		scrollWin1.add(groups);
 		grid1.attach(scrollWin1,3,1,1,3);
 		
-		grid1.attach(new Gtk.Label(_("Text:")),0,4);
-		grid1.attach(entry1,1,4,3,1);
-		grid1.attach(send1,4,4);
+		var bottom_grid = new Gtk.Grid();
+		grid1.attach(bottom_grid,0,4,5,1);
+		bottom_grid.hexpand = true;
+		bottom_grid.attach(new Gtk.Label(_("Text:")),0,0);
+		bottom_grid.attach(entry1,1,0);
+		entry1.hexpand = true;
+		//entry1.width_chars = 40;
+		bottom_grid.attach(send1,2,0);
+		bottom_grid.show_all();
 		
 		grid1.show_all();
 		grid_main = grid1;
@@ -203,14 +209,6 @@ list{
 	border-color:black;
 }
 """);
-//		var css_grid = new Gtk.CssProvider();
-//		var sc_grid = grid_main.get_style_context();
-//		sc_grid.add_provider(css_grid,Gtk.STYLE_PROVIDER_PRIORITY_USER);
-//		//background-color:#BABABA;
-//		css_grid.load_from_data("""grid{
-//	background-color:#BABABA;
-//}
-//""");
 	}
 	public void show(){
 		frame1.show_all();
