@@ -937,6 +937,9 @@ public class AppWin:Gtk.ApplicationWindow{
         item1 = new GLib.MenuItem(_("Homepage"),"app.homepage");
         menu1.append_item(item1);
         
+        item1 = new GLib.MenuItem(_("Wiki"),"app.wiki");
+        menu1.append_item(item1);
+        
         item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
         menu1.append_item(item1);
         
@@ -1137,6 +1140,16 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act12.set_enabled(true);
 		application1.add_action (act12);
+		
+		SimpleAction act13 = new SimpleAction ("wiki", null);
+		act13.activate.connect (() => {
+			application1.hold ();
+			//Gtk.show_uri(null,"https://gitee.com/rocket049/powerchat",Gdk.CURRENT_TIME);
+			client.open_path("https://gitee.com/rocket049/powerchat/wikis");
+			application1.release ();
+		});
+        act13.set_enabled(true);
+		application1.add_action (act13);
 	}
 }
 
