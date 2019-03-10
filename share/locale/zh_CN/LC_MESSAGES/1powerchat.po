@@ -370,8 +370,8 @@ msgid "Text:"
 msgstr "文字:"
 
 #: multisend.vala:88
-msgid "Group Members:\n"
-msgstr "组成员：\n"
+msgid "Group Members:"
+msgstr "组成员："
 
 #: multisend.vala:112
 msgid "Select"

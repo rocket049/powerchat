@@ -94,11 +94,11 @@ public class MultiSendUi: GLib.Object{
 				return;
 			}
 			var array1 = group_map[r.name];
-			var msg = _("Group Members:\n");
+			var msg = "";
 			for(int i=0;i<array1.ids.length;i++){
 				var id1 = array1.ids[i].to_string();
 				var name1 = grid1.frds1[id1].name;
-				msg = msg + @"$(name1)\n";
+				msg = msg + @"$(i+1). $(name1)\n";
 			}
 			//call show dialog
 			ask_group(msg,array1.ids);
@@ -113,7 +113,7 @@ public class MultiSendUi: GLib.Object{
 		var dlg1 = new Gtk.Dialog();
 		dlg1.set_modal(true);
 		dlg1.set_keep_above(true);
-		dlg1.title=_("MultiSend");
+		dlg1.title=_("MultiSend")+" - "+_("Group Members:");
 		var scrollWin1 = new Gtk.ScrolledWindow(null,null);
 		scrollWin1.set_size_request(240,320);
 		scrollWin1.add(new Gtk.Label(msg1));
