@@ -296,7 +296,7 @@ func (c *ChatClient) QueryID(uid int64, msg string) *UserDataRet {
 		Desc: v.Desc, Timestamp: time.Now().Format("2006-01-02 15:04:05"), Msg: msg}
 }
 
-//MoveStrangerToFriend 把陌生人加入联系人名单
+//MoveStrangerToFriend 把留言的陌生人加入联系人名单
 func (c *ChatClient) MoveStrangerToFriend(fid int64) {
 	req, _ := MsgEncode(CmdMoveStranger, c.id, fid, []byte("\n"))
 	c.conn.Write(req)

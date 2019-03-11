@@ -26,7 +26,7 @@ var (
 func init() {
 	cSrv = new(pChatClient)
 	main_init()
-	log.Println("go init.")
+	//log.Printf("CmdChat:%d,CmdSysReturn:%d\n", CmdChat, CmdSysReturn)
 }
 
 func client(ctl1 chan int) {
