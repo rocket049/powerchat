@@ -174,8 +174,6 @@ func Client_NewPasswd(name, pwdOld, pwdNew *C.char) C.int {
 	return 1
 }
 
-var logined_user *C.struct_UserData
-
 //export Client_Login
 func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
 	dgam := &LogDgam{Name: C.GoString(name), Pwdmd5: loginMd5(C.GoString(name), C.GoString(pwd), cSrv.token)}

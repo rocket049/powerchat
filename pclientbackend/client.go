@@ -1,4 +1,4 @@
-package main
+package pclientbackend
 
 import (
 	"crypto/tls"
@@ -8,7 +8,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/user"
 	"path/filepath"
 )
 
@@ -17,24 +16,19 @@ var (
 	id         int64
 	httpId     int64
 	proxyPort  int
-	cSrv       *pChatClient
+	cSrv       *ChatClient
 	serverAddr string
 	servePort  int = 7890
 	pgPath     string
+	dataHome   string
 )
 
 func init() {
-	cSrv = new(pChatClient)
-	main_init()
-	log.Println("go init.")
+	cSrv = nil
 }
 
 func client(ctl1 chan int) {
 	var cfg tls.Config
-	//	roots := x509.NewCertPool()
-	//	pem, _ := ioutil.ReadFile("pems/a-cert.pem")
-	//	roots.AppendCertsFromPEM(pem)
-	//	cfg.RootCAs = roots
 	cfg.InsecureSkipVerify = true
 	conn1, err := tls.Dial("tcp", serverAddr, &cfg)
 	if err != nil {
@@ -78,24 +72,14 @@ var serveChan chan MsgType = make(chan MsgType, 1)
 
 //goroutine replace httpServe and startcSrv4Glib
 func localServe(conn1 net.Conn, res1 chan bool) {
-	var l net.Listener
-	var err error
-	for i := 0; i < 8; i++ {
-		l, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
-		if err == nil {
-			break
-		} else {
-			servePort++
-			proxyPort = servePort + 2000
-		}
-	}
+	//only on connection
+	l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
 	if err != nil {
 		panic(err)
 	}
 	defer l.Close()
 	cSrv.setConn(conn1)
-	u1, _ := user.Current()
-	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
+	go startMyHttpServe(getRelatePath("ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	res1 <- true
 	go httpRespRouter()
 	for {
@@ -183,15 +167,19 @@ func readConn(conn1 net.Conn) {
 		}
 	}
 }
-func main_init() {
+func main_init(dir string) {
+	dataHome = dir
+
 	servePort = 7890
 	proxyPort = servePort + 2000
+
 	filepath1, err := os.Executable()
 	if err != nil {
 		log.Fatal(err)
 	}
 	path1 := filepath.Dir(filepath1)
 	pgPath = path1
+
 	var cfg1 = make(map[string]string)
 	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "config.json"))
 	if err != nil {
@@ -214,8 +202,7 @@ func main_init() {
 }
 
 func getRelatePath(name1 string) string {
-	u1, _ := user.Current()
-	res := filepath.Join(u1.HomeDir, ".powerchat", name1)
+	res := filepath.Join(dataHome, name1)
 	os.MkdirAll(res, os.ModePerm)
 	return res
 }
