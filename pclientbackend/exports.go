@@ -494,19 +494,19 @@ type SFParam struct {
 func (c *ChatClient) SendFile(to int64, pathName string) {
 	param := &SFParam{To: to, PathName: pathName}
 	if c.fileSend != nil {
-		if c.fileSend.Status() {
+		if c.fileSend.status() {
 			return
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
-	sender.Prepare(param.PathName, param.To, c.conn)
-	ok, _ := sender.SendFileHeader()
+	sender.prepare(param.PathName, param.To, c.conn)
+	ok, _ := sender.sendFileHeader()
 	if ok == false {
 		return
 	}
 	c.fileSend = sender
-	sender.SendFileBody()
+	sender.sendFileBody()
 }
 
 //AddFriend 加入联系人

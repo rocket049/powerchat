@@ -170,7 +170,7 @@ type FileSender struct {
 	sendSize int64
 }
 
-func (s *FileSender) Prepare(pathname string, to int64, conn1 io.Writer) {
+func (s *FileSender) prepare(pathname string, to int64, conn1 io.Writer) {
 	for {
 		s.session = rand.Uint32()
 		if s.session != 0 {
@@ -184,7 +184,7 @@ func (s *FileSender) Prepare(pathname string, to int64, conn1 io.Writer) {
 	s.running = true
 }
 
-func (s *FileSender) SendFileHeader() (bool, uint32) {
+func (s *FileSender) sendFileHeader() (bool, uint32) {
 	fh1, err := os.Stat(s.pathname)
 	if err != nil {
 		log.Println(err)
@@ -219,7 +219,7 @@ func (s *FileSender) SendFileHeader() (bool, uint32) {
 	return true, s.session
 }
 
-func (s *FileSender) CancelTrans() {
+func (s *FileSender) cancelTrans() {
 	s.mutex1.Lock()
 	s.running = false
 	s.mutex1.Unlock()
@@ -230,10 +230,10 @@ func (s *FileSender) CancelTrans() {
 }
 
 //goroutine
-func (s *FileSender) SendFileBody() {
+func (s *FileSender) sendFileBody() {
 	f1, err := os.Open(s.pathname)
 	if err != nil {
-		s.CancelTrans()
+		s.cancelTrans()
 		log.Panicln(err)
 		return
 	}
@@ -260,11 +260,11 @@ func (s *FileSender) SendFileBody() {
 	s.mutex1.Unlock()
 }
 
-func (s *FileSender) GetSent() (sent, size int64) {
+func (s *FileSender) getSent() (sent, size int64) {
 	return s.sendSize, s.size
 }
 
-func (s *FileSender) Status() bool {
+func (s *FileSender) status() bool {
 	s.mutex1.Lock()
 	res := s.running
 	s.mutex1.Unlock()
