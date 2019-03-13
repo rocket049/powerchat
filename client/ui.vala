@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=26;
+static int RELEASE=27;
 static int LATESTVER=0;
 
 public struct UserMsg{
@@ -269,6 +269,7 @@ public class MyGrid: GLib.Object{
 			}else{
 				this.msg_win.show_all();
 			}
+			scroll_msgbox();
 		});
 
 		set_css_once();
@@ -297,6 +298,9 @@ public class MyGrid: GLib.Object{
 		this.add_left_name_icon(this.uname,this.usex);
 		this.add_text(this.entry1.text);
 		this.entry1.text = "";
+		scroll_msgbox();
+	}
+	public void scroll_msgbox(){
 		GLib.Idle.add(()=>{
 			var adj1 = this.msgs.get_adjustment();
 			adj1.value = adj1.upper;
@@ -575,6 +579,7 @@ label{
         if(box1==null){
             return;
         }
+        var grid=new Gtk.Grid();
         var lb = new Gtk.Label("");
         lb.set_selectable(true);
         var sc1 = lb.get_style_context();
@@ -586,20 +591,19 @@ label{
 		lb.wrap = true;
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
-            lb.xalign = (float)0;
-        }
-        lb.width_request = 360;
-        lb.max_width_chars = 15;
-        var grid=new Gtk.Grid();
-        var lb1 = new Gtk.Label("");
-        lb1.width_request = 5;
-        grid.attach(lb1,0,0);
+            lb.xalign = (float)0.1;
+        }else{
+			grid.halign = Gtk.Align.CENTER;
+		}
+        lb.hexpand=true;
+        
+        //var lb1 = new Gtk.Label("");
+        //lb1.width_request = 5;
+        //grid.attach(lb1,0,0);
         grid.attach(lb,1,0);
-        var lb2 = new Gtk.Label("");
-        lb2.width_request = 5;
-        grid.attach(lb2,2,0);
-        grid.halign = Gtk.Align.CENTER;
-
+        //var lb2 = new Gtk.Label("");
+        //lb2.width_request = 5;
+        //grid.attach(lb2,2,0);
 		box1.add(grid);
 
 		grid.show_all();
@@ -620,6 +624,7 @@ label{
 		image.show();
     }
     public void add_text(string text,bool center=false ,bool markup=false){
+		var grid=new Gtk.Grid();
         var lb = new Gtk.Label("");
         lb.set_selectable(true);
         var sc1 = lb.get_style_context();
@@ -631,19 +636,19 @@ label{
 		lb.wrap = true;
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
-            lb.xalign = (float)0;
-        }
-        lb.width_request = 360;
-        lb.max_width_chars = 15;
-        var grid=new Gtk.Grid();
-        var lb1 = new Gtk.Label("");
-        lb1.width_request = 5;
-        grid.attach(lb1,0,0);
+            lb.xalign = (float)0.1;
+        }else{
+			grid.halign = Gtk.Align.CENTER;
+		}
+        lb.hexpand=true;
+        
+        //var lb1 = new Gtk.Label("");
+        //lb1.width_request = 5;
+        //grid.attach(lb1,0,0);
         grid.attach(lb,1,0);
-        var lb2 = new Gtk.Label("");
-        lb2.width_request = 5;
-        grid.attach(lb2,2,0);
-        grid.halign = Gtk.Align.CENTER;
+        //var lb2 = new Gtk.Label("");
+        //lb2.width_request = 5;
+        //grid.attach(lb2,2,0);
 		this.msgs.add(grid);
 		grid.show_all();
     }
