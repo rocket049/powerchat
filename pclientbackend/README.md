@@ -7,7 +7,7 @@
 ```
 //包名：pclientbackend
 
-//UserDataRet 用户信息数据机构
+//UserDataRet 用户信息数据结构
 type UserDataRet struct {
 	Id        int64
 	Name      string
@@ -26,7 +26,7 @@ type MsgType struct {
 	Msg  []byte
 }
 
-//GetChatClient 初始化，参数：数据目录路径
+//GetChatClient 初始化，参数：数据目录路径,这个函数必须第一个调用，获得已经初始化好了了对象指针
 //func GetChatClient(path1 string) *ChatClient
 client = GetChatClient( 数据存储目录path1 )
 
@@ -120,6 +120,21 @@ func (c *ChatClient) QueryID(uid int64, msg string) *UserDataRet
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) UserStatus(uid int64) int
 ```
+
+简单流程示例：
+
+```
+import XXXX/pchatclient
+
+client := pchatclient.GetChatClient()  //初始化
+client.Login(name,pwd)  //登录
+friends := client.GetFriends()  //返回朋友列表
+...  //show friends
+stranger_msgs := client.GetStrangerMsgs()  //返回陌生人留言列表
+...  //show stranger messages
+...  //信息收发
+```
+
 ## 关于 `GetMsg` 函数读取信息
 返回类型为`MsgType`，成员Cmd类型为int8，只会得到2个值:0 - CmdChat, 27 - CmdSysReturn
 
