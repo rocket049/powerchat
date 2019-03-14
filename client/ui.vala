@@ -324,6 +324,8 @@ list{
 	border-width:1px;
 	border-style:solid;
 	border-color:black;
+	padding-left:10px;
+	padding-right:10px;
 }
 label{
 	border-width:1px;
@@ -591,10 +593,11 @@ label{
 		lb.wrap = true;
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
-            lb.xalign = (float)0.1;
+            lb.xalign = (float)0;
         }else{
 			grid.halign = Gtk.Align.CENTER;
 		}
+		//stdout.printf(@"Box width: $(box1.width_request)\n");
         lb.hexpand=true;
         
         //var lb1 = new Gtk.Label("");
@@ -636,12 +639,11 @@ label{
 		lb.wrap = true;
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
-            lb.xalign = (float)0.1;
+            lb.xalign = (float)0;
         }else{
 			grid.halign = Gtk.Align.CENTER;
 		}
         lb.hexpand=true;
-        
         //var lb1 = new Gtk.Label("");
         //lb1.width_request = 5;
         //grid.attach(lb1,0,0);
