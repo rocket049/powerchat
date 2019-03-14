@@ -5,24 +5,26 @@
 调用说明：
 
 ```
+//包名：pclientbackend
+
 //UserDataRet 用户信息数据机构
-//type UserDataRet struct {
-//	Id        int64
-//	Name      string
-//	Sex       int
-//	Age       int
-//	Desc      string
-//	Timestamp string
-//	Msg       string
-//}
+type UserDataRet struct {
+	Id        int64
+	Name      string
+	Sex       int
+	Age       int
+	Desc      string
+	Timestamp string
+	Msg       string
+}
 
 //MsgType 通用信息数据包
-//type MsgType struct {
-//	Cmd  ChatCommand
-//	From int64
-//	To   int64
-//	Msg  []byte
-//}
+type MsgType struct {
+	Cmd  ChatCommand
+	From int64
+	To   int64
+	Msg  []byte
+}
 
 //GetChatClient 初始化，参数：数据目录路径
 //func GetChatClient(path1 string) *ChatClient
@@ -56,6 +58,7 @@ res = client.NewPasswd(name,pwdOld,pwdNew)
 client.SetServeId(id)
 
 //GetUrl 返回访问访问联系人WEB页面的URL，不会变化，只需调用一次，保存结果
+//先用上面的SetServeId设置目标联系人，然后打开本URL访问其网页。
 //func (c *ChatClient) GetUrl() string
 url = client.GetUrl()
 
