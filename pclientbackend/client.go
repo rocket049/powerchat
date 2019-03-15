@@ -167,21 +167,14 @@ func readConn(conn1 net.Conn) {
 		}
 	}
 }
-func main_init(dir string) {
+func main_init(dir, cfgPath string) {
 	dataHome = dir
 
 	servePort = 7890
 	proxyPort = servePort + 2000
 
-	filepath1, err := os.Executable()
-	if err != nil {
-		log.Fatal(err)
-	}
-	path1 := filepath.Dir(filepath1)
-	pgPath = path1
-
 	var cfg1 = make(map[string]string)
-	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "config.json"))
+	cfgFile, err := ioutil.ReadFile(cfgPath)
 	if err != nil {
 		log.Fatal(err)
 	}
