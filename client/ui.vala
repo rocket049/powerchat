@@ -352,13 +352,13 @@ label{
 """);
 		this.link_css1 = new Gtk.CssProvider();
 		try{
-			this.link_css1.load_from_data("label{background:#D5FC82;}\nlabel>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
+			this.link_css1.load_from_data("label{background:#D5FC82;border-width:1px; border-style:solid; border-color:green;}\nlabel>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
 		} catch (Error e) {
             print ("CSS Error: %s\n", e.message);
         }
         
         name_css = new Gtk.CssProvider();
-        name_css.load_from_data("grid{margin-top:5px;margin-bottom:5px;background-image: linear-gradient(to top right, #FCAF3E, #FCE94F);}\n");
+        name_css.load_from_data("grid{margin-top:5px;margin-bottom:5px;background-image: linear-gradient(to top right, #FCAF3E, #FCE94F);border-width:1px; border-style:solid; border-color:#F57900;}\n");
 	}
     public void show_sended_msg_to(int64 to,string msg){
         this.add_left_name_icon_to(to,this.uname,this.usex);
