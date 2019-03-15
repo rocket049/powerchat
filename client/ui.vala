@@ -38,6 +38,7 @@ public class MyGrid: GLib.Object{
 	Gee.HashMap<string,weak Gtk.Grid?> frd_boxes;
 	public Gtk.CssProvider provider1;
 	public Gtk.CssProvider mark1;
+	public Gtk.CssProvider name_css;
 	public int mark_num=0;
 	public Gtk.CssProvider button1;
 	public Gtk.CssProvider link_css1;
@@ -307,6 +308,10 @@ public class MyGrid: GLib.Object{
 			return false;
 		});
 	}
+	private void set_css_to(Gtk.Widget w,Gtk.CssProvider p){
+		var sc = w.get_style_context ();
+		sc.add_provider(p,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+	}
 	private void set_css_once(){
 		this.cssp = new Gtk.CssProvider();
 		var sc = this.mygrid.get_style_context ();
@@ -347,10 +352,13 @@ label{
 """);
 		this.link_css1 = new Gtk.CssProvider();
 		try{
-			this.link_css1.load_from_data("label>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
+			this.link_css1.load_from_data("label{background:#D5FC82;}\nlabel>link{color:#0000FF;}\nlabel>selection{background: #A8141B; color: white;}\n");
 		} catch (Error e) {
             print ("CSS Error: %s\n", e.message);
         }
+        
+        name_css = new Gtk.CssProvider();
+        name_css.load_from_data("grid{background:#FFFFFF;}\n");
 	}
     public void show_sended_msg_to(int64 to,string msg){
         this.add_left_name_icon_to(to,this.uname,this.usex);
@@ -532,6 +540,7 @@ label{
         grid2.attach(l2,0,0);
         grid2.set_column_spacing(5);
 		this.msgs.add(grid2);
+		set_css_to(grid2,name_css);
 		grid2.show_all();
     }
     public void add_left_name_icon(string name,int16 sex){
@@ -550,6 +559,7 @@ label{
         grid1.attach(l1,1,0);
         grid1.set_column_spacing(5);
 		this.msgs.add(grid1);
+		set_css_to(grid1,name_css);
 		grid1.show_all();
     }
     public void add_left_name_icon_to(int64 to , string name,int16 sex){
@@ -573,7 +583,7 @@ label{
         grid.set_column_spacing(5);
 
         box1.add(grid);
-
+		set_css_to(grid,name_css);
 		grid.show_all();
     }
     public void add_text_to(int64 to,string text,bool center=false ,bool markup=false){
