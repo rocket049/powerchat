@@ -358,7 +358,7 @@ label{
         }
         
         name_css = new Gtk.CssProvider();
-        name_css.load_from_data("grid{background:#FFFFFF;}\n");
+        name_css.load_from_data("grid{margin-top:5px;margin-bottom:5px;background-image: linear-gradient(to top right, #FCAF3E, #FCE94F);}\n");
 	}
     public void show_sended_msg_to(int64 to,string msg){
         this.add_left_name_icon_to(to,this.uname,this.usex);
