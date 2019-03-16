@@ -18,6 +18,10 @@ type UserDataRet struct {
 	Msg       string
 }
 
+type UserDataArray struct {
+	Users []UserDataRet
+}
+
 //MsgType 通用信息数据包
 type MsgType struct {
 	Cmd  ChatCommand
@@ -39,15 +43,15 @@ res = client.NewUser(name, pwd, sex, birth, desc)
 //func (c *ChatClient) Login(name, pwd string) *UserDataRet
 
 //GetFriends 返回联系人列表和离线信息，登录成功后应立即调用,阻塞函数，最好在线程中运行或者用异步函数包装
-//func (c *ChatClient) GetFriends() []UserDataRet
+//func (c *ChatClient) GetFriends() *UserDataArray
 friends = client.GetFriends()
 
 //GetStrangerMsgs 读取全部陌生人的留言，登录成功后应立即调用，阻塞函数，最好在线程中运行或者用异步函数包装
-//func (c *ChatClient) GetStrangerMsgs() []UserDataRet
+//func (c *ChatClient) GetStrangerMsgs() *UserDataArray
 strangers = client.GetStrangerMsgs()
 
 //SearchPersons 搜索名字包含关键字 key 的用户，阻塞函数，最好在线程中运行或者用异步函数包装
-func (c *ChatClient) SearchPersons(key string) []UserDataRet
+func (c *ChatClient) SearchPersons(key string) *UserDataArray
 
 //NewPasswd 参数： Name,OldMd5,NewMd5，返回：bool
 //func (c *ChatClient) NewPasswd(name, pwdOld, pwdNew string) bool
