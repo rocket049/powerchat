@@ -162,4 +162,8 @@ stranger_msgs := client.GetStrangerMsgs()  //返回陌生人留言列表
 2. "JSON"，收到的是文件或图片，格式是"{Name:'该文件的保存路径',Mime:'mime-type',Size:size,Session:0}"，Session字段可以忽略，现阶段都是0；
 3. "LOGI"，上线通知。
 
+### UserDataArray 增加方法 Next()
+返回 UserDataRet 先调用 getFriends，返回值就是UserDataArray类型，接着循环调用 res.Next()，直到返回值为 null
 
+### IdArray 用于 TellAll 和 MultiSend
+用 ids = NewIdArray() 初始化，然后用 ids.Append(id) 添加数据。
