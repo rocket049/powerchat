@@ -37,6 +37,9 @@ type UserDataRet struct {
 	Timestamp string
 	Msg       string
 }
+type UserDataArray struct {
+	Users []UserDataRet
+}
 type UserBaseInfo struct {
 	Id         int64
 	Name       string
@@ -203,7 +206,7 @@ func (c *ChatClient) Login(name, pwd string) *UserDataRet {
 }
 
 //GetFriends 返回联系人列表和离线信息,阻塞函数，最好在线程中运行或者用异步函数包装
-func (c *ChatClient) GetFriends() []UserDataRet {
+func (c *ChatClient) GetFriends() *UserDataArray {
 	req, _ := MsgEncode(CmdGetFriends, c.id, 0, []byte("\n"))
 	c.conn.Write(req)
 	var resp MsgType
@@ -238,7 +241,7 @@ func (c *ChatClient) GetFriends() []UserDataRet {
 	}
 	//log.Println("GetFriends")
 	go notifyVersion()
-	return ret
+	return &UserDataArray{ret}
 }
 
 //UserStatus 参数：id int64，返回值：0-offline，1-online
@@ -303,7 +306,7 @@ func (c *ChatClient) MoveStrangerToFriend(fid int64) {
 }
 
 //GetStrangerMsgs 读取全部陌生人的留言，阻塞函数，最好在线程中运行或者用异步函数包装
-func (c *ChatClient) GetStrangerMsgs() []UserDataRet {
+func (c *ChatClient) GetStrangerMsgs() *UserDataArray {
 	req, _ := MsgEncode(CmdGetStrangers, c.id, 0, []byte("\n"))
 	c.conn.Write(req)
 	var resp MsgType
@@ -336,11 +339,11 @@ func (c *ChatClient) GetStrangerMsgs() []UserDataRet {
 		ret = append(ret, UserDataRet{Id: v.Id, Name: v.Name, Sex: v.Sex,
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, Timestamp: offmsg.Timestamp, Msg: offmsg.Msg})
 	}
-	return ret
+	return &UserDataArray{ret}
 }
 
 //SearchPersons 搜索用户，阻塞函数，最好在线程中运行或者用异步函数包装
-func (c *ChatClient) SearchPersons(key string) []UserDataRet {
+func (c *ChatClient) SearchPersons(key string) *UserDataArray {
 	req, _ := MsgEncode(CmdSearchPersons, c.id, 0, []byte(key))
 	c.conn.Write(req)
 	var resp MsgType
@@ -368,7 +371,7 @@ func (c *ChatClient) SearchPersons(key string) []UserDataRet {
 		ret = append(ret, UserDataRet{Id: v.Id, Name: v.Name, Sex: v.Sex,
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, Timestamp: "", Msg: ""})
 	}
-	return ret
+	return &UserDataArray{ret}
 }
 
 type ChatMessage struct {
