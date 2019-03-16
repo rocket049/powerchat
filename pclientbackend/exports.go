@@ -39,7 +39,7 @@ type UserDataRet struct {
 }
 type UserDataArray struct {
 	Users []UserDataRet
-	Pos   int
+	pos   int
 }
 type IdArray struct {
 	Ids []int64
@@ -63,12 +63,12 @@ type ChatClient struct {
 }
 
 func (p *UserDataArray) Next() (res *UserDataRet) {
-	if p.Pos >= len(p.Users) {
+	if p.pos >= len(p.Users) {
 		res = nil
 	} else {
-		res = &p.Users[p.Pos]
+		res = &p.Users[p.pos]
 	}
-	p.Pos++
+	p.pos++
 	return res
 }
 
@@ -266,7 +266,7 @@ func (c *ChatClient) GetFriends() *UserDataArray {
 	}
 	//log.Println("GetFriends")
 	go notifyVersion()
-	return &UserDataArray{Users: ret, Pos: 0}
+	return &UserDataArray{Users: ret, pos: 0}
 }
 
 //UserStatus 参数：id int64，返回值：0-offline，1-online
@@ -364,7 +364,7 @@ func (c *ChatClient) GetStrangerMsgs() *UserDataArray {
 		ret = append(ret, UserDataRet{Id: v.Id, Name: v.Name, Sex: v.Sex,
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, Timestamp: offmsg.Timestamp, Msg: offmsg.Msg})
 	}
-	return &UserDataArray{Users: ret, Pos: 0}
+	return &UserDataArray{Users: ret, pos: 0}
 }
 
 //SearchPersons 搜索用户，阻塞函数，最好在线程中运行或者用异步函数包装
@@ -396,7 +396,7 @@ func (c *ChatClient) SearchPersons(key string) *UserDataArray {
 		ret = append(ret, UserDataRet{Id: v.Id, Name: v.Name, Sex: v.Sex,
 			Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc, Timestamp: "", Msg: ""})
 	}
-	return &UserDataArray{Users: ret, Pos: 0}
+	return &UserDataArray{Users: ret, pos: 0}
 }
 
 type ChatMessage struct {
