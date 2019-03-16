@@ -22,6 +22,10 @@ type UserDataArray struct {
 	Users []UserDataRet
 }
 
+type IdArray struct {
+	Ids []int64
+}
+
 //MsgType 通用信息数据包
 type MsgType struct {
 	Cmd  ChatCommand
@@ -75,13 +79,13 @@ addr = client.GetHost()
 client.ChatTo(id,message)
 
 //MultiSend 向id列表中的所有人发送同一个文字信息
-func (c *ChatClient) MultiSend(msg string, ids []int64)
+func (c *ChatClient) MultiSend(msg string, ids *IdArray)
 
 //Tell 向指定ID发送上线通知
 func (c *ChatClient) Tell(uid int64)
 
 //TellAll 向id列表中的所有人发上线通知
-func (c *ChatClient) TellAll(uids []int64)
+func (c *ChatClient) TellAll(uids *IdArray)
 
 //GetMsg 读取信息，阻塞函数，需要在线程中循环运行或者用异步函数包装
 //func (c *ChatClient) GetMsg() *MsgType

@@ -40,6 +40,9 @@ type UserDataRet struct {
 type UserDataArray struct {
 	Users []UserDataRet
 }
+type IdArray struct {
+	Ids []int64
+}
 type UserBaseInfo struct {
 	Id         int64
 	Name       string
@@ -396,14 +399,14 @@ func (c *ChatClient) Tell(uid int64) {
 }
 
 //TellAll 向id列表中的所有人发上线通知
-func (c *ChatClient) TellAll(uids []int64) {
-	mMsg := &MultiSendMsg{Ids: uids, Msg: "LOGI"}
+func (c *ChatClient) TellAll(uids *IdArray) {
+	mMsg := &MultiSendMsg{Ids: uids.Ids, Msg: "LOGI"}
 	c.multiSendGo(mMsg)
 }
 
 //MultiSend 向id列表中的所有人发送同一个文字信息
-func (c *ChatClient) MultiSend(msg string, ids []int64) {
-	mMsg := &MultiSendMsg{Ids: ids, Msg: fmt.Sprintf("TEXT%s", msg)}
+func (c *ChatClient) MultiSend(msg string, ids *IdArray) {
+	mMsg := &MultiSendMsg{Ids: ids.Ids, Msg: fmt.Sprintf("TEXT%s", msg)}
 	c.multiSendGo(mMsg)
 }
 
