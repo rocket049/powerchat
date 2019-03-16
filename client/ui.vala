@@ -535,6 +535,7 @@ label{
         img2.set_from_pixbuf(pix1);
         grid2.attach(img2,1,0);
         grid2.halign = Gtk.Align.END;
+
 		var l2 = new Gtk.Label(name);
 		l2.xalign = (float)1;
         grid2.attach(l2,0,0);
@@ -558,6 +559,7 @@ label{
 		l1.xalign = (float)0;
         grid1.attach(l1,1,0);
         grid1.set_column_spacing(5);
+        grid1.halign = Gtk.Align.START;
 		this.msgs.add(grid1);
 		set_css_to(grid1,name_css);
 		grid1.show_all();
@@ -581,7 +583,7 @@ label{
 		l1.xalign = (float)0;
         grid.attach(l1,1,0);
         grid.set_column_spacing(5);
-
+        grid.halign = Gtk.Align.START;
         box1.add(grid);
 		set_css_to(grid,name_css);
 		grid.show_all();
@@ -604,9 +606,11 @@ label{
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
             lb.xalign = (float)0;
+            //grid.halign = Gtk.Align.START;
         }else{
-			grid.halign = Gtk.Align.CENTER;
+            lb.xalign = (float)0.5;
 		}
+        grid.halign = Gtk.Align.CENTER;
 		//stdout.printf(@"Box width: $(box1.width_request)\n");
         lb.hexpand=true;
         
@@ -650,10 +654,12 @@ label{
         lb.wrap_mode = Pango.WrapMode.CHAR;
         if(!center){
             lb.xalign = (float)0;
+            //grid.halign = Gtk.Align.START;
         }else{
-			grid.halign = Gtk.Align.CENTER;
+            lb.xalign = (float)0.5;
 		}
-        lb.hexpand=true;
+        grid.halign = Gtk.Align.CENTER;
+        //lb.hexpand=true;
         //var lb1 = new Gtk.Label("");
         //lb1.width_request = 5;
         //grid.attach(lb1,0,0);
