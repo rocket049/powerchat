@@ -17,13 +17,14 @@ type UserDataRet struct {
 	Timestamp string
 	Msg       string
 }
-
+//UserDataArray 包装[]UserDataRet的对象，后面有用法说明
 type UserDataArray struct {
 	Users []UserDataRet
 }
-
+//IdArray 包装[]int64的对象，后面有用法说明
 type IdArray struct {
 	Ids []int64
+	pos int
 }
 
 //MsgType 通用信息数据包
@@ -87,7 +88,7 @@ func (c *ChatClient) Tell(uid int64)
 //TellAll 向id列表中的所有人发上线通知
 func (c *ChatClient) TellAll(uids *IdArray)
 
-//GetMsg 读取信息，阻塞函数，需要在线程中循环运行或者用异步函数包装
+//GetMsg 读取信息,网络断开或发生错误时返回null。阻塞函数，需要在线程中循环运行或者用异步函数包装
 //func (c *ChatClient) GetMsg() *MsgType
 
 //SendFile 发送文件，参数：id,pathname。 阻塞函数，需要在线程中循环运行或者用异步函数包装
@@ -162,8 +163,11 @@ stranger_msgs := client.GetStrangerMsgs()  //返回陌生人留言列表
 2. "JSON"，收到的是文件或图片，格式是"{Name:'该文件的保存路径',Mime:'mime-type',Size:size,Session:0}"，Session字段可以忽略，现阶段都是0；
 3. "LOGI"，上线通知。
 
-### UserDataArray 增加方法 Next()
-返回 UserDataRet 先调用 res = client.GetFriends()，返回值就是UserDataArray类型，接着循环调用 res.Next()，直到返回值为 null
+### UserDataArray 用法
+方法 Next()
+返回 UserDataRet 先调用 res = client.GetFriends()，返回值就是UserDataArray类型，
+接着循环调用 res.Next()，直到返回值为 null
 
 ### IdArray 用于 TellAll 和 MultiSend
-用 ids = NewIdArray() 初始化，然后用 ids.Append(id) 添加数据。
+用 ids = NewIdArray() 初始化，
+然后用 ids.Append(id) 添加数据。
