@@ -100,6 +100,7 @@ func (c *pChatClient) setID(ident int64) {
 func Client_SetHttpId(ident C.gint64) {
 	cSrv.httpId = int64(ident)
 	httpId = cSrv.httpId
+	clearLocRouter()
 }
 
 //export Client_NewUser
