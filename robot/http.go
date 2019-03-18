@@ -5,10 +5,15 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 var router1 = &sync.Map{}
 
@@ -100,7 +105,7 @@ func proxyResopnse(conn1 io.ReadWriter, httpConn io.ReadWriter, from int64, time
 
 //local router
 var locRouter = &sync.Map{}
-var counter uint32 = 0
+var counter uint32 = rand.Uint32()
 var lock1 sync.Mutex
 
 func getConnID() uint32 {
@@ -116,7 +121,7 @@ func httpResponse2(conn1 io.ReadWriter, locConn net.Conn, to int64) {
 	cid := getConnID()
 	locRouter.Store(cid, locConn)
 	defer locConn.Close()
-	defer locRouter.Delete(to)
+	defer locRouter.Delete(cid)
 	header := make([]byte, 4)
 	binary.BigEndian.PutUint32(header, cid)
 	r, _ := MsgEncode(CmdHttpReqContinued, 0, to, header)

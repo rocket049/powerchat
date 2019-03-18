@@ -6,10 +6,15 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 var router1 = &sync.Map{}
 
@@ -101,7 +106,7 @@ func proxyResopnse(conn1 io.ReadWriter, httpConn io.ReadWriter, from int64, time
 
 //local router
 var locRouter = &sync.Map{}
-var counter uint32 = 0
+var counter uint32 = rand.Uint32()
 var lock1 sync.Mutex
 
 func getConnID() uint32 {

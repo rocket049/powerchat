@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=29;
+static int RELEASE=30;
 static int LATESTVER=0;
 
 public struct UserMsg{

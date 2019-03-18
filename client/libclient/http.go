@@ -6,12 +6,22 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
 )
 
+func init() {
+	rand.Seed(time.Now().Unix())
+}
+
 var router1 = &sync.Map{}
+
+func getClientConnID(msg *MsgType) uint32 {
+	cid := binary.BigEndian.Uint32(msg.Msg[:4])
+	return cid
+}
 
 //goroutine http proxy
 func httpProxy2(conn1 io.ReadWriter) {
@@ -22,7 +32,7 @@ func httpProxy2(conn1 io.ReadWriter) {
 		}
 		if msg.Cmd == CmdHttpReqContinued {
 			ch1 := make(chan MsgType, 1)
-			cid := binary.BigEndian.Uint32(msg.Msg)
+			cid := getClientConnID(&msg)
 			router1.Store(cid, ch1)
 			//star serve ch1
 			go proxyChan(ch1, conn1, msg.From, cid)
@@ -81,7 +91,7 @@ func proxyResopnse(conn1 io.ReadWriter, httpConn io.ReadWriter, from int64, time
 	for {
 		n, err := httpConn.Read(buf)
 		if err != nil {
-			log.Printf("ProxyResp:%v\n", err)
+			//log.Printf("ProxyResp:%v\n", err)
 			cr, _ := MsgEncode(CmdHttpRespClose, id, from, header)
 			conn1.Write(cr)
 			timeout_ch <- 0
@@ -101,7 +111,7 @@ func proxyResopnse(conn1 io.ReadWriter, httpConn io.ReadWriter, from int64, time
 
 //local router
 var locRouter = &sync.Map{}
-var counter uint32 = 0
+var counter uint32 = rand.Uint32()
 var lock1 sync.Mutex
 
 func getConnID() uint32 {
@@ -117,7 +127,7 @@ func httpResponse2(conn1 io.ReadWriter, locConn net.Conn, to int64) {
 	cid := getConnID()
 	locRouter.Store(cid, locConn)
 	defer locConn.Close()
-	defer locRouter.Delete(to)
+	defer locRouter.Delete(cid)
 	header := make([]byte, 4)
 	binary.BigEndian.PutUint32(header, cid)
 	r, _ := MsgEncode(CmdHttpReqContinued, 0, to, header)
