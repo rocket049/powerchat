@@ -535,7 +535,7 @@ func (c *ChatClient) SendFile(to int64, pathName string) {
 		return
 	}
 	c.fileSend = sender
-	sender.sendFileBody()
+	go sender.sendFileBody()
 }
 
 //AddFriend 加入联系人

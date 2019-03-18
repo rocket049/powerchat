@@ -562,7 +562,7 @@ func Client_SendFile(to C.gint64, pathName *C.char) {
 		return
 	}
 	cSrv.fileSend = sender
-	sender.SendFileBody()
+	go sender.SendFileBody()
 }
 
 //export Client_AddFriend

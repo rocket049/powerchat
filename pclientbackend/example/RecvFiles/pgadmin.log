@@ -1,0 +1,37 @@
+ERROR  : 10时08分32秒: 错误: Error connecting to the server: could not translate host name "127.0.0.1:5432" to address: 未知的名称或服务
+
+ERROR  : 10时09分32秒: 错误: Error connecting to the server: fe_sendauth: no password supplied
+
+ERROR  : 10时09分51秒: 错误: Error connecting to the server: FATAL:  password authentication failed for user "postgres"
+FATAL:  password authentication failed for user "postgres"
+
+ERROR  : 10时22分51秒: ERROR:  syntax error at or near "not"
+LINE 1: comment on table if not exists users
+                            ^
+ERROR  : 10时23分04秒: ERROR:  syntax error at or near "exists"
+LINE 1: comment on table if exists users
+                            ^
+ERROR  : 10时23分09秒: ERROR:  syntax error at or near ""用户数据""
+LINE 2: is "用户数据";
+           ^
+ERROR  : 08时47分16秒: ERROR:  syntax error at or near "="
+LINE 6: skip=2
+            ^
+ERROR  : 11时27分37秒: ERROR:  syntax error at or near "contain"
+LINE 1: select * from history where msg contain '记录';
+                                        ^
+ERROR  : 11时27分42秒: ERROR:  syntax error at or near "contains"
+LINE 1: select * from history where msg contains '记录';
+                                        ^
+ERROR  : 11时31分49秒: ERROR:  argument of OR must be type boolean, not type integer
+LINE 1: select * from history where strpos(msg,'go')>0 or strpos(nam...
+                                                          ^
+ERROR  : 08时25分10秒: ERROR:  relation "chat01" does not exist
+ERROR  : 16时42分56秒: ERROR:  function contains(text, unknown) does not exist
+LINE 1: select * from history where contains(msg,'好')>1
+                                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+ERROR  : 16时43分03秒: ERROR:  function contain(text, unknown) does not exist
+LINE 1: select * from history where contain(msg,'好')>1
+                                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
