@@ -103,6 +103,7 @@ func startFileServ(conn1 io.Writer) {
 			log.Println("error create file:", h2.Name)
 			continue
 		}
+		notifyMsg(&MsgType{Cmd: CmdSysReturn, From: 0, To: 0, Msg: []byte("Receiving:" + h2.Name)})
 		//request Accept
 		binary.BigEndian.PutUint32(bs, session)
 		msg, _ := MsgEncode(CmdFileAccept, 0, h1.From, bs)
