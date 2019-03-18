@@ -170,3 +170,19 @@ func httpRespRouter() {
 		}
 	}
 }
+
+func clearLocRouter() {
+	var ka = []interface{}{}
+	var va = []interface{}{}
+	locRouter.Range(func(k, v interface{}) bool {
+		va = append(va, v)
+		ka = append(ka, k)
+		return true
+	})
+	for _, k := range ka {
+		locRouter.Delete(k)
+	}
+	for _, v := range va {
+		v.(io.Closer).Close()
+	}
+}

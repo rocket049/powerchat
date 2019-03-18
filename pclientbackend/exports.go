@@ -111,6 +111,7 @@ func GetChatClient(dataDir, configPath string) *ChatClient {
 func (c *ChatClient) SetServeId(ident int64) {
 	c.httpId = ident
 	httpId = ident
+	clearLocRouter()
 }
 
 //NewUser 注册新用户，参数： 名字，密码，性别(1-男，2-女)，出生年份（四位数：1985,2005,...），自述信息
