@@ -98,11 +98,11 @@ func (c *ChatClient) setID(ident int64) {
 }
 
 //GetChatClient 初始化，参数：数据目录路径
-func GetChatClient(dataDir, configPath string) *ChatClient {
+func GetChatClient(dataDir, cfgSrc string) *ChatClient {
 	if cSrv == nil {
 		//only initial once
 		cSrv = new(ChatClient)
-		main_init(dataDir, configPath)
+		main_init(dataDir, cfgSrc)
 	}
 	return cSrv
 }

@@ -36,8 +36,8 @@ type MsgType struct {
 }
 
 //GetChatClient 初始化，参数：数据目录路径,这个函数必须第一个调用，获得已经初始化好了了对象指针
-//func GetChatClient(dataDir,cfgPath string) *ChatClient
-client = GetChatClient( 数据存储目录path1, config.json的路径 )
+//func GetChatClient(dataDir,cfgSrc string) *ChatClient
+client = GetChatClient( 数据存储目录path1, config.json的内容 )
 
 //NewUser 注册新用户，参数： 名字，密码，性别(1-男，2-女)，出生年份（四位数：1985,2005,...），自述信息。返回：bool
 //func (c *ChatClient) NewUser(name, pwd string, sex, birth int, desc string) bool
