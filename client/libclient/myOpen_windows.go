@@ -1,5 +1,14 @@
 package main
 
+import (
+	"os"
+	"os/exec"
+	"strings"
+	"syscall"
+
+	"github.com/skratchdot/open-golang/open"
+)
+
 func myOpen(path1 string) error {
 	if strings.HasPrefix(path1, "http://") {
 		cmd := exec.Command("cmd", "/C", "start", path1)
