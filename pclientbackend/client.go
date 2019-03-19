@@ -167,18 +167,14 @@ func readConn(conn1 net.Conn) {
 		}
 	}
 }
-func main_init(dir, cfgPath string) {
+func main_init(dir, cfg string) {
 	dataHome = dir
 
 	servePort = 7890
 	proxyPort = servePort + 2000
 
 	var cfg1 = make(map[string]string)
-	cfgFile, err := ioutil.ReadFile(cfgPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = json.Unmarshal(cfgFile, &cfg1)
+	err = json.Unmarshal([]byte(cfg), &cfg1)
 	if err != nil {
 		log.Fatal(err)
 	}
