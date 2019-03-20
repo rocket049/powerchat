@@ -193,7 +193,7 @@ func main_init() {
 	path1 := filepath.Dir(filepath1)
 	pgPath = path1
 	var cfg1 = make(map[string]string)
-	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "config.json"))
+	cfgFile, err := ioutil.ReadFile(filepath.Join(path1, "..", "etc", "powerchat", "config.json"))
 	if err != nil {
 		log.Fatal(err)
 	}
