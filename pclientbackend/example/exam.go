@@ -2,12 +2,17 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/rocket049/powerchat/pclientbackend"
 )
 
 func main() {
-	client := pclientbackend.GetChatClient(".", "./config.json")
+	cfg, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		panic(err)
+	}
+	client := pclientbackend.GetChatClient(".", string(cfg))
 	defer client.Quit()
 	me := client.Login("test1", "1234")
 	fmt.Println(me)

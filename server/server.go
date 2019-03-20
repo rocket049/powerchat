@@ -73,7 +73,7 @@ func serveConn(conn1 net.Conn) {
 	client.Auth = false
 
 	for {
-		conn1.SetReadDeadline(time.Now().Add(time.Minute * 5))
+		conn1.SetReadDeadline(time.Now().Add(time.Minute * 2))
 		msg, err := ReadMsg(conn1)
 		if err != nil {
 			log.Printf("Disconnect:%v\n", client.Id)
