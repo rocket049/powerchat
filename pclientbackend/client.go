@@ -167,6 +167,7 @@ func readConn(conn1 net.Conn) {
 		}
 	}
 }
+
 func main_init(dir, cfgSrc string) {
 	dataHome = dir
 
@@ -174,7 +175,6 @@ func main_init(dir, cfgSrc string) {
 	proxyPort = servePort + 2000
 
 	var cfg1 = make(map[string]string)
-
 	err := json.Unmarshal([]byte(cfgSrc), &cfg1)
 	if err != nil {
 		log.Fatal(err)
