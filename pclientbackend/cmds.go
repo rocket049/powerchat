@@ -1,8 +1,9 @@
-package pclientbackend
+package main
 
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 )
 
@@ -84,6 +85,9 @@ type MsgType struct {
 }
 
 func MsgDecode(msg []byte) *MsgType {
+	if len(msg) < 17 {
+		return nil
+	}
 	res := new(MsgType)
 	res.Cmd = ChatCommand(msg[0])
 	res.From = int64(binary.BigEndian.Uint64(msg[1:9]))
@@ -99,6 +103,9 @@ func ReadMsg(r io.Reader) ([]byte, error) {
 		return nil, err
 	}
 	var size1 = binary.BigEndian.Uint16(lbuf)
+	if size1 <= 17 {
+		return nil, errors.New("Message Format Error")
+	}
 	var data = make([]byte, int(size1))
 	_, err = io.ReadFull(r, data)
 	if err != nil {

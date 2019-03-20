@@ -85,6 +85,9 @@ type MsgType struct {
 }
 
 func MsgDecode(msg []byte) *MsgType {
+	if len(msg) < 17 {
+		return nil
+	}
 	res := new(MsgType)
 	res.Cmd = ChatCommand(msg[0])
 	res.From = int64(binary.BigEndian.Uint64(msg[1:9]))
