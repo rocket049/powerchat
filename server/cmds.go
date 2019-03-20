@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 )
 
@@ -99,6 +100,9 @@ func ReadMsg(r io.Reader) ([]byte, error) {
 		return nil, err
 	}
 	var size1 = binary.BigEndian.Uint16(lbuf)
+	if size1 <= 17 {
+		return nil, errors.New("Message Format Error")
+	}
 	var data = make([]byte, int(size1))
 	_, err = io.ReadFull(r, data)
 	if err != nil {
