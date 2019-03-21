@@ -153,8 +153,9 @@ stranger_msgs := client.GetStrangerMsgs()  //返回陌生人留言列表
 ### Cmd=27 时全部系统返回信息，此时 From=0
 1. "Offline ID"，其中ID是数字，表示该 ID 下线了。
 2. "Version:NUM"，其中NUM是数字，表示github上最新客户端版本号。
-3. "DELETE 1"，用户删除了自己。
-4. "DELETE 0"，用户删除自己的操作失败了。
+3. "DELETE 1\n"，用户删除了自己。
+4. "DELETE 0\n"，用户删除自己的操作失败了。
+5. "ConnDown\n"，连接中断。
 
 ### Cmd=0 时的信息来自其他用户用户，此时 From > 0
 这是如果Msg成员的前4个字符有3中情况：
