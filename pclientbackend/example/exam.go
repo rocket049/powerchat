@@ -15,7 +15,7 @@ func main() {
 	client := pclientbackend.GetChatClient(".", string(cfg))
 	defer client.Quit()
 	me := client.Login("test1", "1234")
-	fmt.Println(me)
+	fmt.Println("Login:", me)
 	for {
 		msg := client.GetMsg()
 		if msg == nil {
