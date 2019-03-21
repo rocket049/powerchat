@@ -383,3 +383,13 @@ msgstr "不选"
 
 msgid "Test Online"
 msgstr "是否在线"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid ""
+"Disconnected from Server!\n"
+"Please Restart powerchat!"
+msgstr ""
+"网络连接意外断开!\n"
+"请重启powerchat程序!"
