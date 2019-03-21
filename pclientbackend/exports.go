@@ -450,6 +450,7 @@ func (c *ChatClient) startPing() {
 		time.Sleep(time.Second * 60)
 		_, err := c.conn.Write(msg)
 		if err != nil {
+			c.conn.Close()
 			break
 		}
 	}
