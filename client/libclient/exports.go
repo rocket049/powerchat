@@ -475,7 +475,11 @@ func multiSendGo(param *MultiSendMsg) error {
 //export Client_Ping
 func Client_Ping() {
 	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
-	cSrv.conn.Write(msg)
+	_, err := cSrv.conn.Write(msg)
+	if err != nil {
+		log.Println(err)
+		cSrv.conn.Close()
+	}
 }
 
 //export Client_HttpConnect
