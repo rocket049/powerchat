@@ -740,15 +740,11 @@ label{
             }else if(msg[0:8]=="DELETE 0"){
                 this.add_text(_("[Operate Fail]"));
             }else if(msg[0:8]=="ConnDown"){
-				application1.hold ();
 				var dlg_about = new Gtk.MessageDialog(app, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
 				dlg_about.text = _("Warning");
 				dlg_about.secondary_text = _("Disconnected from Server!\nPlease Restart powerchat!");
-				dlg_about.show();
-				dlg_about.response.connect((rid)=>{
-					dlg_about.destroy();
-				});
-				application1.release ();
+				dlg_about.run();
+				dlg_about.destroy();
 			}
 			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
