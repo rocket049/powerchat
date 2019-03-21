@@ -126,7 +126,7 @@ func readConn(conn1 net.Conn) {
 		msgb, err := ReadMsg(conn1)
 		if err != nil {
 			log.Printf("ReadMsg:%v\n", err)
-			notifyMsg(&MsgType{Cmd: CmdSysReturn, From: 0, To: 0, Msg: []byte("ConnDown")})
+			notifyMsg(&MsgType{Cmd: CmdSysReturn, From: 0, To: 0, Msg: []byte("ConnDown\n")})
 			return
 		}
 		msg := MsgDecode(msgb)
