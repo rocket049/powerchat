@@ -525,6 +525,7 @@ func (c *ChatClient) SendFile(to int64, pathName string) {
 	param := &SFParam{To: to, PathName: pathName}
 	if c.fileSend != nil {
 		if c.fileSend.status() {
+			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
 			return
 		}
 	}

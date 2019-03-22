@@ -555,6 +555,7 @@ func Client_SendFile(to C.gint64, pathName *C.char) {
 	param := &SFParam{To: int64(to), PathName: C.GoString(pathName)}
 	if cSrv.fileSend != nil {
 		if cSrv.fileSend.Status() {
+			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
 			return
 		}
 	}

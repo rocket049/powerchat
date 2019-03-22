@@ -220,7 +220,7 @@ func (s *FileSender) SendFileBody() {
 	f1, err := os.Open(s.pathname)
 	if err != nil {
 		s.CancelTrans()
-		log.Panicln(err)
+		notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("Error:  " + err.Error())})
 		return
 	}
 	defer f1.Close()
