@@ -40,13 +40,11 @@ func client(ctl1 chan int) {
 	//replace httpServe and cSrv.startcSrv4Glib
 	res1 := make(chan bool, 1)
 	go localServe(conn1, res1)
-	//go httpServe(conn1)
-	go readConn(conn1)
 	ok := <-res1
 	close(res1)
 	if ok {
 		ctl1 <- 1
-		startFileServ(conn1)
+		readConn(conn1)
 	}
 	fmt.Println("quit")
 }
@@ -131,16 +129,16 @@ func readConn(conn1 net.Conn) {
 			pushServeChan(msg)
 
 		case CmdFileHeader:
-			pushFileMsg(msg)
+			pushFileMsg2(conn1, msg)
 		case CmdFileContinued:
 			//file
-			pushFileMsg(msg)
+			pushFileMsg2(conn1, msg)
 		case CmdFileClose:
 			//file
-			pushFileMsg(msg)
+			pushFileMsg2(conn1, msg)
 		case CmdFileCancel:
 			//file
-			pushFileMsg(msg)
+			pushFileMsg2(conn1, msg)
 		case CmdFileAccept:
 			//begin send file
 			fileResp <- *msg

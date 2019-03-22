@@ -591,7 +591,6 @@ func Client_Quit() {
 	log.Println("rpc serve normal exit")
 	noticer.Close()
 	cSrv.conn.Close()
-	close(fileChan)
 }
 
 //export Client_GetHost

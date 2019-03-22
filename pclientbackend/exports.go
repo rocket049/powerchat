@@ -559,7 +559,6 @@ func (c *ChatClient) GetProxyPort() int {
 //Quit 退出
 func (c *ChatClient) Quit() {
 	c.conn.Close()
-	close(fileChan)
 	close(notifyChan)
 }
 

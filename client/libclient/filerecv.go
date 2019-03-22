@@ -15,14 +15,21 @@ import (
 	"time"
 )
 
-func init() {
-	rand.Seed(time.Now().Unix())
+type fileReceiver struct {
+	From   int64
+	Header *fileHeaderType
+	File   *os.File
+	Lock   sync.Mutex
 }
 
 var (
-	fileChan chan MsgType
-	fileResp chan MsgType
+	receiver *fileReceiver
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+	receiver = &fileReceiver{From: 0, Header: nil, Lock: sync.Mutex{}}
+}
 
 func getFileDir() string {
 	return getRelatePath("RecvFiles")
@@ -36,8 +43,70 @@ type fileHeaderType struct {
 }
 
 //gorutine
-func pushFileMsg(msg *MsgType) {
-	fileChan <- *msg
+func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
+	receiver.Lock.Lock()
+	defer receiver.Lock.Unlock()
+	if receiver.From == 0 && msg.Cmd == CmdFileHeader {
+		receiver.From = msg.From
+		receiver.Header = new(fileHeaderType)
+		err := json.Unmarshal(msg.Msg, receiver.Header)
+		if err != nil {
+			receiver.From = 0
+			receiver.Header = nil
+			return
+		}
+		fileDir := getFileDir()
+		receiver.File, err = os.Create(filepath.Join(fileDir, receiver.Header.Name))
+		if err != nil {
+			log.Println("error create file:", receiver.Header.Name)
+			receiver.From = 0
+			receiver.Header = nil
+			return
+		}
+		notifyMsg(&MsgType{Cmd: CmdChat, From: receiver.From, To: 0,
+			Msg: []byte("TEXTSending:" + receiver.Header.Name)})
+		//request Accept
+		bs := make([]byte, 4)
+		binary.BigEndian.PutUint32(bs, receiver.Header.Session)
+		resp, _ := MsgEncode(CmdFileAccept, 0, receiver.From, bs)
+		conn1.Write(resp)
+		log.Printf("Accept %s\n", receiver.Header.Name)
+	} else if receiver.From == msg.From && msg.Cmd == CmdFileContinued && len(msg.Msg) >= 4 {
+		if dataSession(msg.Msg) != receiver.Header.Session {
+			return
+		}
+		receiver.File.Write(msg.Msg[4:])
+	} else if receiver.From == msg.From && msg.Cmd == CmdFileClose && len(msg.Msg) >= 4 {
+		if dataSession(msg.Msg) != receiver.Header.Session {
+			return
+		}
+		name1 := receiver.File.Name()
+		receiver.File.Close()
+		notifyFile(name1, receiver.From)
+		//From=0 释放 receiver
+		//log.Println("complete:", receiver.Header.Name)
+		receiver.From = 0
+	} else if receiver.From == msg.From && msg.Cmd == CmdFileCancel && len(msg.Msg) >= 4 {
+		if dataSession(msg.Msg) != receiver.Header.Session {
+			return
+		}
+		name1 := receiver.File.Name()
+		receiver.File.Close()
+		os.Remove(name1)
+		notifyMsg(&MsgType{Cmd: CmdChat, From: receiver.From, To: 0,
+			Msg: []byte("TEXTCancel:" + receiver.Header.Name)})
+		receiver.From = 0
+	} else if receiver.From != 0 && msg.Cmd == CmdFileHeader {
+		h1 := new(fileHeaderType)
+		err := json.Unmarshal(msg.Msg, h1)
+		if err != nil {
+			return
+		}
+		var bs [4]byte
+		binary.BigEndian.PutUint32(bs[:], h1.Session)
+		resp, _ := MsgEncode(CmdFileBlock, 0, msg.From, bs[:])
+		conn1.Write(resp)
+	}
 }
 
 func dataSession(data []byte) uint32 {
@@ -69,95 +138,9 @@ func notifyFile(pathname string, from int64) {
 	}
 	msgbuf := bytes.NewBufferString("JSON")
 	msgbuf.Write(b1)
-	msg := MsgType{Cmd: CmdFileHeader, From: from, To: 0, Msg: msgbuf.Bytes()}
+	msg := MsgType{Cmd: CmdChat, From: from, To: 0, Msg: msgbuf.Bytes()}
 	//msgChan <- msg
 	notifyMsg(&msg)
-}
-
-//goroutine
-func startFileServ(conn1 io.Writer) {
-	fileResp = make(chan MsgType, 1)
-	fileChan = make(chan MsgType, 10)
-	var fileDir = getFileDir()
-	for {
-		h1, ok := <-fileChan
-		if ok == false {
-			log.Println("close file Header Chan")
-			return
-		}
-		if h1.Cmd != CmdFileHeader {
-			log.Println("error not a fileHeader")
-			continue
-		}
-		h2 := new(fileHeaderType)
-		err := json.Unmarshal(h1.Msg, h2)
-		if err != nil {
-			log.Println("error parse fileHeader")
-			continue
-		}
-		var from = h1.From
-		var session = h2.Session
-		var bs = make([]byte, 4)
-		file1, err := os.Create(filepath.Join(fileDir, h2.Name))
-		if err != nil {
-			log.Println("error create file:", h2.Name)
-			continue
-		}
-		notifyMsg(&MsgType{Cmd: CmdChat, From: h1.From, To: 0, Msg: []byte("TEXTSending:" + h2.Name)})
-		//request Accept
-		binary.BigEndian.PutUint32(bs, session)
-		msg, _ := MsgEncode(CmdFileAccept, 0, h1.From, bs)
-		conn1.Write(msg)
-		log.Printf("Accept %s\n", h2.Name)
-		//receive file
-		for {
-			b1, ok := <-fileChan
-			if ok == false {
-				log.Println("close file chan")
-				file1.Close()
-				return
-			}
-			if b1.Cmd == CmdFileContinued {
-				if b1.From != from {
-					continue
-				}
-				if dataSession(b1.Msg) != session {
-					continue
-				}
-				file1.Write(b1.Msg[4:])
-			} else if b1.Cmd == CmdFileClose {
-				//finish
-				if dataSession(b1.Msg) != session {
-					continue
-				}
-				file1.Close()
-				//recv notify
-				//msgChan <- MsgType{Cmd: h1.Cmd, From: h1.From, To: 0, Msg: []byte("Recv 1 file")}
-				notifyFile(file1.Name(), h1.From)
-				break
-			} else if b1.Cmd == CmdFileCancel {
-				//cancel
-				if dataSession(b1.Msg) != session {
-					continue
-				}
-				name1 := file1.Name()
-				file1.Close()
-				os.Remove(name1)
-				break
-			} else if b1.Cmd == CmdFileHeader {
-				var tmph fileHeaderType
-				var b2 [4]byte
-				err := json.Unmarshal(h1.Msg, &tmph)
-				if err != nil {
-					log.Println("error fileHeader")
-					continue
-				}
-				binary.BigEndian.PutUint32(b2[:], tmph.Session)
-				msg, _ := MsgEncode(CmdFileBlock, 0, b1.From, b2[:])
-				conn1.Write(msg)
-			}
-		}
-	}
 }
 
 type FileSender struct {
@@ -184,6 +167,8 @@ func (s *FileSender) Prepare(pathname string, to int64, conn1 io.Writer) {
 	s.to = to
 	s.running = true
 }
+
+var fileResp = make(chan MsgType, 1)
 
 func (s *FileSender) SendFileHeader() (bool, uint32) {
 	fh1, err := os.Stat(s.pathname)

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=PowerChat
+Icon=powerchat.png
+Exec=powerchat
+Categories=GNOME;GTK;Network;
+MimeType=application/xhtml+xml;
+StartupNotify=true
