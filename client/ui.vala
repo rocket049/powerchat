@@ -820,6 +820,15 @@ label{
         sc3.remove_class("off");
         this.friends.invalidate_sort ();
     }
+    public void user_offline(int64 uid1){
+        Gtk.Grid grid = this.frd_boxes[uid1.to_string()];
+        var sc3 = grid.get_style_context();
+        sc3.add_provider(this.provider1,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+        if (sc3.has_class("off")==false){
+            sc3.add_class("off");
+        }
+        this.friends.invalidate_sort ();
+    }
 	public void msg_mark(string uid){
 		Gtk.ListBoxRow r = this.frd_boxes[uid].get_parent() as Gtk.ListBoxRow;
 		if(app.counter==1){

@@ -12,8 +12,12 @@ public class MyFriendMenu : Gtk.Menu{
 		var item1 = new Gtk.MenuItem.with_label (_("Test Online"));
 		item1.activate.connect(()=>{
 			//stdout.printf("menu: %s\n",this.friend_id);
-			grid1.user_online(this.friend_id.to_int64());
-			client.tell(this.friend_id.to_int64());
+            var status = client.user_status(this.friend_id.to_int64());
+            if(status==1)
+			    grid1.user_online(this.friend_id.to_int64());
+            else
+                grid1.user_offline(this.friend_id.to_int64());
+			//client.tell(this.friend_id.to_int64());
 		});
 		this.append(item1);
 		var item2 = new Gtk.MenuItem.with_label (_("Delete"));
