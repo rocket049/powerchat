@@ -21,7 +21,8 @@ import (
 )
 
 var (
-	cmdChan chan MsgType = make(chan MsgType, 1)
+	cmdChan    chan MsgType = make(chan MsgType, 1)
+	notifyChan chan MsgType = make(chan MsgType, 1)
 )
 
 type msgOfflineData struct {
@@ -469,8 +470,6 @@ func (c *ChatClient) SetProxyPort(port int) int {
 	saveManual(c.id, cfg1)
 	return port1
 }
-
-var notifyChan = make(chan MsgType, 1)
 
 //GetMsg 读取信息，阻塞函数，需要在线程中运行或者用异步函数包装
 func (c *ChatClient) GetMsg() *MsgType {
