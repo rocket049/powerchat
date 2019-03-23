@@ -561,6 +561,7 @@ func (c *ChatClient) GetProxyPort() int {
 func (c *ChatClient) Quit() {
 	c.conn.Close()
 	close(notifyChan)
+	exit(0)
 }
 
 //GetHost 返回服务器 IP:PORT
