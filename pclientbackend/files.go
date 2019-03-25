@@ -16,10 +16,30 @@ import (
 )
 
 type fileReceiver struct {
-	From   int64
-	Header *fileHeaderType
-	File   *os.File
-	Lock   sync.Mutex
+	From      int64
+	Header    *fileHeaderType
+	File      *os.File
+	Lock      sync.Mutex
+	timeStamp time.Time
+}
+
+func (s *fileReceiver) UpdateTime() {
+	s.timeStamp = time.Now()
+}
+
+func (s *fileReceiver) IsRunning() bool {
+	if s.From == 0 {
+		return false
+	} else {
+		if s.timeStamp.Add(time.Second * 60).After(time.Now()) {
+			return true
+		} else {
+			name1 := s.File.Name()
+			s.File.Close()
+			os.Remove(name1)
+			return false
+		}
+	}
 }
 
 var (
@@ -46,7 +66,7 @@ type fileHeaderType struct {
 func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
 	receiver.Lock.Lock()
 	defer receiver.Lock.Unlock()
-	if receiver.From == 0 && msg.Cmd == CmdFileHeader {
+	if receiver.IsRunning() == false && msg.Cmd == CmdFileHeader {
 		receiver.From = msg.From
 		receiver.Header = new(fileHeaderType)
 		err := json.Unmarshal(msg.Msg, receiver.Header)
@@ -63,6 +83,7 @@ func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
 			receiver.Header = nil
 			return
 		}
+		receiver.UpdateTime()
 		notifyMsg(&MsgType{Cmd: CmdChat, From: receiver.From, To: 0,
 			Msg: []byte("TEXTSending:" + receiver.Header.Name)})
 		//request Accept
@@ -76,6 +97,7 @@ func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
 			return
 		}
 		receiver.File.Write(msg.Msg[4:])
+		receiver.UpdateTime()
 	} else if receiver.From == msg.From && msg.Cmd == CmdFileClose && len(msg.Msg) >= 4 {
 		if dataSession(msg.Msg) != receiver.Header.Session {
 			return
@@ -96,7 +118,7 @@ func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
 		notifyMsg(&MsgType{Cmd: CmdChat, From: receiver.From, To: 0,
 			Msg: []byte("TEXTCancel:" + receiver.Header.Name)})
 		receiver.From = 0
-	} else if receiver.From != 0 && msg.Cmd == CmdFileHeader {
+	} else if receiver.IsRunning() == true && msg.Cmd == CmdFileHeader {
 		h1 := new(fileHeaderType)
 		err := json.Unmarshal(msg.Msg, h1)
 		if err != nil {
