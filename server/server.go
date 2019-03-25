@@ -126,12 +126,12 @@ func serveConn(conn1 net.Conn) {
 			}
 		case CmdMoveStranger:
 			//move stranger to friend
-			err := moveStrangerToFriend(smsg.From, smsg.To)
+			err := moveStrangerToFriend(client.Id, smsg.To)
 			if err != nil {
 				log.Printf("on CmdMoveStranger:%v\n", err)
 			}
 		case CmdRemoveFriend:
-			err := removeFriend(smsg.From, smsg.To)
+			err := removeFriend(client.Id, smsg.To)
 			if err != nil {
 				log.Printf("on CmdRemoveFriend:%v\n", err)
 			}
