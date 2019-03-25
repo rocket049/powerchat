@@ -31,7 +31,7 @@ func (s *fileReceiver) IsRunning() bool {
 	if s.From == 0 {
 		return false
 	} else {
-		if s.timeStamp.Add(time.Second.Seconds() * 60).After(time.Now()) {
+		if s.timeStamp.Add(time.Second * 60).After(time.Now()) {
 			return true
 		} else {
 			name1 := s.File.Name()
