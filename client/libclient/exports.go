@@ -412,6 +412,9 @@ func Client_SearchPersons(key *C.char, callback unsafe.Pointer) {
 	for _, v := range frds {
 		//ret = append(ret, FriendData{Id: v.Id, Name: v.Name, Sex: v.Sex,
 		//Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc})
+		if v.Id == cSrv.id {
+			break
+		}
 		C.callAppendUser(callback, C.gint64(v.Id), C.CString(v.Name), C.int(v.Sex),
 			C.int(time.Now().Year()-v.Birthday.Year()), C.CString(v.Desc),
 			C.CString(""), C.CString(""))
