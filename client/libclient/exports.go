@@ -575,6 +575,9 @@ func Client_SendFile(to C.gint64, pathName *C.char) {
 
 //export Client_AddFriend
 func Client_AddFriend(fid C.gint64) {
+	if int64(fid)==cSrv.id {
+		return
+	}
 	req, _ := MsgEncode(CmdAddFriend, 0, int64(fid), []byte("\n"))
 	cSrv.conn.Write(req)
 }
