@@ -1,4 +1,4 @@
-module github.com/rocket049/powerchat/libclientbackend
+module github.com/rocket049/powerchat/pclientbackend
 
 go 1.12
 
