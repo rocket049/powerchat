@@ -124,7 +124,10 @@ msgstr "更新"
 
 #: ui.vala:373
 msgid "Confirm Fail!"
-msgstr ""
+msgstr "两次密码不一致"
+
+msgid "Update password Fail!"
+msgstr "密码修改失败"
 
 #: ui.vala:356
 msgid "Chat To: "

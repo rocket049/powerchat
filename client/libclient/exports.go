@@ -172,6 +172,24 @@ func Client_NewPasswd(name, pwdOld, pwdNew *C.char) C.int {
 	}
 	msg, _ := MsgEncode(CmdUpdatePasswd, 0, 0, msg2)
 	cSrv.conn.Write(msg)
+	res := checkPwd(C.GoString(name), C.GoString(pwdNew))
+	return C.int(res)
+}
+
+//checkPwd 测试密码是否正确，同步方法
+func checkPwd(name, pwd string) int {
+	dgam := &LogDgam{Name: name, Pwdmd5: loginMd5(name, pwd, cSrv.token)}
+	bmsg, _ := json.Marshal(dgam)
+	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
+	cSrv.conn.Write(msg)
+	resp, ok := <-cmdChan
+	if ok == false {
+		return 3
+	}
+	s := string(resp.Msg[0:4])
+	if strings.HasPrefix(s, "FAIL") {
+		return 2
+	}
 	return 1
 }
 
@@ -575,7 +593,7 @@ func Client_SendFile(to C.gint64, pathName *C.char) {
 
 //export Client_AddFriend
 func Client_AddFriend(fid C.gint64) {
-	if int64(fid)==cSrv.id {
+	if int64(fid) == cSrv.id {
 		return
 	}
 	req, _ := MsgEncode(CmdAddFriend, 0, int64(fid), []byte("\n"))

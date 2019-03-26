@@ -367,7 +367,8 @@ label{
 	public void update_pwd(){
 		var dlg_pwd = new Gtk.Dialog.with_buttons(_("Update Password"),app,Gtk.DialogFlags.MODAL);
 		var grid = new Gtk.Grid();
-		grid.attach(new Gtk.Label(_("Input your new password")),0,0,2,1);
+		var board = new Gtk.Label(_("Input your new password"));
+		grid.attach(board,0,0,2,1);
 
 		grid.attach(new Gtk.Label(_("Old Password:")),0,1);
 		var pwd1 = new Gtk.Entry();
@@ -398,8 +399,12 @@ label{
 					dlg_pwd.title = _("Confirm Fail!");
 					return;
 				}
-				client.update_pwd(this.uname,pwd1.text,pwd2.text);
-				dlg_pwd.destroy();
+				int res = client.update_pwd(this.uname,pwd1.text,pwd2.text);
+				if (res==1){
+					dlg_pwd.destroy();
+				}else{
+					dlg_pwd.title =_("Update password Fail!");
+				}
 			}
 		});
 		dlg_pwd.show_all();
