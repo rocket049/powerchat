@@ -51,4 +51,11 @@ func exportsTest(client *pclientbackend.ChatClient) {
 	client.Tell(1)
 	time.Sleep(time.Second * n)
 	client.UpdateDesc("test user " + time.Now().Format("2006-01-02 15:04:05"))
+	time.Sleep(time.Second * n)
+	client.NewPasswd("test1", "1234", "123456")
+	fmt.Println("NewPwd Ret:", client.CheckPwd("test1", "1234"))
+	fmt.Println("NewPwd Ret:", client.CheckPwd("test1", "123456"))
+	time.Sleep(time.Second * n)
+	client.NewPasswd("test1", "123456", "1234")
+	fmt.Println("NewPwd Ret:", client.CheckPwd("test1", "1234"))
 }

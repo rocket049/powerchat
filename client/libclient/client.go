@@ -71,8 +71,6 @@ func OnReady(msg *MsgType) {
 
 //for httpProxy
 var httpChan chan MsgType
-var httpReqChan chan MsgType
-
 var serveChan chan MsgType = make(chan MsgType, 1)
 
 //goroutine replace httpServe and startcSrv4Glib
@@ -119,6 +117,9 @@ func pushServeChan(msg *MsgType) {
 //goroutine
 func readConn(conn1 net.Conn) {
 	defer conn1.Close()
+	defer close(httpChan)
+	defer close(serveChan)
+	defer close(cmdChan)
 	for {
 		conn1.SetReadDeadline(time.Now().Add(time.Minute * 3))
 		msgb, err := ReadMsg(conn1)

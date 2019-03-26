@@ -62,6 +62,10 @@ func (c *ChatClient) SearchPersons(key string) *UserDataArray
 //func (c *ChatClient) NewPasswd(name, pwdOld, pwdNew string) bool
 res = client.NewPasswd(name,pwdOld,pwdNew)
 
+//CheckPwd 验证密码是否正确，返回值：1 正确，2 密码错误，3 网络错误
+//func (c *ChatClient) CheckPwd(name, pwd string) int
+res = client.CheckPwd("username", "password")
+
 //SetServeId 设置要访问的联系人 id，打开联系人的WEB页面前调用
 //func (c *ChatClient) SetServeId(ident int64)
 client.SetServeId(id)
