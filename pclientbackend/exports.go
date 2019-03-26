@@ -541,6 +541,9 @@ func (c *ChatClient) SendFile(to int64, pathName string) {
 
 //AddFriend 加入联系人
 func (c *ChatClient) AddFriend(fid int64) {
+	if int64(fid)==cSrv.id {
+		return
+	}
 	req, _ := MsgEncode(CmdAddFriend, 0, fid, []byte("\n"))
 	c.conn.Write(req)
 }
