@@ -17,7 +17,7 @@ var (
 	id         int64
 	httpId     int64
 	proxyPort  int
-	cSrv       *ChatClient
+	cSrv       *pChatClient
 	serverAddr string
 	servePort  int = 7890
 	pgPath     string
@@ -25,8 +25,17 @@ var (
 )
 
 func init() {
-	cSrv = nil
+	cSrv = new(pChatClient)
 }
+
+var (
+	//for httpProxy
+	httpChan  chan MsgType
+	serveChan chan MsgType
+	//for export
+	cmdChan    chan MsgType
+	notifyChan chan MsgType
+)
 
 func client(ctl1 chan int) {
 	var cfg tls.Config
@@ -36,6 +45,12 @@ func client(ctl1 chan int) {
 		log.Fatal(err)
 	}
 	defer conn1.Close()
+
+	serveChan = make(chan MsgType, 1)
+	httpChan = make(chan MsgType, 10)
+	cmdChan = make(chan MsgType, 1)
+	notifyChan = make(chan MsgType, 1)
+
 	go httpProxy2(conn1)
 	//replace httpServe and cSrv.startcSrv4Glib
 	res1 := make(chan bool, 1)
@@ -47,6 +62,11 @@ func client(ctl1 chan int) {
 		readConn(conn1)
 	}
 	fmt.Println("quit")
+	close(httpChan)
+	close(serveChan)
+	close(notifyChan)
+	close(cmdChan)
+	os.Exit(0)
 }
 
 type UserInfo struct {
@@ -62,12 +82,6 @@ func OnReady(msg *MsgType) {
 	token = msg.Msg
 	cSrv.token = msg.Msg
 }
-
-//for httpProxy
-var httpChan chan MsgType
-var httpReqChan chan MsgType
-
-var serveChan chan MsgType = make(chan MsgType, 1)
 
 //goroutine replace httpServe and startcSrv4Glib
 func localServe(conn1 net.Conn, res1 chan bool) {
@@ -108,7 +122,7 @@ func readConn(conn1 net.Conn) {
 		if err != nil {
 			log.Printf("ReadMsg:%v\n", err)
 			notifyMsg(&MsgType{Cmd: CmdSysReturn, From: 0, To: 0, Msg: []byte("ConnDown\n")})
-			return
+			break
 		}
 		msg := MsgDecode(msgb)
 		switch msg.Cmd {
@@ -172,7 +186,7 @@ func readConn(conn1 net.Conn) {
 func main_init(dir, cfgSrc string) {
 	dataHome = dir
 
-	servePort = 7890
+	servePort = 7880
 	proxyPort = servePort + 2000
 
 	var cfg1 = make(map[string]string)
@@ -185,7 +199,7 @@ func main_init(dir, cfgSrc string) {
 	if ok == false {
 		log.Fatal("config file parse error\n")
 	}
-	httpChan = make(chan MsgType, 10)
+
 	ctl1 := make(chan int, 1)
 	go client(ctl1)
 	<-ctl1

@@ -485,7 +485,7 @@ label{
         //grid2.parent.name = @"$(user1.id)";
         grid2.show_all();
 
-        img2.tooltip_text = @"$(user1.age)岁\n$(user1.desc)";
+        img2.tooltip_text = @"ID:$(user1.id)\n$(user1.age)岁\n$(user1.desc)";
 		var h_id = user1.id;
         b2.clicked.connect(()=>{
 			//stdout.printf(@"open $(h_id)\n");

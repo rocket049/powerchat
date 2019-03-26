@@ -20,11 +20,6 @@ import (
 	"time"
 )
 
-var (
-	cmdChan    chan MsgType = make(chan MsgType, 1)
-	notifyChan chan MsgType = make(chan MsgType, 1)
-)
-
 type msgOfflineData struct {
 	Timestamp string
 	Msg       string
@@ -54,7 +49,7 @@ type UserBaseInfo struct {
 	MsgOffline string
 }
 
-type ChatClient struct {
+type pChatClient struct {
 	conn      net.Conn
 	token     []byte
 	id        int64
@@ -62,6 +57,8 @@ type ChatClient struct {
 	proxyPort int
 	fileSend  *FileSender
 }
+
+type ChatClient struct{}
 
 func (p *UserDataArray) Next() (res *UserDataRet) {
 	if p.pos >= len(p.Users) {
@@ -84,33 +81,47 @@ func (p *IdArray) Append(id int64) {
 	p.Ids = append(p.Ids, id)
 }
 
-func (c *ChatClient) setToken(tk []byte) {
+func (c *pChatClient) setToken(tk []byte) {
 	c.token = make([]byte, len(tk))
 	copy(c.token, tk)
 }
 
-func (c *ChatClient) setConn(connection net.Conn) {
+func (c *pChatClient) setConn(connection net.Conn) {
 	c.conn = connection
 	go c.startPing()
 }
 
-func (c *ChatClient) setID(ident int64) {
+//startPing 心跳数据
+func (c *pChatClient) startPing() {
+	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
+	for {
+		time.Sleep(time.Second * 60)
+		_, err := cSrv.conn.Write(msg)
+		if err != nil {
+			cSrv.conn.Close()
+			break
+		}
+	}
+}
+
+func (c *pChatClient) setID(ident int64) {
 	c.id = ident
 }
 
+var hasInit bool = false
+
 //GetChatClient 初始化，参数：数据目录路径
 func GetChatClient(dataDir, cfgSrc string) *ChatClient {
-	if cSrv == nil {
-		//only initial once
-		cSrv = new(ChatClient)
+	if !hasInit {
 		main_init(dataDir, cfgSrc)
+		hasInit = true
 	}
-	return cSrv
+	return new(ChatClient)
 }
 
 //SetServeId 设置要访问的联系人 id
 func (c *ChatClient) SetServeId(ident int64) {
-	c.httpId = ident
+	cSrv.httpId = ident
 	httpId = ident
 	clearLocRouter()
 }
@@ -132,7 +143,7 @@ func (c *ChatClient) NewUser(name, pwd string, sex, birth int, desc string) bool
 		return false
 	}
 	msg, _ := MsgEncode(CmdRegister, 0, 0, b)
-	c.conn.Write(msg)
+	cSrv.conn.Write(msg)
 	ret := <-cmdChan
 	if ret.Cmd == CmdRegResult && string(ret.Msg[0:2]) == "OK" {
 		return true
@@ -173,7 +184,7 @@ func newuserMd5(name, pwd string) []byte {
 //NewPasswd 参数： Name,OldMd5-login中的算法,NewMd5-NewUser的算法
 func (c *ChatClient) NewPasswd(name, pwdOld, pwdNew string) bool {
 	msg1 := make(map[string][]byte)
-	msg1["old"] = loginMd5(name, pwdOld, c.token)
+	msg1["old"] = loginMd5(name, pwdOld, cSrv.token)
 	msg1["new"] = newuserMd5(name, pwdNew)
 	msg1["name"] = []byte(name)
 
@@ -182,17 +193,17 @@ func (c *ChatClient) NewPasswd(name, pwdOld, pwdNew string) bool {
 		return false
 	}
 	msg, _ := MsgEncode(CmdUpdatePasswd, 0, 0, msg2)
-	c.conn.Write(msg)
+	cSrv.conn.Write(msg)
 	return true
 }
 
 //Login 参数：name ,password
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) Login(name, pwd string) *UserDataRet {
-	dgam := &LogDgam{Name: name, Pwdmd5: loginMd5(name, pwd, c.token)}
+	dgam := &LogDgam{Name: name, Pwdmd5: loginMd5(name, pwd, cSrv.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
-	c.conn.Write(msg)
+	cSrv.conn.Write(msg)
 	resp, ok := <-cmdChan
 	if ok == false {
 		return nil
@@ -209,11 +220,11 @@ func (c *ChatClient) Login(name, pwd string) *UserDataRet {
 	if err != nil {
 		return nil
 	}
-	c.id = u.Id
+	cSrv.id = u.Id
 	id = u.Id
 
 	//load manual config
-	cfg1 := readManual(c.id)
+	cfg1 := readManual(cSrv.id)
 	if cfg1 != nil {
 		sPort, ok := cfg1["ProxyPort"]
 		if ok {
@@ -234,8 +245,8 @@ func (c *ChatClient) Login(name, pwd string) *UserDataRet {
 
 //GetFriends 返回联系人列表和离线信息,阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) GetFriends() *UserDataArray {
-	req, _ := MsgEncode(CmdGetFriends, c.id, 0, []byte("\n"))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdGetFriends, cSrv.id, 0, []byte("\n"))
+	cSrv.conn.Write(req)
 	var resp MsgType
 	var ok bool
 	for {
@@ -275,7 +286,7 @@ func (c *ChatClient) GetFriends() *UserDataArray {
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) UserStatus(uid int64) int {
 	req, _ := MsgEncode(CmdUserStatus, 0, uid, []byte("\n"))
-	c.conn.Write(req)
+	cSrv.conn.Write(req)
 	var resp MsgType
 	var ok bool
 	for {
@@ -301,8 +312,8 @@ func (c *ChatClient) UserStatus(uid int64) int {
 //QueryID 查询陌生人信息，返回 UserDataRet 结构体，参数：ID int64， msg stirng。 msg - 接受到的陌生人信息
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) QueryID(uid int64, msg string) *UserDataRet {
-	req, _ := MsgEncode(CmdQueryID, c.id, uid, []byte("\n"))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdQueryID, cSrv.id, uid, []byte("\n"))
+	cSrv.conn.Write(req)
 	var resp MsgType
 	var ok bool
 	for {
@@ -328,14 +339,14 @@ func (c *ChatClient) QueryID(uid int64, msg string) *UserDataRet {
 
 //MoveStrangerToFriend 把留言的陌生人加入联系人名单
 func (c *ChatClient) MoveStrangerToFriend(fid int64) {
-	req, _ := MsgEncode(CmdMoveStranger, c.id, fid, []byte("\n"))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdMoveStranger, cSrv.id, fid, []byte("\n"))
+	cSrv.conn.Write(req)
 }
 
 //GetStrangerMsgs 读取全部陌生人的留言，阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) GetStrangerMsgs() *UserDataArray {
-	req, _ := MsgEncode(CmdGetStrangers, c.id, 0, []byte("\n"))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdGetStrangers, cSrv.id, 0, []byte("\n"))
+	cSrv.conn.Write(req)
 	var resp MsgType
 	var ok bool
 	for {
@@ -371,8 +382,8 @@ func (c *ChatClient) GetStrangerMsgs() *UserDataArray {
 
 //SearchPersons 搜索用户，阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) SearchPersons(key string) *UserDataArray {
-	req, _ := MsgEncode(CmdSearchPersons, c.id, 0, []byte(key))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdSearchPersons, cSrv.id, 0, []byte(key))
+	cSrv.conn.Write(req)
 	var resp MsgType
 	var ok bool
 	for {
@@ -413,13 +424,13 @@ func (c *ChatClient) ChatTo(to int64, msg string) {
 	buf := bytes.NewBufferString("TEXT")
 	buf.WriteString(p.Msg)
 	msg1, _ := MsgEncode(CmdChat, 0, p.To, buf.Bytes())
-	c.conn.Write(msg1)
+	cSrv.conn.Write(msg1)
 }
 
 //Tell 上线通知
 func (c *ChatClient) Tell(uid int64) {
 	msg, _ := MsgEncode(CmdChat, 0, uid, []byte("LOGI"))
-	c.conn.Write(msg)
+	cSrv.conn.Write(msg)
 }
 
 //TellAll 向id列表中的所有人发上线通知
@@ -440,21 +451,8 @@ func (c *ChatClient) multiSendGo(param *MultiSendMsg) error {
 		return err
 	}
 	msg, _ := MsgEncode(CmdMultiSend, 0, 0, bmsg)
-	c.conn.Write(msg)
+	cSrv.conn.Write(msg)
 	return nil
-}
-
-//startPing 心跳数据
-func (c *ChatClient) startPing() {
-	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
-	for {
-		time.Sleep(time.Second * 60)
-		_, err := c.conn.Write(msg)
-		if err != nil {
-			c.conn.Close()
-			break
-		}
-	}
 }
 
 //SetProxyPort 设置代理端口
@@ -463,11 +461,11 @@ func (c *ChatClient) SetProxyPort(port int) int {
 	if port > 0 {
 		port1 = port
 	}
-	c.proxyPort = port1
+	cSrv.proxyPort = port1
 	proxyPort = port1
 	cfg1 := make(map[string]string)
 	cfg1["ProxyPort"] = fmt.Sprintf("%d", port1)
-	saveManual(c.id, cfg1)
+	saveManual(cSrv.id, cfg1)
 	return port1
 }
 
@@ -522,36 +520,36 @@ type SFParam struct {
 //SendFile 发送文件，参数：id,pathname
 func (c *ChatClient) SendFile(to int64, pathName string) {
 	param := &SFParam{To: to, PathName: pathName}
-	if c.fileSend != nil {
-		if c.fileSend.status() {
+	if cSrv.fileSend != nil {
+		if cSrv.fileSend.status() {
 			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
 			return
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
-	sender.prepare(param.PathName, param.To, c.conn)
+	sender.prepare(param.PathName, param.To, cSrv.conn)
 	ok, _ := sender.sendFileHeader()
 	if ok == false {
 		return
 	}
-	c.fileSend = sender
+	cSrv.fileSend = sender
 	go sender.sendFileBody()
 }
 
 //AddFriend 加入联系人
 func (c *ChatClient) AddFriend(fid int64) {
-	if fid==cSrv.id {
+	if fid == cSrv.id {
 		return
 	}
 	req, _ := MsgEncode(CmdAddFriend, 0, fid, []byte("\n"))
-	c.conn.Write(req)
+	cSrv.conn.Write(req)
 }
 
 //RemoveFriend 删除联系人
 func (c *ChatClient) RemoveFriend(uid int64) {
-	req, _ := MsgEncode(CmdRemoveFriend, c.id, uid, []byte("\n"))
-	c.conn.Write(req)
+	req, _ := MsgEncode(CmdRemoveFriend, cSrv.id, uid, []byte("\n"))
+	cSrv.conn.Write(req)
 }
 
 //GetProxyPort 返回代理端口
@@ -561,9 +559,7 @@ func (c *ChatClient) GetProxyPort() int {
 
 //Quit 退出
 func (c *ChatClient) Quit() {
-	c.conn.Close()
-	close(notifyChan)
-	os.Exit(0)
+	cSrv.conn.Close()
 }
 
 //GetHost 返回服务器 IP:PORT
@@ -579,7 +575,7 @@ func (c *ChatClient) GetUrl() string {
 //UpdateDesc 更新自述信息
 func (c *ChatClient) UpdateDesc(param string) {
 	req, _ := MsgEncode(CmdUpdateDesc, 0, 0, []byte(param))
-	c.conn.Write(req)
+	cSrv.conn.Write(req)
 }
 
 type CheckDelData struct {
@@ -598,7 +594,7 @@ func (c *ChatClient) DeleteMe(name, pwd string) bool {
 		return false
 	}
 	req, _ := MsgEncode(CmdDeleteMe, 0, 0, jsond)
-	_, err = c.conn.Write(req)
+	_, err = cSrv.conn.Write(req)
 	if err == nil {
 		return true
 	} else {
