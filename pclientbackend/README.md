@@ -58,7 +58,7 @@ strangers = client.GetStrangerMsgs()
 //SearchPersons 搜索名字包含关键字 key 的用户，阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) SearchPersons(key string) *UserDataArray
 
-//NewPasswd 参数： Name,OldMd5,NewMd5，返回：bool
+//NewPasswd 修改密码，参数： Name,OldMd5,NewMd5，返回：bool
 //func (c *ChatClient) NewPasswd(name, pwdOld, pwdNew string) bool
 res = client.NewPasswd(name,pwdOld,pwdNew)
 
