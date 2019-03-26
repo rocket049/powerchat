@@ -1,4 +1,4 @@
-module libclientbackend
+module github.com/rocket049/powerchat/libclientbackend
 
 go 1.12
 
@@ -19,6 +19,6 @@ replace golang.org/x/text => github.com/golang/text v0.3.0
 replace golang.org/x/crypto => github.com/golang/crypto v0.0.0-20190325154230-a5d413f7728c
 
 require (
-	github.com/rocket049/powerchat v1.3.14 // indirect
+	github.com/rocket049/powerchat v1.3.14
 	github.com/russross/blackfriday v1.5.2
 )
