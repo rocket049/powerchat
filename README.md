@@ -6,10 +6,10 @@ linux / windows 加密聊天，分享文件，分享内容（markdown或html）�
 
 ## 编译说明
 
-编译图形界面(ui)需要 vala-0.40。
+编译图形界面(ui)需要 vala-0.40 或者 vala-0.42。
 测试过 vala-0.38，编译后运行异常，其他版本未经测试。
 
-编译依赖：glib2、gtk3、gee、json-glib、jsonrpc-glib
+编译依赖：glib2、gtk3、gee、json-glib
 
 ## 通用功能
 
