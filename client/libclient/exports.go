@@ -161,10 +161,13 @@ func newuserMd5(name, pwd string) []byte {
 //NewPasswd params Name,OldMd5-login中的算法,NewMd5-NewUser的算法
 //export Client_NewPasswd
 func Client_NewPasswd(name, pwdOld, pwdNew *C.char) C.int {
+	gName := C.GoString(name)
+	gPwdold := C.GoString(pwdOld)
+	gPwdnew := C.GoString(pwdNew)
 	msg1 := make(map[string][]byte)
-	msg1["old"] = loginMd5(C.GoString(name), C.GoString(pwdOld), cSrv.token)
-	msg1["new"] = newuserMd5(C.GoString(name), C.GoString(pwdNew))
-	msg1["name"] = []byte(C.GoString(name))
+	msg1["old"] = loginMd5(gName, gPwdold, cSrv.token)
+	msg1["new"] = newuserMd5(gName, gPwdnew)
+	msg1["name"] = []byte(gName)
 
 	msg2, err := json.Marshal(msg1)
 	if err != nil {
@@ -172,7 +175,7 @@ func Client_NewPasswd(name, pwdOld, pwdNew *C.char) C.int {
 	}
 	msg, _ := MsgEncode(CmdUpdatePasswd, 0, 0, msg2)
 	cSrv.conn.Write(msg)
-	res := checkPwd(C.GoString(name), C.GoString(pwdNew))
+	res := checkPwd(gName, gPwdnew)
 	return C.int(res)
 }
 
