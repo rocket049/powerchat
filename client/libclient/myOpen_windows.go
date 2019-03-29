@@ -10,7 +10,7 @@ import (
 )
 
 func myOpen(path1 string) error {
-	if strings.HasPrefix(path1, "http://") {
+	if strings.HasPrefix(path1, "http://") || strings.HasPrefix(path1, "https://") {
 		cmd := exec.Command("cmd", "/C", "start", path1)
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 		return cmd.Start()
