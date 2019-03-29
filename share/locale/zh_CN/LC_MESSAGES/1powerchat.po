@@ -396,3 +396,9 @@ msgid ""
 msgstr ""
 "网络连接意外断开!\n"
 "请重启powerchat程序!"
+
+msgid "Android Homepage"
+msgstr "安卓版主页"
+
+msgid "PC Homepage"
+msgstr "PC版主页"
