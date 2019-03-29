@@ -4,6 +4,11 @@
 
 linux / windows 加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
 
+### Android 版主页
+
+- 主页：[https://gitee.com/sonichy/PowerChat_Android](https://gitee.com/sonichy/PowerChat_Android)
+- 下载地址：[https://gitee.com/sonichy/PowerChat_Android/releases](https://gitee.com/sonichy/PowerChat_Android/releases)
+
 ## 编译说明
 
 编译图形界面(ui)需要 vala-0.40 或者 vala-0.42。
