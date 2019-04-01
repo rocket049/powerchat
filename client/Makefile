@@ -9,7 +9,11 @@ powerchat.exe:$(SRC) libclient.dll
 libclient.a:./libclient/*.go
 	go build -o libclient.a -buildmode=c-archive ./libclient
 libclient.dll:./libclient/*.go
-	go build -o libclient.dll -buildmode=c-shared ./libclient
+	cd libclient
+	go build -o libclient.dll -buildmode=c-shared .
+	mv libclient.dll ..
+	mv libclient.h ..
+	cd ..
 libclient.h:./libclient/*.go
 	go build -buildmode=c-archive ./libclient
 install:
