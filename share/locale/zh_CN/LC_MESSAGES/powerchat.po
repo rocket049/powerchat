@@ -402,3 +402,6 @@ msgstr "安卓版主页"
 
 msgid "PC Homepage"
 msgstr "PC版主页"
+
+msgid "Sending:"
+msgstr "发送中："
