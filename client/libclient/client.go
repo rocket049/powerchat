@@ -120,6 +120,7 @@ func readConn(conn1 net.Conn) {
 	defer close(httpChan)
 	defer close(serveChan)
 	defer close(cmdChan)
+
 	for {
 		conn1.SetReadDeadline(time.Now().Add(time.Minute * 3))
 		msgb, err := ReadMsg(conn1)

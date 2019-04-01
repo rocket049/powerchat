@@ -13,7 +13,18 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/chai2010/gettext-go/gettext"
 )
+
+func init() {
+	exe1, _ := os.Executable()
+	path1 := filepath.Join(filepath.Dir(exe1), "..", "share", "locale")
+	gettext.BindTextdomain("powerchat", path1, nil)
+	gettext.Textdomain("powerchat")
+}
+
+var T = gettext.T
 
 type fileReceiver struct {
 	From      int64
@@ -85,7 +96,7 @@ func pushFileMsg2(conn1 io.Writer, msg *MsgType) {
 		}
 		receiver.UpdateTime()
 		notifyMsg(&MsgType{Cmd: CmdChat, From: receiver.From, To: 0,
-			Msg: []byte("TEXTSending:" + receiver.Header.Name)})
+			Msg: []byte("TEXT" + T("Sending:") + receiver.Header.Name)})
 		//request Accept
 		bs := make([]byte, 4)
 		binary.BigEndian.PutUint32(bs, receiver.Header.Session)
