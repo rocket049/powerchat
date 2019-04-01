@@ -22,6 +22,7 @@ func init() {
 	path1 := filepath.Join(filepath.Dir(exe1), "..", "share", "locale")
 	gettext.BindTextdomain("powerchat", path1, nil)
 	gettext.Textdomain("powerchat")
+	log.Println("mo:", path1)
 }
 
 var T = gettext.T
