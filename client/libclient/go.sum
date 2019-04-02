@@ -13,6 +13,8 @@ github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c/go.mod h1:wJfORR
 github.com/gopherjs/gopherwasm v1.0.0/go.mod h1:SkZ8z7CWBz5VXbhJel8TxCmAcsQqzgWGR/8nMhyhZSI=
 github.com/hajimehoshi/oto v0.3.1 h1:cpf/uIv4Q0oc5uf9loQn7PIehv+mZerh+0KKma6gzMk=
 github.com/hajimehoshi/oto v0.3.1/go.mod h1:e9eTLBB9iZto045HLbzfHJIc+jP3xaKrjZTghvb6fdM=
+github.com/rocket049/gettext-go v0.0.0-3 h1:t4Y2wKb41h6nfmDFs7krrC/yYFuVGDEQdWgtNIcsRyM=
+github.com/rocket049/gettext-go v0.0.0-3/go.mod h1:ml+YnSaBAssRogT+i9YB39QhSlo43Bc10E39yopcEBE=
 github.com/rocket049/gettext-go v0.0.0-20190331 h1:eWHqZyGlyKel8ypEvL0d3BmeDTiVPoIv56wHZAD4hGc=
 github.com/rocket049/gettext-go v0.0.0-20190401 h1:QRdjAMQl40tvvYvAHSYG0LEoOmW0K0SRcuf1aWv9nmc=
 github.com/rocket049/gettext-go v0.0.0-20190401/go.mod h1:z+igV2QnnzHCjD2LPuccnBoTKIdh/7h8TLtgcsnepHk=
