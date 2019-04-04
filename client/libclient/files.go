@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chai2010/gettext-go/gettext"
+	"github.com/rocket049/gettext-go/gettext"
 )
 
 func init() {
