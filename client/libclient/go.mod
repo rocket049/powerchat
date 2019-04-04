@@ -19,9 +19,8 @@ replace golang.org/x/text => github.com/golang/text v0.3.0
 replace golang.org/x/crypto => github.com/golang/crypto v0.0.0-20190325154230-a5d413f7728c
 
 require (
-	github.com/chai2010/gettext-go v0.0.0-20170215093142-bf70f2a70fb1 // indirect
 	github.com/hajimehoshi/oto v0.3.1
-	github.com/rocket049/gettext-go v0.0.0-20190404
+	github.com/rocket049/gettext-go v0.0.0-20190404080233-af421a50b332
 	github.com/russross/blackfriday v1.5.2
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20190104022628-a2dfa6d0dab6
