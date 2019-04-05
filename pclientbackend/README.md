@@ -95,8 +95,9 @@ func (c *ChatClient) TellAll(uids *IdArray)
 //GetMsg 读取信息,网络断开或发生错误时返回null。阻塞函数，需要在线程中循环运行或者用异步函数包装
 //func (c *ChatClient) GetMsg() *MsgType
 
-//SendFile 发送文件，参数：id,pathname。 阻塞函数，需要在线程中循环运行或者用异步函数包装
-func (c *ChatClient) SendFile(to int64, pathName string)
+//SendFile 发送文件，参数：id,pathname。返回值: 0-成功，正在传送；1-内部错误；2-接收方忙。(20190405)
+//阻塞函数，需要在线程中循环运行或者用异步函数包装
+func (c *ChatClient) SendFile(to int64, pathName string) int
 
 //AddFriend 加入联系人
 func (c *ChatClient) AddFriend(fid int64)
@@ -167,6 +168,7 @@ stranger_msgs := client.GetStrangerMsgs()  //返回陌生人留言列表
 1. "TEXT"，后面的的是文字聊天信息；
 2. "JSON"，收到的是文件或图片，格式是"{Name:'该文件的保存路径',Mime:'mime-type',Size:size,Session:0}"，Session字段可以忽略，现阶段都是0；
 3. "LOGI"，上线通知。
+4. "F OK"，文件发送成功。如果没有受到，就是还在发送，或者失败了。(20190405)
 
 ### UserDataArray 用法
 方法 Next()
