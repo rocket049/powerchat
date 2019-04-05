@@ -534,24 +534,24 @@ type SFParam struct {
 	PathName string
 }
 
-//SendFile 发送文件，参数：id,pathname
-func (c *ChatClient) SendFile(to int64, pathName string) {
+//SendFile 发送文件，参数：id,pathname；返回值: 0-成功，正在传送；1-内部错误；2-接收方忙。
+func (c *ChatClient) SendFile(to int64, pathName string) int {
 	param := &SFParam{To: to, PathName: pathName}
 	if cSrv.fileSend != nil {
 		if cSrv.fileSend.status() {
-			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
-			return
+			return 1
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.prepare(param.PathName, param.To, cSrv.conn)
-	ok, _ := sender.sendFileHeader()
-	if ok == false {
-		return
+	ret := sender.sendFileHeader()
+	if ret > 0 {
+		return ret
 	}
 	cSrv.fileSend = sender
 	go sender.sendFileBody()
+	return 0
 }
 
 //AddFriend 加入联系人

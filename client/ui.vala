@@ -795,6 +795,8 @@ label{
 			return;
 		}else if(typ1=="JSON"){
 			fname = @"ID:$(from)";
+		}else if(typ1=="F OK"){
+			fname = @"ID:$(from)";
 		}
 
 		switch(typ1){
@@ -830,6 +832,12 @@ label{
 			if( u==null )
 				break;
 			user_online(from);
+			break;
+		case "F OK":
+			this.add_right_name_icon(fname,fsex);
+			this.add_text(_("[File transfer complete]"));
+			msg_mark(from.to_string());
+			msg_notify(fname);
 			break;
 		}
 		GLib.Idle.add(()=>{

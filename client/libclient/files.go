@@ -278,6 +278,7 @@ func (s *FileSender) SendFileBody() {
 	}
 	msg, _ := MsgEncode(CmdFileClose, 0, s.to, b1[:4])
 	s.conn.Write(msg)
+	notifyMsg(&MsgType{CmdChat, s.to, 0, []byte("F OK\n")})
 	s.mutex1.Lock()
 	s.running = false
 	s.mutex1.Unlock()

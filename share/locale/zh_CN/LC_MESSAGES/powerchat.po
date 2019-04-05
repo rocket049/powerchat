@@ -411,3 +411,6 @@ msgstr "发送失败：未知错误"
 
 msgid "Fail send file : peer block"
 msgstr "发送失败：接收方忙"
+
+msgid "[File transfer complete]"
+msgstr "[文件发送完成]"
