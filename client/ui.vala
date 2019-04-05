@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=39;
+static int RELEASE=40;
 static int LATESTVER=0;
 
 public struct UserMsg{
@@ -162,7 +162,7 @@ public class MyGrid: GLib.Object{
 			send_uri1(uris);
 		});
 		dropbox.button_press_event.connect((e)=>{
-			var dlg = new Gtk.FileChooserDialog (_("Open File"), app as Gtk.Window, Gtk.FileChooserAction.OPEN, 
+			var dlg = new Gtk.FileChooserDialog (_("Select a file to send"), app as Gtk.Window, Gtk.FileChooserAction.OPEN, 
 				_("Open"),Gtk.ResponseType.ACCEPT, _("Cancel"),Gtk.ResponseType.CANCEL);
 			var res = dlg.run();
 			if (res == Gtk.ResponseType.ACCEPT){
