@@ -304,7 +304,7 @@ msgstr "我的博客目录"
 msgid "Quit"
 msgstr "退出"
 
-msgid "Send File/Image Here: Drag File / Paste File / Double Click Here"
+msgid "Send File/Image Here: Drag file / Paste file / Double Click Here"
 msgstr "发送文件或图片：拖放文件 / 粘贴文件 / 双击此处"
 
 msgid "too many files"
