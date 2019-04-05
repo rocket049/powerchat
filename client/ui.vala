@@ -150,7 +150,7 @@ public class MyGrid: GLib.Object{
 		Gtk.EventBox dropbox = new Gtk.EventBox();
 		dropbox.set_size_request(240,40);
 		mygrid.attach(dropbox,2,2,5,1);
-		droplabel = new Gtk.Label(_("Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"));
+		droplabel = new Gtk.Label(_("Send File/Image Here: Drag file / Paste file / Double Click"));
 		droplabel.wrap = true;
         droplabel.wrap_mode = Pango.WrapMode.CHAR;
 		droplabel.selectable = true;
@@ -161,6 +161,16 @@ public class MyGrid: GLib.Object{
 			var uris = data.get_uris();
 			send_uri1(uris);
 		});
+		dropbox.button_press_event.connect((e)=>{
+			var dlg = new Gtk.FileChooserDialog (_("Open File"), app as Gtk.Window, Gtk.FileChooserAction.OPEN, 
+				_("Open"),Gtk.ResponseType.ACCEPT, _("Cancel"),Gtk.ResponseType.CANCEL);
+			var res = dlg.run();
+			if (res == Gtk.ResponseType.ACCEPT){
+				send_filename(dlg.get_filename());
+			}
+			dlg.destroy();
+			return true;
+			});
 		dropbox.key_press_event.connect((e)=>{
 			if(e.keyval==Gdk.Key.v && e.state==Gdk.ModifierType.CONTROL_MASK){
 				var clipboard1 = Gtk.Clipboard.@get(Gdk.Atom.NONE);
@@ -287,6 +297,17 @@ public class MyGrid: GLib.Object{
 		}
 		client.send_file(this.to, fname);
 		string text1 = @"<a href='$(uris[0])'>$(GLib.Path.get_basename(fname))</a>";
+		this.add_left_name_icon(this.uname,this.usex);
+		this.add_text(text1,true,true);
+	}
+	
+	public void send_filename(string fname){
+		if(FileUtils.test(fname, FileTest.IS_REGULAR)==false){
+			this.add_text(_("this is not a file")+@" : $(fname)");
+			return;
+		}
+		client.send_file(this.to, fname);
+		string text1 = @"<a href='$(GLib.Filename.to_uri(fname))'>$(GLib.Path.get_basename(fname))</a>";
 		this.add_left_name_icon(this.uname,this.usex);
 		this.add_text(text1,true,true);
 	}
