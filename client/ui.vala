@@ -150,7 +150,7 @@ public class MyGrid: GLib.Object{
 		Gtk.EventBox dropbox = new Gtk.EventBox();
 		dropbox.set_size_request(240,40);
 		mygrid.attach(dropbox,2,2,5,1);
-		droplabel = new Gtk.Label(_("Send File/Image Here: Drag file / Paste file / Double Click"));
+		droplabel = new Gtk.Label(_("Send File/Image Here: Drag file / Paste file / Double Click Here"));
 		droplabel.wrap = true;
         droplabel.wrap_mode = Pango.WrapMode.CHAR;
 		droplabel.selectable = true;
