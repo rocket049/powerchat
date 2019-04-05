@@ -575,23 +575,24 @@ type SFParam struct {
 }
 
 //export Client_SendFile
-func Client_SendFile(to C.gint64, pathName *C.char) {
+func Client_SendFile(to C.gint64, pathName *C.char) C.int {
 	param := &SFParam{To: int64(to), PathName: C.GoString(pathName)}
 	if cSrv.fileSend != nil {
 		if cSrv.fileSend.Status() {
 			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
-			return
+			return 1
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.Prepare(param.PathName, param.To, cSrv.conn)
-	ok, _ := sender.SendFileHeader()
-	if ok == false {
-		return
+	ret := sender.SendFileHeader()
+	if ret > 0 {
+		return C.int(ret)
 	}
 	cSrv.fileSend = sender
 	go sender.SendFileBody()
+	return 0
 }
 
 //export Client_AddFriend

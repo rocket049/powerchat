@@ -405,3 +405,9 @@ msgstr "PC版主页"
 
 msgid "Sending:"
 msgstr "发送中："
+
+msgid "Fail send file : unknow error"
+msgstr "发送失败：未知错误"
+
+msgid "Fail send file : peer block"
+msgstr "发送失败：接收方忙"

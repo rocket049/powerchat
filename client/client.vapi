@@ -36,7 +36,7 @@ public static int Client_ProxyPort(int p0);
 
 public static void Client_SetNotifyFn(void* p0);
 
-public static void Client_SendFile(int64 p0, string p1);
+public static int Client_SendFile(int64 p0, string p1);
 
 public static void Client_AddFriend(int64 p0);
 

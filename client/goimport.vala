@@ -100,7 +100,23 @@ public class ChatClient:GLib.Object{
 		Client_SetHttpId(uid);
 	}
 	public void send_file(int64 to , string pathname){
-		Client_SendFile(to,pathname);
+		var ret = Client_SendFile(to,pathname);
+		switch (ret){
+		case 1:
+			Idle.add(()=>{
+				grid1.add_text(_("Fail send file : unknow error"));
+				return false;
+			});
+			
+			break;
+		case 2:
+			Idle.add(()=>{
+				grid1.add_text(_("Fail send file : peer block"));
+				return false;
+			});
+			
+			break;
+		}
 	}
 	public int add_user(string name,string pwd,int sex,int birthyear,string desc){
 		return Client_NewUser({name,sex,birthyear,desc,pwd});
