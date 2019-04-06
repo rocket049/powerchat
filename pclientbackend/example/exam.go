@@ -16,6 +16,7 @@ func main() {
 	client := pclientbackend.GetChatClient(".", string(cfg))
 	me := client.Login("test1", "1234")
 	fmt.Println("Login:", me)
+	fmt.Println(client.SendFile(1, "/home/fuhz/pclientbackend-sources.jar"))
 	for i := 0; i < 5; i++ {
 		msg := client.GetMsg()
 		if msg == nil {
