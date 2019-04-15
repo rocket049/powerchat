@@ -10,7 +10,7 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=40;
+static int RELEASE=41;
 static int LATESTVER=0;
 
 public struct UserMsg{
@@ -1018,7 +1018,10 @@ public class AppWin:Gtk.ApplicationWindow{
 
         item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
         menu1.append_item(item1);
-
+#if ! WINDOWS
+		item1 = new GLib.MenuItem(_("GenerateLauncher"),"app.launcher");
+        menu1.append_item(item1);
+#endif
         item1 = new GLib.MenuItem(_("About"),"app.about");
         menu1.append_item(item1);
 
@@ -1240,6 +1243,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act13.set_enabled(true);
 		application1.add_action (act13);
+		
+		SimpleAction act14 = new SimpleAction ("launcher", null);
+		act14.activate.connect (() => {
+			application1.hold ();
+			client.make_launcher();
+			application1.release ();
+		});
+        act14.set_enabled(true);
+		application1.add_action (act14);
 	}
 }
 

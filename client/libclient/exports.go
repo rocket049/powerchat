@@ -671,5 +671,10 @@ func Client_GetPgPath(p **C.char) {
 	*p = C.CString(fmt.Sprintf("%s", filepath.Dir(filepath1)))
 }
 
+//export Client_MakeLauncher
+func Client_MakeLauncher() {
+	makeLauncher()
+}
+
 //main
 func main() {}

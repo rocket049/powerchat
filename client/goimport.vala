@@ -167,5 +167,8 @@ public class ChatClient:GLib.Object{
 		Client_GetPgPath(out p);
 		return p.dup();
 	}
+	public void make_launcher(){
+		Client_MakeLauncher();
+	}
 }
 

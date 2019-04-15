@@ -414,3 +414,6 @@ msgstr "发送失败：接收方忙"
 
 msgid "[File transfer complete]"
 msgstr "[文件发送完成]"
+
+msgid "GenerateLauncher"
+msgstr "加入启动菜单"

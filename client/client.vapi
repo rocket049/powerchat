@@ -55,3 +55,5 @@ public static void Client_UpdateDesc(string p0);
 public static int Client_DeleteMe(string p0, string p1);
 
 public static void Client_GetPgPath(out string p0);
+
+public static void Client_MakeLauncher();
