@@ -531,7 +531,8 @@ label{
 			Gtk.ListBoxRow r = this.friends.get_row_at_y((int)e.y);
 			this.friends.select_row(r);
 			popup1.set_id( r.name );
-			popup1.popup_at_pointer(e);
+			//popup1.popup_at_pointer(e);
+            popup1.popup(null,null,null,e.button,e.get_time());
 			return true;
 		});
 

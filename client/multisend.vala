@@ -343,7 +343,8 @@ list{
 			Gtk.ListBoxRow r = groups.get_row_at_y((int)e.y);
 			groups.select_row(r);
 			popup1.set_name( r.name );
-			popup1.popup_at_pointer(e);
+			//popup1.popup_at_pointer(e);
+            popup1.popup(null,null,null,e.button,e.get_time());
 			return true;
 		});
 	}
