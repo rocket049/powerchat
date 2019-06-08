@@ -894,6 +894,9 @@ public void msg_notify(string uname){
 	return;
 #else
 	var app = application1;
+	if (app.get_active_window().is_active) {
+		return;
+	}
 	app.hold();
 	var notify1 = new Notification(_("New message"));
 	notify1.set_body(_("From: ")+uname);
@@ -907,6 +910,7 @@ public void version_notify(){
 	return;
 #else
 	var app = application1;
+	
 	app.hold();
 	var notify1 = new Notification(_("New Version Released!"));
 	notify1.set_body(_("Click here or click menu item 'Help->Upgrade' to get new version."));
