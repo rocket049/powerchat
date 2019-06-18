@@ -58,6 +58,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -430,7 +431,19 @@ func Client_SearchPersons(key *C.char, callback unsafe.Pointer) {
 		return
 	}
 	//ret := []FriendData{}
+	frdArray := []UserBaseInfo{}
 	for _, v := range frds {
+		frdArray = append(frdArray, v)
+	}
+	sort.SliceStable(frdArray, func(i, j int) bool {
+		a := frdArray[i].Desc[0:1]
+		b := frdArray[j].Desc[0:1]
+		if a == b {
+			return frdArray[i].Id < frdArray[j].Id
+		}
+		return a < b
+	})
+	for _, v := range frdArray {
 		//ret = append(ret, FriendData{Id: v.Id, Name: v.Name, Sex: v.Sex,
 		//Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc})
 		if v.Id == cSrv.id {

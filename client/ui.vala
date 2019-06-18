@@ -10,8 +10,9 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=42;
 static int LATESTVER=0;
+static int RELEASE=43; 
+const string ver = "1.3.21";          //43
 
 public struct UserMsg{
 	public int64 id;
@@ -1059,7 +1060,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		act2.activate.connect (() => {
 			application1.hold ();
 			var dlg_about = new Gtk.MessageDialog(this, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
-			dlg_about.text = _("Copy Right: Fu Huizhong <fuhuizn@163.com>");
+			dlg_about.text = _("Copy Right: Fu Huizhong <fuhuizn@163.com>") +"\n\n        PowerChat "+ver;
 			//var markup = "<h2>Fu Huizhong <fuhuizn@163.com></h2><p><b>PC Homepage:</b><br/><a href='https://gitee.com/rocket049/powerchat'>https://gitee.com/rocket049/powerchat</a><br/><a href='https://github.com/rocket049/powerchat'>https://github.com/rocket049/powerchat</a><br/><b>Android Homepage:</b><br/><a href='https://gitee.com/sonichy/PowerChat_Android'>https://gitee.com/sonichy/PowerChat_Android</a></p>";
 			var markup = _("PC Homepage")+":\n<a href='https://gitee.com/rocket049/powerchat'>https://gitee.com/rocket049/powerchat</a>\n<a href='https://github.com/rocket049/powerchat'>https://github.com/rocket049/powerchat</a>\n"+_("Android Homepage")+":\n<a href='https://gitee.com/sonichy/PowerChat_Android'>https://gitee.com/sonichy/PowerChat_Android</a>";
             //dlg_about.secondary_text = "Fu Huizhong <fuhuizn@163.com>";

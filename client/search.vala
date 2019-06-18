@@ -94,7 +94,7 @@ public class SearchDialg:GLib.Object{
 		this.store1.clear();
 		this.persons = new GLib.List<UserMsg?>();
 		//this.store1.set_sort_column_id(0,Gtk.SortType.ASCENDING);
-		this.store1.set_sort_column_id(5,Gtk.SortType.ASCENDING );
+		//this.store1.set_sort_column_id(5,Gtk.SortType.ASCENDING );
 		
 		client.search_person_async(this.key1.text);
 	}
