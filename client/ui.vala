@@ -12,7 +12,7 @@ static MultiSendUi msend_ui;
 static ChatClient client;
 static int LATESTVER=0;
 static int RELEASE=44; 
-const string ver = "1.3.24";          //44
+const string ver = "1.3.22";          //44
 
 public struct UserMsg{
 	public int64 id;
