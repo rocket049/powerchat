@@ -323,25 +323,19 @@ func Client_UserStatus(uid C.gint64) C.int {
 	req, _ := MsgEncode(CmdUserStatus, 0, int64(uid), []byte("\n"))
 	cSrv.conn.Write(req)
 	var resp MsgType
-	var ok bool
-	for {
-		resp, ok = <-cmdChan
-		if ok == false {
-			return 0
-		}
+	select {
+	case <-time.After(time.Second * 5):
+		return 0
+	case resp = <-cmdChan:
 		if resp.Cmd == CmdUserStatus {
-			break
+			if string(resp.Msg) == "Y" {
+				return 1
+			}
 		} else {
 			cmdChan <- resp
-			time.Sleep(time.Millisecond * 100)
 		}
 	}
-
-	if string(resp.Msg) == "Y" {
-		return 1
-	} else {
-		return 0
-	}
+	return 0
 }
 
 //export Client_QueryID

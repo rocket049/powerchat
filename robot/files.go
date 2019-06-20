@@ -30,7 +30,6 @@ func pushFileMsg(msg *MsgType) {
 
 //goroutine
 func startFileServ(conn1 io.Writer) {
-	fileChan = make(chan MsgType, 10)
 	for {
 		h1, ok := <-fileChan
 		if ok == false {

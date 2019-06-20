@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/rocket049/powerchat/pclientbackend"
+	"pclientbackend"
 )
 
 func main() {
@@ -14,22 +14,17 @@ func main() {
 		panic(err)
 	}
 	client := pclientbackend.GetChatClient(".", string(cfg))
+	time.Sleep(time.Second * 3)
 	me := client.Login("test1", "1234")
 	fmt.Println("Login:", me)
-	fmt.Println(client.SendFile(1, "/home/fuhz/pclientbackend-sources.jar"))
-	for i := 0; i < 5; i++ {
-		msg := client.GetMsg()
-		if msg == nil {
-			break
-		}
-		fmt.Println(msg.From, string(msg.Msg))
-	}
+	//fmt.Println(client.SendFile(1, "/home/fuhz/pclientbackend-sources.jar"))
+	//limitRecv(client, 10)
 
-	client = pclientbackend.GetChatClient(".", string(cfg))
-	me = client.Login("test1", "1234")
-	fmt.Println("Login Again:", me)
-	go exportsTest(client)
-	limitRecv(client, 10)
+	//client = pclientbackend.GetChatClient(".", string(cfg))
+	//me = client.Login("test1", "1234")
+	//fmt.Println("Login Again:", me)
+	//go exportsTest(client)
+	limitRecv(client, 20)
 	client.Quit()
 }
 
