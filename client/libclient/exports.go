@@ -199,7 +199,10 @@ func checkPwd(name, pwd string) int {
 
 //export Client_Login
 func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
-	dgam := &LogDgam{Name: C.GoString(name), Pwdmd5: loginMd5(C.GoString(name), C.GoString(pwd), cSrv.token)}
+	nameRetry = C.GoString(name)
+	pwdRetry = C.GoString(pwd)
+	retry = true
+	dgam := &LogDgam{Name: nameRetry, Pwdmd5: loginMd5(nameRetry, pwdRetry, cSrv.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
 	cSrv.conn.Write(msg)
@@ -240,6 +243,16 @@ func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
 	C.FillUserData(p, C.gint64(u.Id), C.CString(u.Name), C.int(u.Sex),
 		C.int(time.Now().Year()-u.Birthday.Year()), C.CString(u.Desc))
 	return C.int(1)
+}
+
+func retry_login() {
+	dgam := &LogDgam{Name: nameRetry, Pwdmd5: loginMd5(nameRetry, pwdRetry, cSrv.token)}
+	bmsg, _ := json.Marshal(dgam)
+	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
+	cSrv.conn.Write(msg)
+	<-cmdChan
+
+	notifyMsg(&MsgType{CmdChat, 0, 0, []byte("Re-Connected.")})
 }
 
 type msgOfflineData struct {

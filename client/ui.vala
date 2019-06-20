@@ -11,8 +11,8 @@ static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
 static int LATESTVER=0;
-static int RELEASE=43; 
-const string ver = "1.3.21";          //43
+static int RELEASE=44; 
+const string ver = "1.3.24";          //44
 
 public struct UserMsg{
 	public int64 id;
@@ -767,12 +767,8 @@ label{
                 Gtk.main_quit();
             }else if(msg[0:8]=="DELETE 0"){
                 this.add_text(_("[Operate Fail]"));
-            }else if(msg[0:8]=="ConnDown"){
-				var dlg_about = new Gtk.MessageDialog(app, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
-				dlg_about.text = _("Warning");
-				dlg_about.secondary_text = _("Disconnected from Server!\nPlease Restart powerchat!");
-				dlg_about.run();
-				dlg_about.destroy();
+            }else {
+				this.add_text(@"[SYS:$(msg)]");
 			}
 			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
