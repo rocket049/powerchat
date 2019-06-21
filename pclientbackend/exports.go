@@ -89,20 +89,24 @@ func (c *pChatClient) setToken(tk []byte) {
 
 func (c *pChatClient) setConn(connection net.Conn) {
 	c.conn = connection
-	go c.startPing()
+	c.startPing()
 }
 
 //startPing 心跳数据
 func (c *pChatClient) startPing() {
-	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
-	for {
-		time.Sleep(time.Second * 60)
-		_, err := cSrv.conn.Write(msg)
-		if err != nil {
-			cSrv.conn.Close()
-			break
+	loop1 := func(conn1 net.Conn) {
+		msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
+		for {
+			time.Sleep(time.Second * 60)
+			_, err := conn1.Write(msg)
+			if err != nil {
+				break
+			}
 		}
 	}
+
+	go loop1(c.conn)
+
 }
 
 func (c *pChatClient) setID(ident int64) {
