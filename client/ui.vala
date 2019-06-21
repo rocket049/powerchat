@@ -314,7 +314,7 @@ public class MyGrid: GLib.Object{
 	}
 	public void send_msg(){
 		// 发送信息
-		if(this.to==0)
+		if(this.to==0 || this.entry1.text.length==0)
 			return;
 		client.ChatTo(this.to,this.entry1.text);
 		//var u = this.frds1[this.uid.to_string()];
