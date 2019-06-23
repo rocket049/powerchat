@@ -4,6 +4,9 @@
 
 `linux`/`windows` 加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
 
+### 在 ubuntu 19.04 上运行的说明
+经本人测试，Appimage 版在 ubuntu 19.04 上不能运行，但是 deb 版可以，请使用 deb 安装。
+
 ### Android 版主页
 
 - 主页：[https://gitee.com/sonichy/PowerChat_Android](https://gitee.com/sonichy/PowerChat_Android)
