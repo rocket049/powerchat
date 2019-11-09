@@ -183,9 +183,11 @@ func searchUsers(key string) (map[int64]*UserBaseInfo, error) {
 	dbMutex.Lock()
 	rows, err := db.Query(sql1, key)
 	dbMutex.Unlock()
+
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc)
@@ -239,6 +241,7 @@ func getFriends(uid int64) (map[int64]*UserBaseInfo, error) {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", uid)))
 	if err != nil {
 		return nil, err
@@ -254,6 +257,7 @@ func getFriends(uid int64) (map[int64]*UserBaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc, &r1.MsgOffline)
@@ -287,6 +291,7 @@ func getStrangers(uid int64) (map[int64]*UserBaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc, &r1.MsgOffline)
@@ -323,8 +328,8 @@ func offlineMsg(from, to int64, msg string) error {
 	if err != nil {
 		return err
 	}
-	var offlineMsg = &offlineMsgData{Msg: msg[4:], Timestamp: time.Now().Format("2006-01-02 15:04:05")}
-	bv, err := json.Marshal(offlineMsg)
+	var offMsg = &offlineMsgData{Msg: msg[4:], Timestamp: time.Now().Format("2006-01-02 15:04:05")}
+	bv, err := json.Marshal(offMsg)
 	if err != nil {
 		return err
 	}
