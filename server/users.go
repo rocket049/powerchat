@@ -31,6 +31,15 @@ var (
 	dbstore string
 )
 
+func dbReconnect() error {
+	var err error
+	dbMutex.Lock()
+	db.Close()
+	db, err = sql.Open("sqlite3", filepath.Join(dbstore, "users.db"))
+	dbMutex.Unlock()
+	return err
+}
+
 func init() {
 	var err error
 	exe1, _ := os.Executable()
@@ -84,6 +93,8 @@ func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int
 	}
 	sql1 := "insert into users(name,sex,birthday,desc,pwdmd5) values(?,?,date(?),?,?);"
 	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
 	_, err := db.Exec(sql1, name, sex, birthday, desc, pwdmd5)
 	if err != nil {
 		return 0, err
@@ -92,7 +103,7 @@ func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int
 	row := db.QueryRow(sql2)
 	var res int64
 	err = row.Scan(&res)
-	dbMutex.Unlock()
+
 	return res, err
 }
 
@@ -194,6 +205,7 @@ func addFriend(uid, fid int64) error {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", uid)))
 	if err != nil {
 		return err
@@ -301,6 +313,7 @@ func offlineMsg(from, to int64, msg string) error {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", to)))
 	if err != nil {
 		return err
@@ -327,6 +340,7 @@ func offlineMsg(from, to int64, msg string) error {
 
 const create_strangers = "create table if not exists strangers (id INTEGER not null unique,name text not null unique,sex integer,birthday DATE not null,desc text,msgOffline text default '');"
 
+//call before dbMutex.Lock() , so not need call it inside it
 func strangerMsg(udb *sql.DB, from int64, msg string) error {
 	udb.Exec(create_strangers)
 	//update first
