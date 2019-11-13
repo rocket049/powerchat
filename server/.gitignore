@@ -1,3 +1,4 @@
 server
 *.exe
 /dbstore
+*.gz

@@ -34,8 +34,11 @@ var (
 func dbReconnect() error {
 	var err error
 	dbMutex.Lock()
-	db.Close()
-	db, err = sql.Open("sqlite3", filepath.Join(dbstore, "users.db"))
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		db, err = sql.Open("sqlite3", filepath.Join(dbstore, "users.db"))
+	}
 	dbMutex.Unlock()
 	return err
 }
@@ -53,6 +56,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	go func() {
+		for {
+			time.Sleep(time.Hour * 24)
+			dbReconnect()
+		}
+	}()
 }
 
 func dbClose() {

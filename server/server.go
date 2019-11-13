@@ -429,7 +429,7 @@ func (c *ClientType) Login(conn1 io.WriteCloser, msg *MsgType) error {
 	u1 := new(LogDgam)
 	err := json.Unmarshal(msg.Msg, u1)
 	if err != nil {
-		c.SysResp(conn1, CmdLogResult, err.Error())
+		c.SysResp(conn1, CmdLogResult, "FAIL "+err.Error())
 		return err
 	}
 	u, err := getUserByName(u1.Name)
