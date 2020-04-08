@@ -244,6 +244,14 @@ func (c *ClientType) SearchPersons(conn1 io.Writer, key string) error {
 		c.SysResp(conn1, CmdReturnPersons, "")
 		return err
 	}
+	for id, _ := range list1 {
+		_, ok := clients.Load(id)
+		if ok {
+			list1[id].Desc = "+" + list1[id].Desc
+		} else {
+			list1[id].Desc = "-" + list1[id].Desc
+		}
+	}
 	b, err := json.Marshal(list1)
 	if err != nil {
 		c.SysResp(conn1, CmdReturnPersons, "")
@@ -421,7 +429,7 @@ func (c *ClientType) Login(conn1 io.WriteCloser, msg *MsgType) error {
 	u1 := new(LogDgam)
 	err := json.Unmarshal(msg.Msg, u1)
 	if err != nil {
-		c.SysResp(conn1, CmdLogResult, err.Error())
+		c.SysResp(conn1, CmdLogResult, "FAIL "+err.Error())
 		return err
 	}
 	u, err := getUserByName(u1.Name)

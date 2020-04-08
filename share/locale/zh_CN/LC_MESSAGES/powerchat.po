@@ -304,8 +304,8 @@ msgstr "我的博客目录"
 msgid "Quit"
 msgstr "退出"
 
-msgid "Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"
-msgstr "发送文件或图片：拖放文件到此处，或按'Ctrl-V'粘贴文件到此处"
+msgid "Send File/Image Here: Drag file / Paste file / Double Click Here"
+msgstr "发送文件或图片：拖放文件 / 粘贴文件 / 双击此处"
 
 msgid "too many files"
 msgstr "一次只能发送一个文件"
@@ -405,3 +405,15 @@ msgstr "PC版主页"
 
 msgid "Sending:"
 msgstr "发送中："
+
+msgid "Fail send file : unknow error"
+msgstr "发送失败：未知错误"
+
+msgid "Fail send file : peer block"
+msgstr "发送失败：接收方忙"
+
+msgid "[File transfer complete]"
+msgstr "[文件发送完成]"
+
+msgid "GenerateLauncher"
+msgstr "加入启动菜单"

@@ -18,7 +18,11 @@ github.com/rocket049/gettext-go v0.0.0-3/go.mod h1:ml+YnSaBAssRogT+i9YB39QhSlo43
 github.com/rocket049/gettext-go v0.0.0-20190331 h1:eWHqZyGlyKel8ypEvL0d3BmeDTiVPoIv56wHZAD4hGc=
 github.com/rocket049/gettext-go v0.0.0-20190401 h1:QRdjAMQl40tvvYvAHSYG0LEoOmW0K0SRcuf1aWv9nmc=
 github.com/rocket049/gettext-go v0.0.0-20190401/go.mod h1:z+igV2QnnzHCjD2LPuccnBoTKIdh/7h8TLtgcsnepHk=
+github.com/rocket049/gettext-go v0.0.0-20190404 h1:7UGUP/mS4Oyh8h2X5eYd70+dGgQ1ryVgeDOZrzKEBvU=
+github.com/rocket049/gettext-go v0.0.0-20190404/go.mod h1:Gl6JTxggYLA0ZUsPaKhecbSWrGj763B6aAs90xel+QE=
 github.com/rocket049/gettext-go v0.0.0-20190401015911-0f61cc1d7242 h1:LABM/gUhFiwJAzvpN2bcV4Yg048FudYWt9vk4BJPF7Q=
+github.com/rocket049/gettext-go v0.0.0-20190404080233-af421a50b332 h1:Qfb1/EqZT9XVOp36Qu11kfb2NAC93xfUF9AkW4WO/cg=
+github.com/rocket049/gettext-go v0.0.0-20190404080233-af421a50b332/go.mod h1:kwHzDYyH1mBSE4+qy9lA14PHalXGgmolkS7Em8dwNOw=
 github.com/rocket049/gettext-go/gettext v0.0.0-20190401015911-0f61cc1d7242 h1:9UFZ1OtyCC1CzHnxvlE/MoH1BeUbm33OBw1d2PkCLJ0=
 github.com/rocket049/gettext-go/gettext v0.0.0-20190401015911-0f61cc1d7242/go.mod h1:8QdZbAX2FfdF8SvNORpsqGySpKw3qTBeq3FPCKxzUeA=
 github.com/rocket049/gettext-go/gettext v0.0.0-20190401020403-78db5cbd25b4 h1:k/m5OltaPGytgZAsXa7ddi6d0x5rJpbtwcOzM65OGZo=

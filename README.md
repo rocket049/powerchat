@@ -2,7 +2,12 @@
 
 英文名：`powerchat`
 
-linux / windows 加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
+`linux`/`windows` 加密聊天，分享文件，分享内容（markdown或html），TCP加密隧道
+
+### 在 ubuntu 19.04、debian 上运行的说明
+请使用 deb 版，下载 deb 包后用 apt 命令安装。
+
+安装命令：`apt install ./powerchat-x86_64.deb`
 
 ### Android 版主页
 

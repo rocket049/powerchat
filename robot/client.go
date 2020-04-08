@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 	servePort  int = 8890
 	user1      string
 	pwd1       string
+	retry      bool = false
 )
 
 func init() {
@@ -28,6 +30,7 @@ func init() {
 }
 
 func client() {
+	fmt.Println("start")
 	var cfg tls.Config
 	//	roots := x509.NewCertPool()
 	//	pem, _ := ioutil.ReadFile("pems/a-cert.pem")
@@ -36,20 +39,24 @@ func client() {
 	cfg.InsecureSkipVerify = true
 	conn1, err := tls.Dial("tcp", serverAddr, &cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer conn1.Close()
 	robotSrv.setConn(conn1)
 	go httpProxy2(conn1)
-	//replace httpServe and rpcSrv.startRpcSrv4Glib
-	res1 := make(chan bool, 1)
-	go localServe(conn1, res1)
-	//go httpServe(conn1)
-	go readConn(conn1)
-	ok := <-res1
-	close(res1)
+	var ok bool = true
+	if !retry {
+		res1 := make(chan bool, 1)
+		go localServe(conn1, res1)
+		ok = <-res1
+		close(res1)
+		retry = true
+	}
+
+	go startFileServ(conn1)
 	if ok {
-		startFileServ(conn1)
+		readConn(conn1)
 	}
 	fmt.Println("quit")
 }
@@ -184,8 +191,14 @@ func main() {
 	if ok == false {
 		log.Fatal("config file parse error\n")
 	}
-	httpChan = make(chan MsgType, 10)
-	client()
+	for {
+		httpChan = make(chan MsgType, 10)
+		fileChan = make(chan MsgType, 10)
+		client()
+		close(httpChan)
+		close(fileChan)
+		time.Sleep(time.Second * 10)
+	}
 }
 
 func getRelatePath(name1 string) string {

@@ -7,7 +7,7 @@ powerchat.exe:$(SRC) libclient.dll
 	if [ -f libclient.a ] ; then rm libclient.a; fi
 	valac -o powerchat.exe -X -mwindows -D WINDOWS $(VALACFLAGS) $(SRC)
 libclient.a:./libclient/*.go
-	go build -o libclient.a -buildmode=c-archive ./libclient
+	sh ./libclient/linux.sh
 libclient.dll:./libclient/*.go
 	sh ./libclient/dll.sh
 libclient.h:./libclient/*.go

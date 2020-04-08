@@ -108,6 +108,7 @@ func (c *PClient) Ping() error {
 		_, err := c.conn.Write(msg)
 		//log.Printf("ping %v\n", t1.Second())
 		if err != nil {
+			c.conn.Close()
 			return err
 		}
 		timer1.Reset(time.Second * 50)

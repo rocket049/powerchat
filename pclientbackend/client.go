@@ -8,7 +8,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -22,6 +24,10 @@ var (
 	servePort  int = 7890
 	pgPath     string
 	dataHome   string
+	retry      bool = false
+	nameRetry  string
+	pwdRetry   string
+	lServe     *localServer
 )
 
 func init() {
@@ -36,37 +42,43 @@ var (
 	cmdChan    chan MsgType
 	notifyChan chan MsgType
 )
+var onceClient sync.Once
 
-func client(ctl1 chan int) {
+func client() {
 	var cfg tls.Config
 	cfg.InsecureSkipVerify = true
 	conn1, err := tls.Dial("tcp", serverAddr, &cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer conn1.Close()
 
-	serveChan = make(chan MsgType, 1)
 	httpChan = make(chan MsgType, 10)
-	cmdChan = make(chan MsgType, 1)
-	notifyChan = make(chan MsgType, 1)
+
+	onceClient.Do(func() {
+		serveChan = make(chan MsgType, 1)
+		cmdChan = make(chan MsgType, 1)
+		notifyChan = make(chan MsgType, 1)
+	})
 
 	go httpProxy2(conn1)
-	//replace httpServe and cSrv.startcSrv4Glib
-	res1 := make(chan bool, 1)
-	go localServe(conn1, res1)
-	ok := <-res1
-	close(res1)
+
+	var ok bool = true
+	if !retry {
+		lServe = newLocalServer(conn1)
+		res1 := make(chan bool, 1)
+		go lServe.Serve(res1)
+		ok = <-res1
+		close(res1)
+	} else {
+		lServe.SetConn(conn1)
+	}
 	if ok {
-		ctl1 <- 1
 		readConn(conn1)
 	}
-	fmt.Println("quit")
+
 	close(httpChan)
-	close(serveChan)
-	close(notifyChan)
-	close(cmdChan)
-	os.Exit(0)
 }
 
 type UserInfo struct {
@@ -81,18 +93,45 @@ type UserInfo struct {
 func OnReady(msg *MsgType) {
 	token = msg.Msg
 	cSrv.token = msg.Msg
+	if retry {
+		go retry_login()
+	}
 }
 
 //goroutine replace httpServe and startcSrv4Glib
-func localServe(conn1 net.Conn, res1 chan bool) {
-	//only on connection
-	l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
+type localServer struct {
+	conn net.Conn
+}
+
+func newLocalServer(c net.Conn) *localServer {
+	cSrv.setConn(c)
+	return &localServer{conn: c}
+}
+
+func (s *localServer) SetConn(c net.Conn) {
+	s.conn = c
+	cSrv.setConn(c)
+}
+
+func (s *localServer) Serve(res1 chan bool) {
+	var l net.Listener
+	var err error
+	for i := 0; i < 8; i++ {
+		l, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", servePort))
+		if err == nil {
+			break
+		} else {
+			servePort++
+			proxyPort = servePort + 2000
+		}
+	}
 	if err != nil {
 		panic(err)
 	}
 	defer l.Close()
-	cSrv.setConn(conn1)
-	go startMyHttpServe(getRelatePath("ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
+
+	u1, _ := user.Current()
+	go startMyHttpServe(filepath.Join(u1.HomeDir, "ChatShare"), fmt.Sprintf("localhost:%d", proxyPort))
 	res1 <- true
 	go httpRespRouter()
 	for {
@@ -101,7 +140,7 @@ func localServe(conn1 net.Conn, res1 chan bool) {
 			log.Println("2.accept", err)
 			return
 		}
-		go httpResponse2(conn1, conn, httpId)
+		go httpResponse2(s.conn, conn, httpId)
 
 	}
 }
@@ -200,10 +239,14 @@ func main_init(dir, cfgSrc string) {
 		log.Fatal("config file parse error\n")
 	}
 
-	ctl1 := make(chan int, 1)
-	go client(ctl1)
-	<-ctl1
-	close(ctl1)
+	go func() {
+		for {
+			client()
+			log.Println("disconnect ,re-connect 10s later.")
+			time.Sleep(time.Second * 10)
+		}
+
+	}()
 }
 
 func getRelatePath(name1 string) string {

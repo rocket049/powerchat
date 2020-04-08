@@ -31,6 +31,18 @@ var (
 	dbstore string
 )
 
+func dbReconnect() error {
+	var err error
+	dbMutex.Lock()
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		db, err = sql.Open("sqlite3", filepath.Join(dbstore, "users.db"))
+	}
+	dbMutex.Unlock()
+	return err
+}
+
 func init() {
 	var err error
 	exe1, _ := os.Executable()
@@ -44,6 +56,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	go func() {
+		for {
+			time.Sleep(time.Hour * 24)
+			dbReconnect()
+		}
+	}()
 }
 
 func dbClose() {
@@ -84,6 +102,8 @@ func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int
 	}
 	sql1 := "insert into users(name,sex,birthday,desc,pwdmd5) values(?,?,date(?),?,?);"
 	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
 	_, err := db.Exec(sql1, name, sex, birthday, desc, pwdmd5)
 	if err != nil {
 		return 0, err
@@ -92,7 +112,7 @@ func insertUser(name string, sex int, birthday, desc string, pwdmd5 string) (int
 	row := db.QueryRow(sql2)
 	var res int64
 	err = row.Scan(&res)
-	dbMutex.Unlock()
+
 	return res, err
 }
 
@@ -172,9 +192,11 @@ func searchUsers(key string) (map[int64]*UserBaseInfo, error) {
 	dbMutex.Lock()
 	rows, err := db.Query(sql1, key)
 	dbMutex.Unlock()
+
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc)
@@ -194,6 +216,7 @@ func addFriend(uid, fid int64) error {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", uid)))
 	if err != nil {
 		return err
@@ -227,6 +250,7 @@ func getFriends(uid int64) (map[int64]*UserBaseInfo, error) {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", uid)))
 	if err != nil {
 		return nil, err
@@ -242,6 +266,7 @@ func getFriends(uid int64) (map[int64]*UserBaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc, &r1.MsgOffline)
@@ -275,6 +300,7 @@ func getStrangers(uid int64) (map[int64]*UserBaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		r1 := new(UserBaseInfo)
 		err := rows.Scan(&r1.Id, &r1.Name, &r1.Sex, &r1.Birthday, &r1.Desc, &r1.MsgOffline)
@@ -301,6 +327,7 @@ func offlineMsg(from, to int64, msg string) error {
 	}
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
+
 	udb, err := sql.Open("sqlite3", filepath.Join(dbstore, fmt.Sprintf("%d", to)))
 	if err != nil {
 		return err
@@ -310,8 +337,8 @@ func offlineMsg(from, to int64, msg string) error {
 	if err != nil {
 		return err
 	}
-	var offlineMsg = &offlineMsgData{Msg: msg[4:], Timestamp: time.Now().Format("2006-01-02 15:04:05")}
-	bv, err := json.Marshal(offlineMsg)
+	var offMsg = &offlineMsgData{Msg: msg[4:], Timestamp: time.Now().Format("2006-01-02 15:04:05")}
+	bv, err := json.Marshal(offMsg)
 	if err != nil {
 		return err
 	}
@@ -327,6 +354,7 @@ func offlineMsg(from, to int64, msg string) error {
 
 const create_strangers = "create table if not exists strangers (id INTEGER not null unique,name text not null unique,sex integer,birthday DATE not null,desc text,msgOffline text default '');"
 
+//call before dbMutex.Lock() , so not need call it inside it
 func strangerMsg(udb *sql.DB, from int64, msg string) error {
 	udb.Exec(create_strangers)
 	//update first

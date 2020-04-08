@@ -10,8 +10,9 @@ static LoginDialog login1;
 static AddUserDialog adduser1;
 static MultiSendUi msend_ui;
 static ChatClient client;
-static int RELEASE=39;
 static int LATESTVER=0;
+static int RELEASE=44; 
+const string ver = "1.3.22";          //44
 
 public struct UserMsg{
 	public int64 id;
@@ -150,7 +151,7 @@ public class MyGrid: GLib.Object{
 		Gtk.EventBox dropbox = new Gtk.EventBox();
 		dropbox.set_size_request(240,40);
 		mygrid.attach(dropbox,2,2,5,1);
-		droplabel = new Gtk.Label(_("Send File/Image Here: Drag a file Or Press Ctrl-V to paste a file"));
+		droplabel = new Gtk.Label(_("Send File/Image Here: Drag file / Paste file / Double Click Here"));
 		droplabel.wrap = true;
         droplabel.wrap_mode = Pango.WrapMode.CHAR;
 		droplabel.selectable = true;
@@ -161,6 +162,16 @@ public class MyGrid: GLib.Object{
 			var uris = data.get_uris();
 			send_uri1(uris);
 		});
+		dropbox.button_press_event.connect((e)=>{
+			var dlg = new Gtk.FileChooserDialog (_("Select a file to send"), app as Gtk.Window, Gtk.FileChooserAction.OPEN, 
+				_("Open"),Gtk.ResponseType.ACCEPT, _("Cancel"),Gtk.ResponseType.CANCEL);
+			var res = dlg.run();
+			if (res == Gtk.ResponseType.ACCEPT){
+				send_filename(dlg.get_filename());
+			}
+			dlg.destroy();
+			return true;
+			});
 		dropbox.key_press_event.connect((e)=>{
 			if(e.keyval==Gdk.Key.v && e.state==Gdk.ModifierType.CONTROL_MASK){
 				var clipboard1 = Gtk.Clipboard.@get(Gdk.Atom.NONE);
@@ -290,9 +301,20 @@ public class MyGrid: GLib.Object{
 		this.add_left_name_icon(this.uname,this.usex);
 		this.add_text(text1,true,true);
 	}
+	
+	public void send_filename(string fname){
+		if(FileUtils.test(fname, FileTest.IS_REGULAR)==false){
+			this.add_text(_("this is not a file")+@" : $(fname)");
+			return;
+		}
+		client.send_file(this.to, fname);
+		string text1 = @"<a href='$(GLib.Filename.to_uri(fname))'>$(GLib.Path.get_basename(fname))</a>";
+		this.add_left_name_icon(this.uname,this.usex);
+		this.add_text(text1,true,true);
+	}
 	public void send_msg(){
 		// 发送信息
-		if(this.to==0)
+		if(this.to==0 || this.entry1.text.length==0)
 			return;
 		client.ChatTo(this.to,this.entry1.text);
 		//var u = this.frds1[this.uid.to_string()];
@@ -510,7 +532,8 @@ label{
 			Gtk.ListBoxRow r = this.friends.get_row_at_y((int)e.y);
 			this.friends.select_row(r);
 			popup1.set_id( r.name );
-			popup1.popup_at_pointer(e);
+			//popup1.popup_at_pointer(e);
+            popup1.popup(null,null,null,e.button,e.get_time());
 			return true;
 		});
 
@@ -744,12 +767,8 @@ label{
                 Gtk.main_quit();
             }else if(msg[0:8]=="DELETE 0"){
                 this.add_text(_("[Operate Fail]"));
-            }else if(msg[0:8]=="ConnDown"){
-				var dlg_about = new Gtk.MessageDialog(app, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
-				dlg_about.text = _("Warning");
-				dlg_about.secondary_text = _("Disconnected from Server!\nPlease Restart powerchat!");
-				dlg_about.run();
-				dlg_about.destroy();
+            }else {
+				this.add_text(@"[SYS:$(msg)]");
 			}
 			//print("Cmd:%i From:%"+int64.FORMAT+" Msg:%s\n",typ,from,msg);
 			return;
@@ -773,6 +792,8 @@ label{
 			this.msgs = bak_msgs;
 			return;
 		}else if(typ1=="JSON"){
+			fname = @"ID:$(from)";
+		}else if(typ1=="F OK"){
 			fname = @"ID:$(from)";
 		}
 
@@ -809,6 +830,12 @@ label{
 			if( u==null )
 				break;
 			user_online(from);
+			break;
+		case "F OK":
+			this.add_right_name_icon(fname,fsex);
+			this.add_text(_("[File transfer complete]"));
+			msg_mark(from.to_string());
+			msg_notify(fname);
 			break;
 		}
 		GLib.Idle.add(()=>{
@@ -864,6 +891,9 @@ public void msg_notify(string uname){
 	return;
 #else
 	var app = application1;
+	if (app.get_active_window().is_active) {
+		return;
+	}
 	app.hold();
 	var notify1 = new Notification(_("New message"));
 	notify1.set_body(_("From: ")+uname);
@@ -877,6 +907,7 @@ public void version_notify(){
 	return;
 #else
 	var app = application1;
+	
 	app.hold();
 	var notify1 = new Notification(_("New Version Released!"));
 	notify1.set_body(_("Click here or click menu item 'Help->Upgrade' to get new version."));
@@ -989,7 +1020,10 @@ public class AppWin:Gtk.ApplicationWindow{
 
         item1 = new GLib.MenuItem(_("Upgrade"),"app.down-page");
         menu1.append_item(item1);
-
+#if ! WINDOWS
+		item1 = new GLib.MenuItem(_("GenerateLauncher"),"app.launcher");
+        menu1.append_item(item1);
+#endif
         item1 = new GLib.MenuItem(_("About"),"app.about");
         menu1.append_item(item1);
 
@@ -1022,7 +1056,7 @@ public class AppWin:Gtk.ApplicationWindow{
 		act2.activate.connect (() => {
 			application1.hold ();
 			var dlg_about = new Gtk.MessageDialog(this, Gtk.DialogFlags.MODAL, Gtk.MessageType.INFO, Gtk.ButtonsType.OK,null);
-			dlg_about.text = _("Copy Right: Fu Huizhong <fuhuizn@163.com>");
+			dlg_about.text = _("Copy Right: Fu Huizhong <fuhuizn@163.com>") +"\n\n        PowerChat "+ver;
 			//var markup = "<h2>Fu Huizhong <fuhuizn@163.com></h2><p><b>PC Homepage:</b><br/><a href='https://gitee.com/rocket049/powerchat'>https://gitee.com/rocket049/powerchat</a><br/><a href='https://github.com/rocket049/powerchat'>https://github.com/rocket049/powerchat</a><br/><b>Android Homepage:</b><br/><a href='https://gitee.com/sonichy/PowerChat_Android'>https://gitee.com/sonichy/PowerChat_Android</a></p>";
 			var markup = _("PC Homepage")+":\n<a href='https://gitee.com/rocket049/powerchat'>https://gitee.com/rocket049/powerchat</a>\n<a href='https://github.com/rocket049/powerchat'>https://github.com/rocket049/powerchat</a>\n"+_("Android Homepage")+":\n<a href='https://gitee.com/sonichy/PowerChat_Android'>https://gitee.com/sonichy/PowerChat_Android</a>";
             //dlg_about.secondary_text = "Fu Huizhong <fuhuizn@163.com>";
@@ -1211,6 +1245,15 @@ public class AppWin:Gtk.ApplicationWindow{
 		});
         act13.set_enabled(true);
 		application1.add_action (act13);
+		
+		SimpleAction act14 = new SimpleAction ("launcher", null);
+		act14.activate.connect (() => {
+			application1.hold ();
+			client.make_launcher();
+			application1.release ();
+		});
+        act14.set_enabled(true);
+		application1.add_action (act14);
 	}
 }
 

@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chai2010/gettext-go/gettext"
+	"github.com/rocket049/gettext-go/gettext"
 )
 
 func init() {
@@ -204,11 +204,11 @@ func (s *FileSender) Prepare(pathname string, to int64, conn1 io.Writer) {
 
 var fileResp = make(chan MsgType, 1)
 
-func (s *FileSender) SendFileHeader() (bool, uint32) {
+func (s *FileSender) SendFileHeader() int {
 	fh1, err := os.Stat(s.pathname)
 	if err != nil {
 		log.Println(err)
-		return false, 0
+		return 1
 	}
 	secs := strings.Split(s.pathname, ".")
 	var typ1 string
@@ -222,7 +222,7 @@ func (s *FileSender) SendFileHeader() (bool, uint32) {
 	b1, err := json.Marshal(fh2)
 	if err != nil {
 		log.Println(err)
-		return false, 0
+		return 1
 	}
 	msg, _ := MsgEncode(CmdFileHeader, 0, s.to, b1)
 	s.conn.Write(msg)
@@ -230,13 +230,16 @@ func (s *FileSender) SendFileHeader() (bool, uint32) {
 	res, ok := <-fileResp
 	if ok == false {
 		log.Println("internal error")
-		return false, 0
+		return 1
+	}
+	if res.Cmd == CmdFileBlock {
+		return 2
 	}
 	if binary.BigEndian.Uint32(res.Msg) != s.session {
-		return false, 0
+		return 1
 	}
 	s.size = fh1.Size()
-	return true, s.session
+	return 0
 }
 
 func (s *FileSender) CancelTrans() {
@@ -275,6 +278,7 @@ func (s *FileSender) SendFileBody() {
 	}
 	msg, _ := MsgEncode(CmdFileClose, 0, s.to, b1[:4])
 	s.conn.Write(msg)
+	notifyMsg(&MsgType{CmdChat, s.to, 0, []byte("F OK\n")})
 	s.mutex1.Lock()
 	s.running = false
 	s.mutex1.Unlock()

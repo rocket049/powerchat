@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -88,34 +89,37 @@ func (c *pChatClient) setToken(tk []byte) {
 
 func (c *pChatClient) setConn(connection net.Conn) {
 	c.conn = connection
-	go c.startPing()
+	c.startPing()
 }
 
 //startPing 心跳数据
 func (c *pChatClient) startPing() {
-	msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
-	for {
-		time.Sleep(time.Second * 60)
-		_, err := cSrv.conn.Write(msg)
-		if err != nil {
-			cSrv.conn.Close()
-			break
+	loop1 := func(conn1 net.Conn) {
+		msg, _ := MsgEncode(CmdPing, 0, 0, []byte("\n"))
+		for {
+			time.Sleep(time.Second * 60)
+			_, err := conn1.Write(msg)
+			if err != nil {
+				break
+			}
 		}
 	}
+
+	go loop1(c.conn)
+
 }
 
 func (c *pChatClient) setID(ident int64) {
 	c.id = ident
 }
 
-var hasInit bool = false
+var onceInit sync.Once
 
 //GetChatClient 初始化，参数：数据目录路径
 func GetChatClient(dataDir, cfgSrc string) *ChatClient {
-	if !hasInit {
+	onceInit.Do(func() {
 		main_init(dataDir, cfgSrc)
-		hasInit = true
-	}
+	})
 	return new(ChatClient)
 }
 
@@ -217,6 +221,9 @@ func (c *ChatClient) CheckPwd(name, pwd string) int {
 //Login 参数：name ,password
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) Login(name, pwd string) *UserDataRet {
+	nameRetry = name
+	pwdRetry = pwd
+	retry = true
 	dgam := &LogDgam{Name: name, Pwdmd5: loginMd5(name, pwd, cSrv.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
@@ -260,6 +267,16 @@ func (c *ChatClient) Login(name, pwd string) *UserDataRet {
 		Age: time.Now().Year() - u.Birthday.Year(), Desc: u.Desc, Timestamp: "", Msg: ""}
 }
 
+func retry_login() {
+	dgam := &LogDgam{Name: nameRetry, Pwdmd5: loginMd5(nameRetry, pwdRetry, cSrv.token)}
+	bmsg, _ := json.Marshal(dgam)
+	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
+	cSrv.conn.Write(msg)
+	<-cmdChan
+
+	notifyMsg(&MsgType{CmdChat, 0, 0, []byte("Re-Connected.")})
+}
+
 //GetFriends 返回联系人列表和离线信息,阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) GetFriends() *UserDataArray {
 	req, _ := MsgEncode(CmdGetFriends, cSrv.id, 0, []byte("\n"))
@@ -299,31 +316,25 @@ func (c *ChatClient) GetFriends() *UserDataArray {
 	return &UserDataArray{Users: ret, pos: 0}
 }
 
-//UserStatus 参数：id int64，返回值：0-offline，1-online
+//UserStatus 参数：id int64，返回值：0-offline，1-online，超时：5s
 //阻塞函数，最好在线程中运行或者用异步函数包装
 func (c *ChatClient) UserStatus(uid int64) int {
 	req, _ := MsgEncode(CmdUserStatus, 0, uid, []byte("\n"))
 	cSrv.conn.Write(req)
 	var resp MsgType
-	var ok bool
-	for {
-		resp, ok = <-cmdChan
-		if ok == false {
-			return 0
-		}
+	select {
+	case <-time.After(time.Second * 5):
+		return 0
+	case resp = <-cmdChan:
 		if resp.Cmd == CmdUserStatus {
-			break
+			if string(resp.Msg) == "Y" {
+				return 1
+			}
 		} else {
 			cmdChan <- resp
-			time.Sleep(time.Millisecond * 100)
 		}
 	}
-
-	if string(resp.Msg) == "Y" {
-		return 1
-	} else {
-		return 0
-	}
+	return 0
 }
 
 //QueryID 查询陌生人信息，返回 UserDataRet 结构体，参数：ID int64， msg stirng。 msg - 接受到的陌生人信息
@@ -534,24 +545,24 @@ type SFParam struct {
 	PathName string
 }
 
-//SendFile 发送文件，参数：id,pathname
-func (c *ChatClient) SendFile(to int64, pathName string) {
+//SendFile 发送文件，参数：id,pathname；返回值: 0-成功，正在传送；1-内部错误；2-接收方忙。
+func (c *ChatClient) SendFile(to int64, pathName string) int {
 	param := &SFParam{To: to, PathName: pathName}
 	if cSrv.fileSend != nil {
 		if cSrv.fileSend.status() {
-			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
-			return
+			return 1
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.prepare(param.PathName, param.To, cSrv.conn)
-	ok, _ := sender.sendFileHeader()
-	if ok == false {
-		return
+	ret := sender.sendFileHeader()
+	if ret > 0 {
+		return ret
 	}
 	cSrv.fileSend = sender
 	go sender.sendFileBody()
+	return 0
 }
 
 //AddFriend 加入联系人
@@ -577,6 +588,7 @@ func (c *ChatClient) GetProxyPort() int {
 //Quit 退出
 func (c *ChatClient) Quit() {
 	cSrv.conn.Close()
+	os.Exit(0)
 }
 
 //GetHost 返回服务器 IP:PORT

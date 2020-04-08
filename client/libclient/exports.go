@@ -58,6 +58,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -198,7 +199,10 @@ func checkPwd(name, pwd string) int {
 
 //export Client_Login
 func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
-	dgam := &LogDgam{Name: C.GoString(name), Pwdmd5: loginMd5(C.GoString(name), C.GoString(pwd), cSrv.token)}
+	nameRetry = C.GoString(name)
+	pwdRetry = C.GoString(pwd)
+	retry = true
+	dgam := &LogDgam{Name: nameRetry, Pwdmd5: loginMd5(nameRetry, pwdRetry, cSrv.token)}
 	bmsg, _ := json.Marshal(dgam)
 	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
 	cSrv.conn.Write(msg)
@@ -239,6 +243,16 @@ func Client_Login(name, pwd *C.char, p *C.struct_UserData) C.int {
 	C.FillUserData(p, C.gint64(u.Id), C.CString(u.Name), C.int(u.Sex),
 		C.int(time.Now().Year()-u.Birthday.Year()), C.CString(u.Desc))
 	return C.int(1)
+}
+
+func retry_login() {
+	dgam := &LogDgam{Name: nameRetry, Pwdmd5: loginMd5(nameRetry, pwdRetry, cSrv.token)}
+	bmsg, _ := json.Marshal(dgam)
+	msg, _ := MsgEncode(CmdLogin, 0, 0, bmsg)
+	cSrv.conn.Write(msg)
+	<-cmdChan
+
+	notifyMsg(&MsgType{CmdChat, 0, 0, []byte("Re-Connected.")})
 }
 
 type msgOfflineData struct {
@@ -309,25 +323,19 @@ func Client_UserStatus(uid C.gint64) C.int {
 	req, _ := MsgEncode(CmdUserStatus, 0, int64(uid), []byte("\n"))
 	cSrv.conn.Write(req)
 	var resp MsgType
-	var ok bool
-	for {
-		resp, ok = <-cmdChan
-		if ok == false {
-			return 0
-		}
+	select {
+	case <-time.After(time.Second * 5):
+		return 0
+	case resp = <-cmdChan:
 		if resp.Cmd == CmdUserStatus {
-			break
+			if string(resp.Msg) == "Y" {
+				return 1
+			}
 		} else {
 			cmdChan <- resp
-			time.Sleep(time.Millisecond * 100)
 		}
 	}
-
-	if string(resp.Msg) == "Y" {
-		return 1
-	} else {
-		return 0
-	}
+	return 0
 }
 
 //export Client_QueryID
@@ -430,7 +438,19 @@ func Client_SearchPersons(key *C.char, callback unsafe.Pointer) {
 		return
 	}
 	//ret := []FriendData{}
+	frdArray := []UserBaseInfo{}
 	for _, v := range frds {
+		frdArray = append(frdArray, v)
+	}
+	sort.SliceStable(frdArray, func(i, j int) bool {
+		a := frdArray[i].Desc[0:1]
+		b := frdArray[j].Desc[0:1]
+		if a == b {
+			return frdArray[i].Id < frdArray[j].Id
+		}
+		return a < b
+	})
+	for _, v := range frdArray {
 		//ret = append(ret, FriendData{Id: v.Id, Name: v.Name, Sex: v.Sex,
 		//Age: time.Now().Year() - v.Birthday.Year(), Desc: v.Desc})
 		if v.Id == cSrv.id {
@@ -575,23 +595,24 @@ type SFParam struct {
 }
 
 //export Client_SendFile
-func Client_SendFile(to C.gint64, pathName *C.char) {
+func Client_SendFile(to C.gint64, pathName *C.char) C.int {
 	param := &SFParam{To: int64(to), PathName: C.GoString(pathName)}
 	if cSrv.fileSend != nil {
 		if cSrv.fileSend.Status() {
 			notifyMsg(&MsgType{Cmd: CmdChat, From: 0, To: 0, Msg: []byte("OneOnly!\n")})
-			return
+			return 1
 		}
 	}
 	//log.Println(param.PathName);
 	var sender = new(FileSender)
 	sender.Prepare(param.PathName, param.To, cSrv.conn)
-	ok, _ := sender.SendFileHeader()
-	if ok == false {
-		return
+	ret := sender.SendFileHeader()
+	if ret > 0 {
+		return C.int(ret)
 	}
 	cSrv.fileSend = sender
 	go sender.SendFileBody()
+	return 0
 }
 
 //export Client_AddFriend
@@ -668,6 +689,11 @@ func Client_DeleteMe(name, pwd *C.char) C.int {
 func Client_GetPgPath(p **C.char) {
 	filepath1, _ := os.Executable()
 	*p = C.CString(fmt.Sprintf("%s", filepath.Dir(filepath1)))
+}
+
+//export Client_MakeLauncher
+func Client_MakeLauncher() {
+	makeLauncher()
 }
 
 //main
