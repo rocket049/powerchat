@@ -3,6 +3,7 @@ using Gdk;
 using Pango;
 using Gee;
 using Json;
+using AppIndicator;
 
 static AppWin app;
 static MyGrid grid1;
@@ -917,7 +918,7 @@ public void version_notify(){
 #endif
 }
 public class AppWin:Gtk.ApplicationWindow{
-	Gtk.StatusIcon tray1;
+	AppIndicator.Indicator tray1;
 	Gdk.Pixbuf icon1;
 	Gdk.Pixbuf icon2;
 	Gtk.VBox box1;
@@ -936,11 +937,45 @@ public class AppWin:Gtk.ApplicationWindow{
 		this.hide_titlebar_when_maximized = true;
 
         this.set_resizable(false);
-        var icon_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","tank.png");
-        this.set_icon_from_file(icon_path);
-        this.icon1 = new Gdk.Pixbuf.from_file(icon_path);
-        this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","msg.png"));
-        this.tray1 = new Gtk.StatusIcon.from_pixbuf(this.icon1);
+        //var icon_path = GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","tank.png");
+        //this.set_icon_from_file(icon_path);
+        //this.icon1 = new Gdk.Pixbuf.from_file(icon_path);
+        //this.icon2 = new Gdk.Pixbuf.from_file(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,"..","share","icons","powerchat","msg.png"));
+        this.tray1 = new Indicator("powerchat", "tank", IndicatorCategory.APPLICATION_STATUS);
+        this.tray1.set_icon_theme_path(GLib.Path.build_path(GLib.Path.DIR_SEPARATOR_S,prog_path,
+                "..","share","icons","powerchat"));
+        this.tray1.set_attention_icon("msg");
+        var menu = new Gtk.Menu();
+
+        var item = new Gtk.MenuItem.with_label(_("Show/Hide Window"));
+        item.activate.connect(() => {
+            if (counter == 0){
+				this.hide();
+				counter = 1;
+			} else{
+				this.show();
+				counter = 0;
+                this.set_keep_above(true);
+			}
+        });
+        item.show();
+        menu.append(item);
+
+        item = new Gtk.MenuItem.with_label(_("Quit"));
+        item.activate.connect(()=>{
+            application1.hold ();
+			// Print "Bye!" to our console:
+			print ("Bye!\n");
+			grid1.release_resource();
+			// Terminate the mainloop: (main returns 0)
+			Gtk.main_quit ();
+			application1.release ();
+        });
+        item.show();
+
+        menu.append(item);
+        this.tray1.set_menu(menu);
+        /*
 		this.tray1.set_visible(false);
 		this.tray1.activate.connect(()=>{
 			if (counter == 0){
@@ -952,11 +987,12 @@ public class AppWin:Gtk.ApplicationWindow{
                 this.set_keep_above(true);
 			}
 		});
+		*/
 		this.set_focus_child.connect((w)=>{
 			this.set_keep_above(false);
 		});
 		this.show.connect(()=>{
-			this.tray1.set_visible(true);
+			//this.tray1.set_visible(true);
 			if(grid1.mark_num==0){
 				this.clear_notify();
 			}
@@ -972,13 +1008,13 @@ public class AppWin:Gtk.ApplicationWindow{
 		this.setup_menubar();
 	}
 	public void update_tooltip(){
-		this.tray1.set_tooltip_text(_("Everyone Publish!")+" - "+@"$(grid1.uname)@$(grid1.host)"+"\n"+_("(Click to Hide/Show)"));
+		this.tray1.set_title(_("Everyone Publish!")+" - "+@"$(grid1.uname)@$(grid1.host)"+"\n"+_("(Click to Hide/Show)"));
 	}
 	public void tray_notify(){
-		this.tray1.set_from_pixbuf(this.icon2);
+		this.tray1.set_status(IndicatorStatus.ATTENTION);
 	}
 	public void clear_notify(){
-		this.tray1.set_from_pixbuf(this.icon1);
+		this.tray1.set_status(IndicatorStatus.ACTIVE);
 	}
 	public void append(Gtk.Widget w){
 		this.box1.pack_start(w);

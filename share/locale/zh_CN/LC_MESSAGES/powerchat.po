@@ -417,3 +417,6 @@ msgstr "[文件发送完成]"
 
 msgid "GenerateLauncher"
 msgstr "加入启动菜单"
+
+msgid "Show/Hide Window"
+msgstr "显示或隐藏窗口"
