@@ -32,6 +32,7 @@ public class MyGrid: GLib.Object{
 	Gtk.Label droplabel;
 	public Gtk.Entry port1;
 	int64 to;
+	string last_from="";
 	bool running = true;
 	//public MyBrowser browser;
 
@@ -268,11 +269,14 @@ public class MyGrid: GLib.Object{
 				this.msg_win.remove(this.msgs);
 			}
 			this.msgs = this.boxes[id.to_string()];
+			
 			this.msg_win.add(this.msgs);
 			Gtk.Grid grid = this.frd_boxes[id.to_string()];
 			var sc3 = grid.get_style_context();
+			//print("before crash 1\n");
 			sc3.remove_provider(this.mark1);
 			if ( sc3.has_class("mark") ){
+			    //print("before crash 2\n");
 				sc3.remove_class("mark");
 				this.mark_num--;
 				if (this.mark_num==0)
@@ -282,9 +286,10 @@ public class MyGrid: GLib.Object{
 			}else{
 				this.msg_win.show_all();
 			}
+			//print("before crash 3\n");
 			scroll_msgbox();
 		});
-
+        //print("before crash 4\n");
 		set_css_once();
 	}
 	public void send_uri1(string[] uris){
@@ -551,6 +556,27 @@ label{
 		r.name="";
 		//r.hide();
 		this.friends.remove( r );
+	}
+	
+	public void set_last_from(string fid) {
+	    this.last_from=fid;
+	}
+	public void select_last_from() {
+	    if(this.last_from==""){
+	        return;
+	    } 
+	    var grid = this.frd_boxes[this.last_from];
+	    Gtk.ListBoxRow r = grid.get_parent() as Gtk.ListBoxRow;
+	    this.friends.select_row(r);
+	}
+	public string get_user_id(string uname) {
+	    foreach( var v in this.frds1.values ){
+	        if( v.name==uname ){
+	            //print (@"get_user_id: $(v.id) - $(uname)\n");
+	            return v.id.to_string();
+	        }
+	    }
+	    return "";
 	}
 	public void add_right_name_icon(string name,int16 sex){
 		string iconp;
@@ -899,6 +925,12 @@ public void msg_notify(string uname){
 	var notify1 = new Notification(_("New message"));
 	notify1.set_body(_("From: ")+uname);
 	notify1.set_default_action("app.show-win");
+	
+	var fid=grid1.get_user_id(uname);
+	if (fid!="") {
+	    grid1.set_last_from(fid);
+	}
+	
 	app.send_notification(null,notify1);
 	app.release();
 #endif
@@ -996,6 +1028,7 @@ public class AppWin:Gtk.ApplicationWindow{
 			if(grid1.mark_num==0){
 				this.clear_notify();
 			}
+			grid1.select_last_from();
 		});
 		// Method called on pressing [X]
 		this.set_destroy_with_parent(false);
